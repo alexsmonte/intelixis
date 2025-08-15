@@ -1,0 +1,147 @@
+<?php
+
+$this->BreadcrumbsPlus->add([['title' => '{{ pluralHumanName }}']]);
+
+?>
+
+<?= $this->element('barra-titulo',['title' => $title]); ?>
+
+<div class="card w-100 position-relative overflow-hidden">
+<div class="px-4 py-3 border-bottom">
+<div class="card-body p-4">
+<div class="d-flex mb-1 align-items-center">
+<h4 class="card-title mb-0"><?= __('{{ pluralHumanName }}') ?></h4>
+<div class="ms-auto flex-shrink-0">
+<button class="btn bg-primary-subtle text-primary "  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<i class="fa fa-bars" aria-hidden="true"></i>
+</button>
+<ul class="dropdown-menu animated flipInX">
+{% set fields = Bake.filterFields(fields, schema, modelObject, indexColumns, ['binary', 'text']) %}
+<li><?= $this->Html->link('<i class="fa fa-plus" aria-hidden="true"></i> Novo {{ singularHumanName }}', ['action' => 'novo'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
+{% set done = [] %}
+<li><?= $this->Html->link('<i class="fa fa-print" aria-hidden="true"></i> Imprimir esta página', ['action' => 'imprimir'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
+<li><?= $this->Html->link('<i class="fa fa-print" aria-hidden="true"></i> Imprimir tudo', ['action' => 'imprimir'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
+</ul>
+</div>
+</div>
+{% set fields = Bake.filterFields(fields, schema, modelObject) %}
+<div class="row">
+
+{% for field in fields %}
+{%- if field not in primaryKey %}
+{%- if keyFields[field] is defined %}
+{%- set fieldData = Bake.columnData(field, schema) %}
+{%- if fieldData.null %}
+<div class="col-md-3 mb-3">
+<?= $this->Form->control('{{ field }}', ['label'=>'{{ field }}','options' => ${{ keyFields[field] }}, 'empty' => true]); ?>
+</div>
+{%- else %}
+<div class="col-md-3 mb-3">
+<?=  $this->Form->control('{{ field }}', ['label'=>'{{ field }}','options' => ${{ keyFields[field] }}]); ?>
+</div>
+{%- endif %}
+{%- elseif field not in ['created', 'modified', 'updated'] %}
+{%- set fieldData = Bake.columnData(field, schema) %}
+<div class="col-md-3 mb-3">
+<?= $this->Form->control('{{ field }}', ['label'=>'{{ field }}', 'class'=>'form-control']); ?>
+</div>
+{%- endif %}
+{%- endif %}
+{%- endfor %}
+
+{%- if associations.BelongsToMany is defined %}
+{%- for assocName, assocData in associations.BelongsToMany %}
+<div class="col-md-3 mb-3">
+<?=  $this->Form->control('{{ assocData.property }}._ids', ['label'=>'{{ field }}', 'class'=>'form-control', 'options' => ${{ assocData.variable }}]); ?>
+</div>
+{%- endfor %}
+{% endif %}
+<div class="col-md-12 mb-3">
+<div class="row">
+<div class="col-md-2 offset-md-10  mb-3">
+<button type="button" class="justify-content-center w-100 btn btn-primary d-flex align-items-center">Pesquisar</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="table-responsive mb-4 border rounded-1">
+<table class="table table-striped text-nowrap mb-0 align-middle">
+<thead class="text-dark fs-4">
+<tr>
+{% for field in fields %}
+<th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('{{ field }}') ?></h6></th>
+{% endfor %}
+<th><?= __('Opções') ?></th>
+</tr>
+</thead>
+<tbody>
+<?php foreach (${{ pluralVar }} as ${{ singularVar }}): ?>
+<tr>
+{% for field in fields %}
+{% set isKey = false %}
+{% if associations.BelongsTo is defined %}
+{% for alias, details in associations.BelongsTo %}
+{% if field == details.foreignKey %}
+{% set isKey = true %}
+<td><p class="mb-0 fw-normal fs-4"><?= ${{ singularVar }}->hasValue('{{ details.property }}') ? $this->Html->link(${{ singularVar }}->{{ details.property }}->{{ details.displayField }}, ['controller' => '{{ details.controller }}', 'action' => 'view', ${{ singularVar }}->{{ details.property }}->{{ details.primaryKey[0] }}]) : '' ?></p></td>
+{% endif %}
+{% endfor %}
+{% endif %}
+{% if isKey is not same as(true) %}
+{% set columnData = Bake.columnData(field, schema) %}
+{% set supportsLabel = Bake.enumSupportsLabel(field, schema) %}
+{% if columnData.type starts with 'enum-' %}
+<td><p class="mb-0 fw-normal fs-4"><?= ${{ singularVar }}->{{ field }} === null ? '' : h(${{ singularVar }}->{{ field }}->{% if supportsLabel %}label(){% else %}value{% endif %}) ?></p></td>
+{% elseif columnData.type not in ['integer', 'float', 'decimal', 'biginteger', 'smallinteger', 'tinyinteger','boolean'] %}
+<td><p class="mb-0 fw-normal fs-4"><?= h(${{ singularVar }}->{{ field }}) ?> </p></td>
+{% elseif columnData.type in ['boolean'] %}
+<td><?= ${{ singularVar }}->{{ field }} == 1 ? '<span class="badge bg-success-subtle text-success">Ativo</span>' : '<span class="badge bg-warning-subtle text-warning">Não</span>'; ?></td>
+{% elseif columnData.null %}
+<td><p class="mb-0 fw-normal fs-4"><?= ${{ singularVar }}->{{ field }} === null ? '' : $this->Number->format(${{ singularVar }}->{{ field }}) ?></p></td>
+{% else %}
+<td><p class="mb-0 fw-normal fs-4"><?= $this->Number->format(${{ singularVar }}->{{ field }}) ?></p></td>
+{% endif %}
+{% endif %}
+{% endfor %}
+{% set pk = '$' ~ singularVar ~ '->' ~ primaryKey[0] %}
+<td>
+<div class="btn-group">
+<button class="btn btn-warning dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+Opções
+</button>
+<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+<li><?= $this->Html->link('Visualizar', ['action' => 'view', {{ pk|raw }}],['class'=>'dropdown-item','escape'=>false]) ?></li>
+<li><?= $this->Html->link('Editar', ['action' => 'edit', {{ pk|raw }}],['class'=>'dropdown-item','escape'=>false]) ?> </li>
+<li>
+<?= $this->Form->postLink(
+'Excluir',
+['action' => 'delete', {{ pk|raw }}],
+[
+'class'=>'dropdown-item',
+'escape'=>false,
+'method' => 'delete',
+'confirm' => __('Tem certeza que deseja excluir # {0}?', {{ pk|raw }}),
+]
+) ?>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+<?php endforeach; ?>
+</tbody>
+</table>
+<div class="paginator mt-4">
+<ul class="pagination justify-content-center">
+<?= $this->Paginator->first('<< ') ?>
+<?= $this->Paginator->prev('< ') ?>
+<?= $this->Paginator->numbers() ?>
+<?= $this->Paginator->next(' >') ?>
+<?= $this->Paginator->last(' >>') ?>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
