@@ -1,0 +1,54 @@
+{% set fields = Bake.filterFields(fields, schema, modelObject) %}
+
+            <?= $this->Form->create(${{ singularVar }}) ?>
+            <div class="row">
+{% for field in fields %}
+{%- if field not in primaryKey %}
+    {%- if keyFields[field] is defined %}
+        {%- set fieldData = Bake.columnData(field, schema) %}
+        {%- if fieldData.null %}
+                <div class="col-md-3 mb-3">
+                    <?= $this->Form->control('{{ field }}', ['label' => '{{ field }}','class' => 'form-control','options' => ${{ keyFields[field] }}, 'empty' => true]); ?>
+                </div>
+                    {{- "\n" }}
+        {%- else %}
+                <div class="col-md-3 mb-3">
+                    <?= $this->Form->control('{{ field }}', ['label' => '{{ field }}','class' => 'form-control','options' => ${{ keyFields[field] }}]); ?>
+                </div>
+                    {{- "\n" }}
+        {%- endif %}
+    {%- elseif field not in ['created', 'modified', 'updated'] %}
+        {%- set fieldData = Bake.columnData(field, schema) %}
+        {%- if fieldData.type in ['date', 'datetime', 'time'] and fieldData.null %}
+            <div class="col-md-3 mb-3">
+                    <?= $this->Form->control('{{ field }}', ['label' => '{{ field }}','class' => 'form-control','empty' => true]); ?>
+            </div>
+                    {{- "\n" }}
+        {%- else %}
+            <div class="col-md-3 mb-3">
+                    <?= $this->Form->control('{{ field }}',['label' => '{{ field }}','class' => 'form-control',]); ?>
+            </div>
+                    {{- "\n" }}
+        {%- endif %}
+    {%- endif %}
+{%- endif %}
+{%- endfor %}
+
+{%- if associations.BelongsToMany is defined %}
+{%- for assocName, assocData in associations.BelongsToMany %}
+    <div class="col-md-3 mb-3">
+                    <?= $this->Form->control('{{ assocData.property }}._ids', ['label' => '{{ field }}','class' => 'form-control','options' => ${{ assocData.variable }}]); ?>
+    </div>
+                    {{- "\n" }}
+{%- endfor %}
+{% endif %}
+    <div class="col-md-12">
+    <div class="row">
+        <div class="col-md-2 offset-md-10  mb-3">
+    <?= $this->Form->button(__('Salvar'),['class' => 'justify-content-center w-100 btn btn-success d-flex align-items-center']) ?>
+        </div>
+    <?= $this->Form->end() ?>
+    </div>
+    </div>
+
+</div>

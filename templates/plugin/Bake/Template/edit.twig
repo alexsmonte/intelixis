@@ -1,0 +1,38 @@
+<?php
+/**
+ * @var \{{ namespace }}\View\AppView $this
+ * @var \{{ entityClass }} ${{ singularVar }}
+        {{- "\n" }}
+{%- if associations.BelongsTo is defined %}
+    {%- for assocName, assocData in associations.BelongsTo %}
+ * @var string[]|\Cake\Collection\CollectionInterface ${{ assocData.variable }}
+        {{- "\n" }}
+    {%- endfor %}
+{% endif %}
+{%- if associations.BelongsToMany is defined %}
+    {%- for assocName, assocData in associations.BelongsToMany %}
+ * @var string[]|\Cake\Collection\CollectionInterface ${{ assocData.variable }}
+        {{- "\n" }}
+    {%- endfor %}
+{% endif %}
+ */
+?>
+
+<?php
+
+$this->BreadcrumbsPlus->add([['title' => '{{ pluralHumanName }}', 'url'=>['controller' => '{{ pluralHumanName }}', 'action' => 'index']],['title'=> 'Novo']]);
+
+?>
+
+<?= $this->element('barra-titulo',['title' => $title]); ?>
+
+<div class="card w-100 position-relative overflow-hidden">
+    <div class="px-4 py-3 border-bottom">
+        <div class="card-body p-4">
+            <div class="d-flex mb-3 align-items-center">
+                <h4 class="card-title mb-0"><?= __('{{ pluralHumanName }}') ?></h4>
+            </div>
+            {{ element('Bake.form') }}
+        </div>
+    </div>
+</div>
