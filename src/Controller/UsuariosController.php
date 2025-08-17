@@ -17,7 +17,7 @@ class UsuariosController extends AppController
         parent::beforeFilter($event);
         // Configure the login action to not require authentication, preventing
         // the infinite redirect loop issue
-        $this->Authentication->addUnauthenticatedActions(['login','criarConta']);
+        $this->Authentication->addUnauthenticatedActions(['login']);
     }
     /**
      * Index method
@@ -30,7 +30,9 @@ class UsuariosController extends AppController
             ->contain(['Contas']);
         $usuarios = $this->paginate($query);
 
-        $this->set(compact('usuarios'));
+        $title  =   'Meus usuários';
+
+        $this->set(compact('usuarios','title'));
     }
 
     /**
@@ -117,7 +119,6 @@ class UsuariosController extends AppController
 
         $this->request->allowMethod(['get','post']);
         $result = $this->Authentication->getResult();
-
 
         if ($result && $result->isValid()) {
 

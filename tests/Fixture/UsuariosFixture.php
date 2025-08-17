@@ -32,8 +32,8 @@ class UsuariosFixture extends TestFixture
                 'password' => 'Lorem ipsum dolor sit amet',
                 'ativar' => 1,
                 'tipo' => 'Lorem ipsum dolor sit amet',
-                'created' => '2025-08-17 02:01:16',
-                'modified' => '2025-08-17 02:01:16',
+                'created' => '2025-08-17 02:26:45',
+                'modified' => '2025-08-17 02:26:45',
             ],
         ];
         parent::init();

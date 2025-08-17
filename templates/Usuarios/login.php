@@ -11,7 +11,7 @@
                 </a>
                 <?= $this->Form->create(null) ?>
                     <div class="mb-3">
-                        <?= $this->Form->control('login',['label'=>'Nome de usuário', 'class'=>'form-control']);?>
+                        <?= $this->Form->control('email',['label'=>'Nome de usuário', 'class'=>'form-control']);?>
                     </div>
                     <div class="mb-4">
                         <?= $this->Form->control('password',['label'=>'Senha', 'class'=>'form-control']);?>
@@ -23,7 +23,7 @@
                     <?= $this->Flash->render() ?>
                     <div class="d-flex align-items-center justify-content-center">
                         <p class="fs-4 mb-0 fw-medium">Ainda não tem conta?</p>
-                        <?= $this->Html->link(__('Criar uma conta'), ['action' => 'criar_conta'],['class'=>'text-primary fw-medium ms-2']) ?>
+                        <?= $this->Html->link(__('Criar uma conta'), ['controller'=>'Contas','action' => 'criar_conta'],['class'=>'text-primary fw-medium ms-2']) ?>
                     </div>
                 <?= $this->Form->end() ?>
             </div>

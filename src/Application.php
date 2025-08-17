@@ -117,7 +117,7 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
         // Identificador (define tabela e campos)
         $authenticationService->loadIdentifier('Authentication.Password', [
             'fields' => [
-                'username' => 'login',
+                'username' => 'email',
                 'password' => 'password',
             ],
             'resolver' => [
@@ -131,7 +131,7 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
         $authenticationService->loadAuthenticator('Authentication.Session');
         $authenticationService->loadAuthenticator('Authentication.Form', [
             'fields' => [
-                'username' => 'login',
+                'username' => 'email',
                 'password' => 'password',
             ]
         ]);

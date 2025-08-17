@@ -1,6 +1,6 @@
 <?php
 
-$cakeDescription = 'JSC: Soluções inteligentes';
+$cakeDescription = 'Intelixis: Soluções inteligentes';
 use Cake\Core\Configure;
 
 ?>

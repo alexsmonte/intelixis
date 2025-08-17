@@ -10,6 +10,42 @@ namespace App\Controller;
  */
 class ContasController extends AppController
 {
+
+    public function beforeFilter(\Cake\Event\EventInterface $event): void
+    {
+        parent::beforeFilter($event);
+        // Configure the login action to not require authentication, preventing
+        // the infinite redirect loop issue
+        $this->Authentication->addUnauthenticatedActions(['criarConta']);
+    }
+
+    public function criarConta()
+    {
+        $conta = $this->Contas->newEmptyEntity();
+
+        if ($this->request->is('post')) {
+
+            $dadosContas    =   $this->request->getData();
+
+            $dadosContas["ativar"]                  =   1;
+            $dadosContas["usuarios"][0]["nome"]     =   $dadosContas["nome"];
+            $dadosContas["usuarios"][0]["email"]    =   $dadosContas["email"];
+            $dadosContas["usuarios"][0]["ativar"]   =   1;
+            $dadosContas["usuarios"][0]["tipo"]     =   'master';
+
+            $conta = $this->Contas->patchEntity($conta, $dadosContas,['associated' => ['Usuarios']]);
+
+            if ($this->Contas->save($conta)) {
+                $this->Flash->success(__('Conta criar com sucesso'));
+
+                return $this->redirect(['action' => 'index']);
+            }
+            $this->Flash->error(__('Ocorreu um erro ao tentar criar sua conta'));
+        }
+
+        $this->set(compact('conta'));
+    }
+
     /**
      * Index method
      *
@@ -32,29 +68,8 @@ class ContasController extends AppController
      */
     public function view($id = null)
     {
-        $conta = $this->Contas->get($id, contain: ['Extensoes', 'Assinaturas', 'Usuarios', 'Whatsapps']);
+        $conta = $this->Contas->get($id, contain: ['Assinaturas', 'Estabelecimentos', 'Usuarios', 'Whatsapps']);
         $this->set(compact('conta'));
-    }
-
-    /**
-     * Add method
-     *
-     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
-     */
-    public function add()
-    {
-        $conta = $this->Contas->newEmptyEntity();
-        if ($this->request->is('post')) {
-            $conta = $this->Contas->patchEntity($conta, $this->request->getData());
-            if ($this->Contas->save($conta)) {
-                $this->Flash->success(__('The conta has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The conta could not be saved. Please, try again.'));
-        }
-        $extensoes = $this->Contas->Extensoes->find('list', limit: 200)->all();
-        $this->set(compact('conta', 'extensoes'));
     }
 
     /**
@@ -66,7 +81,7 @@ class ContasController extends AppController
      */
     public function edit($id = null)
     {
-        $conta = $this->Contas->get($id, contain: ['Extensoes']);
+        $conta = $this->Contas->get($id, contain: []);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $conta = $this->Contas->patchEntity($conta, $this->request->getData());
             if ($this->Contas->save($conta)) {
@@ -76,8 +91,7 @@ class ContasController extends AppController
             }
             $this->Flash->error(__('The conta could not be saved. Please, try again.'));
         }
-        $extensoes = $this->Contas->Extensoes->find('list', limit: 200)->all();
-        $this->set(compact('conta', 'extensoes'));
+        $this->set(compact('conta'));
     }
 
     /**

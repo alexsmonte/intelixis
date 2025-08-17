@@ -24,10 +24,9 @@ class ContasControllerTest extends TestCase
     protected array $fixtures = [
         'app.Contas',
         'app.Assinaturas',
+        'app.Estabelecimentos',
         'app.Usuarios',
         'app.Whatsapps',
-        'app.Extensoes',
-        'app.ContasExtensoes',
     ];
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Model\Entity;
 
 use Cake\ORM\Entity;
+use Authentication\PasswordHasher\DefaultPasswordHasher;
 
 /**
  * Usuario Entity
@@ -19,7 +20,7 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\DateTime|null $modified
  *
  * @property \App\Model\Entity\Conta $conta
- * @property \App\Model\Entity\Whatsapp[] $whatsapps
+ * @property \App\Model\Entity\Estabelecimento[] $estabelecimentos
  */
 class Usuario extends Entity
 {
@@ -42,7 +43,7 @@ class Usuario extends Entity
         'created' => true,
         'modified' => true,
         'conta' => true,
-        'whatsapps' => true,
+        'estabelecimentos' => true,
     ];
 
     /**
@@ -51,6 +52,14 @@ class Usuario extends Entity
      * @var list<string>
      */
     protected array $_hidden = [
-        'password',
+    'password'
     ];
+
+    protected function _setPassword(string $password) : ?string
+    {
+        if (strlen($password) > 0) {
+            return (new DefaultPasswordHasher())->hash($password);
+        }
+        return null;
+    }
 }

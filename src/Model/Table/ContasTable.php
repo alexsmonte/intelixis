@@ -73,15 +73,14 @@ class ContasTable extends Table
     {
         $validator
             ->scalar('cpf_cnpj')
-            ->maxLength('cpf_cnpj', 21)
-            ->requirePresence('cpf_cnpj', 'create')
-            ->notEmptyString('cpf_cnpj');
+            ->requirePresence('cpf_cnpj', 'create','Informe seu CPF/CNPJ')
+            ->notEmptyString('cpf_cnpj', 'CPF/CNPJ não pode ser vazio');
 
         $validator
             ->scalar('nome')
-            ->maxLength('nome', 255)
-            ->requirePresence('nome', 'create')
-            ->notEmptyString('nome');
+            ->maxLength('nome', 255,'Máximo de 255 caracteres')
+            ->requirePresence('nome', 'create','Informe seu nome')
+            ->notEmptyString('nome','Seu nome não pode ser vazio');
 
         $validator
             ->scalar('razao_social')
@@ -89,9 +88,9 @@ class ContasTable extends Table
             ->allowEmptyString('razao_social');
 
         $validator
-            ->email('email')
-            ->requirePresence('email', 'create')
-            ->notEmptyString('email')
+            ->email('email',false,'Informe um e-mail válido')
+            ->requirePresence('email', 'create','Informe um e-mail')
+            ->notEmptyString('email','O e-mail não pode ser vazio')
             ->add('email', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
 
         $validator

@@ -26,7 +26,7 @@ class UsuariosTableTest extends TestCase
     protected array $fixtures = [
         'app.Usuarios',
         'app.Contas',
-        'app.Whatsapps',
+        'app.Estabelecimentos',
     ];
 
     /**

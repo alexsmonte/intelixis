@@ -7,11 +7,14 @@ use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\ORM\Query;
+
 
 /**
  * Usuarios Model
  *
  * @property \App\Model\Table\ContasTable&\Cake\ORM\Association\BelongsTo $Contas
+ * @property \App\Model\Table\EstabelecimentosTable&\Cake\ORM\Association\BelongsToMany $Estabelecimentos
  *
  * @method \App\Model\Entity\Usuario newEmptyEntity()
  * @method \App\Model\Entity\Usuario newEntity(array $data, array $options = [])
@@ -72,20 +75,32 @@ class UsuariosTable extends Table
 
         $validator
             ->scalar('nome')
-            ->maxLength('nome', 255)
-            ->requirePresence('nome', 'create')
-            ->notEmptyString('nome');
+            ->maxLength('nome', 255,'Máximo de 255 caracteres')
+            ->requirePresence('nome', 'create', 'Informe o nome completo')
+            ->notEmptyString('nome', 'O nome não pode ser vazio');
 
         $validator
-            ->email('email')
-            ->requirePresence('email', 'create')
-            ->notEmptyString('email')
+            ->email('email',false,'Informe um e-mail válido')
+            ->maxLength('email', 255,'Máximo de 255 caracteres')
+            ->requirePresence('email', 'create','Informe um e-mail')
+            ->notEmptyString('email','O e-mail não pode ser vazio')
             ->add('email', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
 
         $validator
             ->scalar('password')
-            ->maxLength('password', 255)
-            ->allowEmptyString('password');
+            ->minLength('password', 6,'Mínimo de 6 caracteres')
+            ->allowEmptyString('password','Informe uma senha','create');
+
+        $validator
+            ->scalar('password_confirm')
+            ->requirePresence('password_confirm', 'create')
+            ->notEmptyString('password_confirm', 'Confirme a senha')
+            ->add('password_confirm', 'custom', [
+                'rule' => function ($value, $context) {
+                    return isset($context['data']['password']) && $value === $context['data']['password'];
+                },
+                'message' => 'As senhas não conferem'
+            ]);
 
         $validator
             ->boolean('ativar')
@@ -111,5 +126,10 @@ class UsuariosTable extends Table
         $rules->add($rules->existsIn(['conta_id'], 'Contas'), ['errorField' => 'conta_id']);
 
         return $rules;
+    }
+
+    public function findAtivos(Query $query, array $options)
+    {
+        return $query->where(['ativar' => true]);
     }
 }
