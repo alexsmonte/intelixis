@@ -10,7 +10,7 @@ use Cake\ORM\Entity;
  *
  * @property int $id
  * @property int $conta_id
- * @property int $assinatura_id
+ * @property int $estabelecimento_id
  * @property string $phone_number
  * @property string $business_account
  * @property string $display_phone_number
@@ -39,7 +39,7 @@ class Whatsapp extends Entity
      */
     protected array $_accessible = [
         'conta_id' => true,
-        'assinatura_id' => true,
+        'estabelecimento_id' => true,
         'phone_number' => true,
         'business_account' => true,
         'display_phone_number' => true,

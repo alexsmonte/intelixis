@@ -12,7 +12,6 @@ use Cake\Validation\Validator;
  * Usuarios Model
  *
  * @property \App\Model\Table\ContasTable&\Cake\ORM\Association\BelongsTo $Contas
- * @property \App\Model\Table\WhatsappsTable&\Cake\ORM\Association\BelongsToMany $Whatsapps
  *
  * @method \App\Model\Entity\Usuario newEmptyEntity()
  * @method \App\Model\Entity\Usuario newEntity(array $data, array $options = [])
@@ -52,10 +51,10 @@ class UsuariosTable extends Table
             'foreignKey' => 'conta_id',
             'joinType' => 'INNER',
         ]);
-        $this->belongsToMany('Whatsapps', [
+        $this->belongsToMany('Estabelecimentos', [
             'foreignKey' => 'usuario_id',
-            'targetForeignKey' => 'whatsapp_id',
-            'joinTable' => 'usuarios_whatsapps',
+            'targetForeignKey' => 'estabelecimento_id',
+            'joinTable' => 'usuarios_estabelecimentos',
         ]);
     }
 
@@ -91,6 +90,10 @@ class UsuariosTable extends Table
         $validator
             ->boolean('ativar')
             ->allowEmptyString('ativar');
+
+        $validator
+            ->scalar('tipo')
+            ->notEmptyString('tipo');
 
         return $validator;
     }

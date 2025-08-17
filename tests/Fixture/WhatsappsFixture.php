@@ -11,6 +11,12 @@ use Cake\TestSuite\Fixture\TestFixture;
 class WhatsappsFixture extends TestFixture
 {
     /**
+     * Table name
+     *
+     * @var string
+     */
+    public string $table = 'whatsapps';
+    /**
      * Init method
      *
      * @return void
@@ -21,7 +27,7 @@ class WhatsappsFixture extends TestFixture
             [
                 'id' => 1,
                 'conta_id' => 1,
-                'assinatura_id' => 1,
+                'estabelecimento_id' => 1,
                 'phone_number' => 'Lorem ipsum dolor sit amet',
                 'business_account' => 'Lorem ipsum dolor sit amet',
                 'display_phone_number' => 'Lorem ipsum dolor sit amet',
@@ -30,8 +36,8 @@ class WhatsappsFixture extends TestFixture
                 'pin' => 'Lorem ip',
                 'senha_chatwoot' => 'Lorem ipsum dolor ',
                 'token_empresa' => 'Lorem ipsum dolor sit amet',
-                'created' => '2025-08-01 02:59:30',
-                'modified' => '2025-08-01 02:59:30',
+                'created' => '2025-08-17 02:02:19',
+                'modified' => '2025-08-17 02:02:19',
             ],
         ];
         parent::init();

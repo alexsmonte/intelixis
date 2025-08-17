@@ -11,21 +11,19 @@ use Cake\Validation\Validator;
 /**
  * Extensoes Model
  *
- * @property \App\Model\Table\ContasTable&\Cake\ORM\Association\BelongsToMany $Contas
- *
- * @method \App\Model\Entity\Extenso newEmptyEntity()
- * @method \App\Model\Entity\Extenso newEntity(array $data, array $options = [])
- * @method array<\App\Model\Entity\Extenso> newEntities(array $data, array $options = [])
- * @method \App\Model\Entity\Extenso get(mixed $primaryKey, array|string $finder = 'all', \Psr\SimpleCache\CacheInterface|string|null $cache = null, \Closure|string|null $cacheKey = null, mixed ...$args)
- * @method \App\Model\Entity\Extenso findOrCreate($search, ?callable $callback = null, array $options = [])
- * @method \App\Model\Entity\Extenso patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method array<\App\Model\Entity\Extenso> patchEntities(iterable $entities, array $data, array $options = [])
- * @method \App\Model\Entity\Extenso|false save(\Cake\Datasource\EntityInterface $entity, array $options = [])
- * @method \App\Model\Entity\Extenso saveOrFail(\Cake\Datasource\EntityInterface $entity, array $options = [])
- * @method iterable<\App\Model\Entity\Extenso>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Extenso>|false saveMany(iterable $entities, array $options = [])
- * @method iterable<\App\Model\Entity\Extenso>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Extenso> saveManyOrFail(iterable $entities, array $options = [])
- * @method iterable<\App\Model\Entity\Extenso>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Extenso>|false deleteMany(iterable $entities, array $options = [])
- * @method iterable<\App\Model\Entity\Extenso>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Extenso> deleteManyOrFail(iterable $entities, array $options = [])
+ * @method \App\Model\Entity\Extensao newEmptyEntity()
+ * @method \App\Model\Entity\Extensao newEntity(array $data, array $options = [])
+ * @method array<\App\Model\Entity\Extensao> newEntities(array $data, array $options = [])
+ * @method \App\Model\Entity\Extensao get(mixed $primaryKey, array|string $finder = 'all', \Psr\SimpleCache\CacheInterface|string|null $cache = null, \Closure|string|null $cacheKey = null, mixed ...$args)
+ * @method \App\Model\Entity\Extensao findOrCreate($search, ?callable $callback = null, array $options = [])
+ * @method \App\Model\Entity\Extensao patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
+ * @method array<\App\Model\Entity\Extensao> patchEntities(iterable $entities, array $data, array $options = [])
+ * @method \App\Model\Entity\Extensao|false save(\Cake\Datasource\EntityInterface $entity, array $options = [])
+ * @method \App\Model\Entity\Extensao saveOrFail(\Cake\Datasource\EntityInterface $entity, array $options = [])
+ * @method iterable<\App\Model\Entity\Extensao>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Extensao>|false saveMany(iterable $entities, array $options = [])
+ * @method iterable<\App\Model\Entity\Extensao>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Extensao> saveManyOrFail(iterable $entities, array $options = [])
+ * @method iterable<\App\Model\Entity\Extensao>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Extensao>|false deleteMany(iterable $entities, array $options = [])
+ * @method iterable<\App\Model\Entity\Extensao>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Extensao> deleteManyOrFail(iterable $entities, array $options = [])
  *
  * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
@@ -47,10 +45,10 @@ class ExtensoesTable extends Table
 
         $this->addBehavior('Timestamp');
 
-        $this->belongsToMany('Contas', [
-            'foreignKey' => 'extenso_id',
-            'targetForeignKey' => 'conta_id',
-            'joinTable' => 'contas_extensoes',
+        $this->belongsToMany('Estabelecimentos', [
+            'foreignKey' => 'extensao_id',
+            'targetForeignKey' => 'estabelecimento_id',
+            'joinTable' => 'estabelecimentos_extensoes',
         ]);
     }
 

@@ -11,6 +11,12 @@ use Cake\TestSuite\Fixture\TestFixture;
 class PlanosFixture extends TestFixture
 {
     /**
+     * Table name
+     *
+     * @var string
+     */
+    public string $table = 'planos';
+    /**
      * Init method
      *
      * @return void
@@ -25,8 +31,9 @@ class PlanosFixture extends TestFixture
                 'resumo' => 'Lorem ipsum dolor sit amet',
                 'valor' => 1.5,
                 'numero_whatsapp' => 1,
-                'created' => '2025-07-31 21:32:07',
-                'modified' => '2025-07-31 21:32:07',
+                'ativar' => 1,
+                'created' => '2025-08-17 02:01:25',
+                'modified' => '2025-08-17 02:01:25',
             ],
         ];
         parent::init();

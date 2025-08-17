@@ -83,6 +83,10 @@ class PlanosTable extends Table
             ->integer('numero_whatsapp')
             ->allowEmptyString('numero_whatsapp');
 
+        $validator
+            ->boolean('ativar')
+            ->allowEmptyString('ativar');
+
         return $validator;
     }
 }

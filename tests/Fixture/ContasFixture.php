@@ -11,6 +11,12 @@ use Cake\TestSuite\Fixture\TestFixture;
 class ContasFixture extends TestFixture
 {
     /**
+     * Table name
+     *
+     * @var string
+     */
+    public string $table = 'contas';
+    /**
      * Init method
      *
      * @return void
@@ -31,8 +37,8 @@ class ContasFixture extends TestFixture
                 'uf' => 'Lo',
                 'complemento' => 'Lorem ipsum dolor sit amet',
                 'ativar' => 1,
-                'created' => '2025-07-31 21:32:06',
-                'modified' => '2025-07-31 21:32:06',
+                'created' => '2025-08-17 01:58:40',
+                'modified' => '2025-08-17 01:58:40',
             ],
         ];
         parent::init();

@@ -14,7 +14,6 @@ use Cake\Validation\Validator;
  * @property \App\Model\Table\AssinaturasTable&\Cake\ORM\Association\HasMany $Assinaturas
  * @property \App\Model\Table\UsuariosTable&\Cake\ORM\Association\HasMany $Usuarios
  * @property \App\Model\Table\WhatsappsTable&\Cake\ORM\Association\HasMany $Whatsapps
- * @property \App\Model\Table\ExtensoesTable&\Cake\ORM\Association\BelongsToMany $Extensoes
  *
  * @method \App\Model\Entity\Conta newEmptyEntity()
  * @method \App\Model\Entity\Conta newEntity(array $data, array $options = [])
@@ -53,16 +52,14 @@ class ContasTable extends Table
         $this->hasMany('Assinaturas', [
             'foreignKey' => 'conta_id',
         ]);
+        $this->hasMany('Estabelecimentos', [
+            'foreignKey' => 'conta_id',
+        ]);
         $this->hasMany('Usuarios', [
             'foreignKey' => 'conta_id',
         ]);
         $this->hasMany('Whatsapps', [
             'foreignKey' => 'conta_id',
-        ]);
-        $this->belongsToMany('Extensoes', [
-            'foreignKey' => 'conta_id',
-            'targetForeignKey' => 'extenso_id',
-            'joinTable' => 'contas_extensoes',
         ]);
     }
 
@@ -143,7 +140,7 @@ class ContasTable extends Table
      */
     public function buildRules(RulesChecker $rules): RulesChecker
     {
-        $rules->add($rules->isUnique(['email']), ['errorField' => 'email']);
+        $rules->add($rules->isUnique(['email'],'E-mail já cadastrado'), ['errorField' => 'email']);
 
         return $rules;
     }

@@ -14,6 +14,7 @@ use Cake\ORM\Entity;
  * @property string|null $resumo
  * @property string|null $valor
  * @property int|null $numero_whatsapp
+ * @property bool|null $ativar
  * @property \Cake\I18n\DateTime|null $created
  * @property \Cake\I18n\DateTime|null $modified
  *
@@ -36,6 +37,7 @@ class Plano extends Entity
         'resumo' => true,
         'valor' => true,
         'numero_whatsapp' => true,
+        'ativar' => true,
         'created' => true,
         'modified' => true,
         'assinaturas' => true,

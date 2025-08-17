@@ -12,8 +12,6 @@ use Cake\Validation\Validator;
  * Whatsapps Model
  *
  * @property \App\Model\Table\ContasTable&\Cake\ORM\Association\BelongsTo $Contas
- * @property \App\Model\Table\AssinaturasTable&\Cake\ORM\Association\BelongsTo $Assinaturas
- * @property \App\Model\Table\UsuariosTable&\Cake\ORM\Association\BelongsToMany $Usuarios
  *
  * @method \App\Model\Entity\Whatsapp newEmptyEntity()
  * @method \App\Model\Entity\Whatsapp newEntity(array $data, array $options = [])
@@ -53,14 +51,9 @@ class WhatsappsTable extends Table
             'foreignKey' => 'conta_id',
             'joinType' => 'INNER',
         ]);
-        $this->belongsTo('Assinaturas', [
-            'foreignKey' => 'assinatura_id',
+        $this->belongsTo('Estabelecimentos', [
+            'foreignKey' => 'estabelecimento_id',
             'joinType' => 'INNER',
-        ]);
-        $this->belongsToMany('Usuarios', [
-            'foreignKey' => 'whatsapp_id',
-            'targetForeignKey' => 'usuario_id',
-            'joinTable' => 'usuarios_whatsapps',
         ]);
     }
 
@@ -77,8 +70,7 @@ class WhatsappsTable extends Table
             ->notEmptyString('conta_id');
 
         $validator
-            ->integer('assinatura_id')
-            ->notEmptyString('assinatura_id');
+            ->notEmptyString('estabelecimento_id');
 
         $validator
             ->scalar('phone_number')
@@ -137,7 +129,7 @@ class WhatsappsTable extends Table
     {
         $rules->add($rules->isUnique(['phone_number']), ['errorField' => 'phone_number']);
         $rules->add($rules->existsIn(['conta_id'], 'Contas'), ['errorField' => 'conta_id']);
-        $rules->add($rules->existsIn(['assinatura_id'], 'Assinaturas'), ['errorField' => 'assinatura_id']);
+        $rules->add($rules->existsIn(['estabelecimento_id'], 'Estabelecimentos'), ['errorField' => 'estabelecimento_id']);
 
         return $rules;
     }

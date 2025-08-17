@@ -26,7 +26,7 @@ use Cake\ORM\Entity;
  * @property \App\Model\Entity\Assinatura[] $assinaturas
  * @property \App\Model\Entity\Usuario[] $usuarios
  * @property \App\Model\Entity\Whatsapp[] $whatsapps
- * @property \App\Model\Entity\Extenso[] $extensoes
+ * @property \App\Model\Entity\Extensao[] $extensoes
  */
 class Conta extends Entity
 {

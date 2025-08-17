@@ -14,6 +14,7 @@ use Cake\ORM\Entity;
  * @property string $email
  * @property string|null $password
  * @property bool|null $ativar
+ * @property string $tipo
  * @property \Cake\I18n\DateTime|null $created
  * @property \Cake\I18n\DateTime|null $modified
  *
@@ -37,6 +38,7 @@ class Usuario extends Entity
         'email' => true,
         'password' => true,
         'ativar' => true,
+        'tipo' => true,
         'created' => true,
         'modified' => true,
         'conta' => true,

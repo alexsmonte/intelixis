@@ -11,6 +11,12 @@ use Cake\TestSuite\Fixture\TestFixture;
 class UsuariosFixture extends TestFixture
 {
     /**
+     * Table name
+     *
+     * @var string
+     */
+    public string $table = 'usuarios';
+    /**
      * Init method
      *
      * @return void
@@ -25,8 +31,9 @@ class UsuariosFixture extends TestFixture
                 'email' => 'Lorem ipsum dolor sit amet',
                 'password' => 'Lorem ipsum dolor sit amet',
                 'ativar' => 1,
-                'created' => '2025-07-31 21:32:07',
-                'modified' => '2025-07-31 21:32:07',
+                'tipo' => 'Lorem ipsum dolor sit amet',
+                'created' => '2025-08-17 02:01:16',
+                'modified' => '2025-08-17 02:01:16',
             ],
         ];
         parent::init();

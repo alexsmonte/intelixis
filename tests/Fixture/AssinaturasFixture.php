@@ -11,6 +11,12 @@ use Cake\TestSuite\Fixture\TestFixture;
 class AssinaturasFixture extends TestFixture
 {
     /**
+     * Table name
+     *
+     * @var string
+     */
+    public string $table = 'assinaturas';
+    /**
      * Init method
      *
      * @return void
@@ -22,11 +28,11 @@ class AssinaturasFixture extends TestFixture
                 'id' => 1,
                 'conta_id' => 1,
                 'plano_id' => 1,
-                'data_vencimento' => '2025-07-31',
+                'data_vencimento' => '2025-08-17',
                 'desconto' => 1.5,
                 'status' => 'Lorem ipsum dolor sit amet',
-                'created' => '2025-07-31 21:31:55',
-                'modified' => '2025-07-31 21:31:55',
+                'created' => '2025-08-17 02:00:12',
+                'modified' => '2025-08-17 02:00:12',
             ],
         ];
         parent::init();

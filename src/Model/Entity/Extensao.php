@@ -6,7 +6,7 @@ namespace App\Model\Entity;
 use Cake\ORM\Entity;
 
 /**
- * Extenso Entity
+ * Extensao Entity
  *
  * @property int $id
  * @property string $nome
@@ -18,7 +18,7 @@ use Cake\ORM\Entity;
  *
  * @property \App\Model\Entity\Conta[] $contas
  */
-class Extenso extends Entity
+class Extensao extends Entity
 {
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
