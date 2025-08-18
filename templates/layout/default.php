@@ -33,7 +33,7 @@ use Cake\Core\Configure;
 <body class="link-sidebar">
 <!-- Preloader -->
 <div class="preloader">
-    <img src="/img/logos/favicon.png" alt="loader" class="lds-ripple img-fluid" />
+    <img src="img/logos/favicon.png" alt="loader" class="lds-ripple img-fluid" />
 </div>
 <div id="main-wrapper">
     <!-- Sidebar Start -->

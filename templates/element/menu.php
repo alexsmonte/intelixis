@@ -5,13 +5,13 @@
         <!-- Home -->
         <!-- ============================= -->
         <li class="nav-small-cap">
-            <iconify-icon icon="solar:menu-dots-bold-duotone" class="nav-small-cap-icon fs-5"></iconify-icon>
+            <i class="fa-regular fa-house"></i>
             <span class="hide-menu">Home</span>
         </li>
         <li class="sidebar-item">
             <a class="sidebar-link sidebar-link primary-hover-bg" href="" id="get-url" aria-expanded="false">
                 <span class="aside-icon p-2 bg-primary-subtle rounded-1">
-                  <iconify-icon icon="solar:screencast-2-line-duotone" class="fs-6"></iconify-icon>
+                  <i class="fa-regular fa-house"></i>
                 </span>
                 <span class="hide-menu ps-1">Dashboard</span>
             </a>
@@ -21,7 +21,7 @@
                 <span class="aside-icon p-2 bg-success-subtle rounded-1">
                   <iconify-icon icon="solar:chart-line-duotone" class="fs-6"></iconify-icon>
                 </span>
-                <span class="hide-menu ps-1">Dashboard 2</span>
+                <span class="hide-menu ps-1">Dashboard 2XXX</span>
             </a>
         </li>
         <li class="sidebar-item">

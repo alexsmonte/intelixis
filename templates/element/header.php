@@ -1253,9 +1253,10 @@
                                     </div>
 
                                     <div class="d-flex align-items-center mx-7 py-9 border-bottom">
-                                        <img src="/img/profile/user-1.jpg" alt="user" width="90" class="rounded-circle" />
+
+                                        <img src="img/profile/user-1.jpg" alt="user" width="90" class="rounded-circle" />
                                         <div class="ms-4">
-                                            <h4 class="mb-0 fs-5 fw-normal"><?= $this->request->getAttribute('identity')->nome_completo; ?></h4>
+                                            <h4 class="mb-0 fs-5 fw-normal"><?= $this->request->getAttribute('identity')->nome; ?></h4>
                                             <span class="text-muted">super admin</span>
                                             <p class="text-muted mb-0 mt-1 d-flex align-items-center">
                                                 <iconify-icon icon="solar:mailbox-line-duotone" class="fs-4 me-1"></iconify-icon>

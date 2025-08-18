@@ -15,25 +15,7 @@
                 <!-- Dashboard -->
                 <!-- =================== -->
                 <li class="sidebar-item">
-                    <a class="sidebar-link has-arrow primary-hover-bg" href="javascript:void(0)" aria-expanded="false">
-                        <iconify-icon icon="solar:atom-line-duotone" class="fs-6 aside-icon"></iconify-icon>
-                        <span class="hide-menu ps-1">Dashboard</span>
-                    </a>
-                    <ul aria-expanded="false" class="collapse first-level">
-                        <li class="sidebar-item">
-                            <a href="../horizontal/index.html" class="sidebar-link">
-                                <span class="sidebar-icon"></span>
-                                <span class="hide-menu text-truncate">Dashboard</span>
-                            </a>
-                        </li>
-
-                        <li class="sidebar-item">
-                            <a href="../horizontal/index2.html" class="sidebar-link">
-                                <span class="sidebar-icon"></span>
-                                <span class="hide-menu text-truncate">Dashboard 2</span>
-                            </a>
-                        </li>
-                    </ul>
+                    <?= $this->Html->link('<iconify-icon icon="solar:home-linear" class="fs-6 aside-icon"></iconify-icon><span class="hide-menu ps-1">Dashboard</span>', ['controller'=>'Pages','action' => 'index'],['class'=>'sidebar-link primary-hover-bg','aria-expanded'=>'false', 'escape'=>false]) ?>
                 </li>
 
                 <!-- ============================= -->
