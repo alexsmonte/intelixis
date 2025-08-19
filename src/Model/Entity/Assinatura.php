@@ -19,7 +19,7 @@ use Cake\ORM\Entity;
  *
  * @property \App\Model\Entity\Conta $conta
  * @property \App\Model\Entity\Plano $plano
- * @property \App\Model\Entity\Whatsapp[] $whatsapps
+ * @property \App\Model\Entity\Estabelecimento[] $estabelecimentos
  */
 class Assinatura extends Entity
 {
@@ -42,6 +42,6 @@ class Assinatura extends Entity
         'modified' => true,
         'conta' => true,
         'plano' => true,
-        'whatsapps' => true,
+        'estabelecimentos' => true,
     ];
 }

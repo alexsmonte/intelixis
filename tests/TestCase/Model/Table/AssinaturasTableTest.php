@@ -27,7 +27,7 @@ class AssinaturasTableTest extends TestCase
         'app.Assinaturas',
         'app.Contas',
         'app.Planos',
-        'app.Whatsapps',
+        'app.Estabelecimentos',
     ];
 
     /**

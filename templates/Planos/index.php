@@ -32,6 +32,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Planos']]);
                                 <?= $this->Form->control('valor', ['label'=>'valor', 'class'=>'form-control']); ?>
                             </div>                            <div class="col-md-3 mb-3">
                                 <?= $this->Form->control('numero_whatsapp', ['label'=>'numero_whatsapp', 'class'=>'form-control']); ?>
+                            </div>                            <div class="col-md-3 mb-3">
+                                <?= $this->Form->control('ativar', ['label'=>'ativar', 'class'=>'form-control']); ?>
                             </div>                <div class="col-md-12 mb-3">
                     <div class="row">
                         <div class="col-md-2 offset-md-10  mb-3">
@@ -50,6 +52,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Planos']]);
                             <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('resumo') ?></h6></th>
                             <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('valor') ?></h6></th>
                             <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('numero_whatsapp') ?></h6></th>
+                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('ativar') ?></h6></th>
                             <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('created') ?></h6></th>
                             <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('modified') ?></h6></th>
                         <th><?= __('Opções') ?></th>
@@ -63,6 +66,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Planos']]);
                                                                                     <td><p class="mb-0 fw-normal fs-4"><?= h($plano->resumo) ?> </p></td>
                                                                                     <td><p class="mb-0 fw-normal fs-4"><?= $plano->valor === null ? '' : $this->Number->format($plano->valor) ?></p></td>
                                                                                     <td><p class="mb-0 fw-normal fs-4"><?= $plano->numero_whatsapp === null ? '' : $this->Number->format($plano->numero_whatsapp) ?></p></td>
+                                                                                    <td><?= $plano->ativar == 1 ? '<span class="badge bg-success-subtle text-success">Ativo</span>' : '<span class="badge bg-warning-subtle text-warning">Não</span>'; ?></td>
                                                                                     <td><p class="mb-0 fw-normal fs-4"><?= h($plano->created) ?> </p></td>
                                                                                     <td><p class="mb-0 fw-normal fs-4"><?= h($plano->modified) ?> </p></td>
                                     <td>

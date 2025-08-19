@@ -16,7 +16,7 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\DateTime|null $created
  * @property \Cake\I18n\DateTime|null $modified
  *
- * @property \App\Model\Entity\Conta[] $contas
+ * @property \App\Model\Entity\Estabelecimento[] $estabelecimentos
  */
 class Extensao extends Entity
 {
@@ -36,6 +36,6 @@ class Extensao extends Entity
         'ativar' => true,
         'created' => true,
         'modified' => true,
-        'contas' => true,
+        'estabelecimentos' => true,
     ];
 }

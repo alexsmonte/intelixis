@@ -46,6 +46,10 @@
                     <th><?= __('Modified') ?></th>
                     <td><?= h($plano->modified) ?></td>
                 </tr>
+                <tr>
+                    <th><?= __('Ativar') ?></th>
+                    <td><?= $plano->ativar ? __('Yes') : __('No'); ?></td>
+                </tr>
             </table>
             <div class="text">
                 <strong><?= __('Descricao') ?></strong>

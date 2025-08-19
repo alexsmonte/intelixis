@@ -32,8 +32,8 @@ class PlanosFixture extends TestFixture
                 'valor' => 1.5,
                 'numero_whatsapp' => 1,
                 'ativar' => 1,
-                'created' => '2025-08-17 02:01:25',
-                'modified' => '2025-08-17 02:01:25',
+                'created' => '2025-08-19 02:33:57',
+                'modified' => '2025-08-19 02:33:57',
             ],
         ];
         parent::init();

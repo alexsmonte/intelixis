@@ -13,6 +13,7 @@ use Cake\Validation\Validator;
  *
  * @property \App\Model\Table\ContasTable&\Cake\ORM\Association\BelongsTo $Contas
  * @property \App\Model\Table\PlanosTable&\Cake\ORM\Association\BelongsTo $Planos
+ * @property \App\Model\Table\EstabelecimentosTable&\Cake\ORM\Association\HasMany $Estabelecimentos
  *
  * @method \App\Model\Entity\Assinatura newEmptyEntity()
  * @method \App\Model\Entity\Assinatura newEntity(array $data, array $options = [])

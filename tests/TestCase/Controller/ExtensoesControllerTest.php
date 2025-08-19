@@ -23,8 +23,8 @@ class ExtensoesControllerTest extends TestCase
      */
     protected array $fixtures = [
         'app.Extensoes',
-        'app.Contas',
-        'app.ContasExtensoes',
+        'app.Estabelecimentos',
+        'app.EstabelecimentosExtensoes',
     ];
 
     /**

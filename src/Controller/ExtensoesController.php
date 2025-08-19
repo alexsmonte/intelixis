@@ -26,14 +26,14 @@ class ExtensoesController extends AppController
     /**
      * View method
      *
-     * @param string|null $id Extenso id.
+     * @param string|null $id Extensao id.
      * @return \Cake\Http\Response|null|void Renders view
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
     public function view($id = null)
     {
-        $extenso = $this->Extensoes->get($id, contain: ['Contas']);
-        $this->set(compact('extenso'));
+        $extensao = $this->Extensoes->get($id, contain: ['Estabelecimentos']);
+        $this->set(compact('extensao'));
     }
 
     /**
@@ -43,58 +43,58 @@ class ExtensoesController extends AppController
      */
     public function add()
     {
-        $extenso = $this->Extensoes->newEmptyEntity();
+        $extensao = $this->Extensoes->newEmptyEntity();
         if ($this->request->is('post')) {
-            $extenso = $this->Extensoes->patchEntity($extenso, $this->request->getData());
-            if ($this->Extensoes->save($extenso)) {
-                $this->Flash->success(__('The extenso has been saved.'));
+            $extensao = $this->Extensoes->patchEntity($extensao, $this->request->getData());
+            if ($this->Extensoes->save($extensao)) {
+                $this->Flash->success(__('The extensao has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The extenso could not be saved. Please, try again.'));
+            $this->Flash->error(__('The extensao could not be saved. Please, try again.'));
         }
-        $contas = $this->Extensoes->Contas->find('list', limit: 200)->all();
-        $this->set(compact('extenso', 'contas'));
+        $estabelecimentos = $this->Extensoes->Estabelecimentos->find('list', limit: 200)->all();
+        $this->set(compact('extensao', 'estabelecimentos'));
     }
 
     /**
      * Edit method
      *
-     * @param string|null $id Extenso id.
+     * @param string|null $id Extensao id.
      * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
     public function edit($id = null)
     {
-        $extenso = $this->Extensoes->get($id, contain: ['Contas']);
+        $extensao = $this->Extensoes->get($id, contain: ['Estabelecimentos']);
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $extenso = $this->Extensoes->patchEntity($extenso, $this->request->getData());
-            if ($this->Extensoes->save($extenso)) {
-                $this->Flash->success(__('The extenso has been saved.'));
+            $extensao = $this->Extensoes->patchEntity($extensao, $this->request->getData());
+            if ($this->Extensoes->save($extensao)) {
+                $this->Flash->success(__('The extensao has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The extenso could not be saved. Please, try again.'));
+            $this->Flash->error(__('The extensao could not be saved. Please, try again.'));
         }
-        $contas = $this->Extensoes->Contas->find('list', limit: 200)->all();
-        $this->set(compact('extenso', 'contas'));
+        $estabelecimentos = $this->Extensoes->Estabelecimentos->find('list', limit: 200)->all();
+        $this->set(compact('extensao', 'estabelecimentos'));
     }
 
     /**
      * Delete method
      *
-     * @param string|null $id Extenso id.
+     * @param string|null $id Extensao id.
      * @return \Cake\Http\Response|null Redirects to index.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
-        $extenso = $this->Extensoes->get($id);
-        if ($this->Extensoes->delete($extenso)) {
-            $this->Flash->success(__('The extenso has been deleted.'));
+        $extensao = $this->Extensoes->get($id);
+        if ($this->Extensoes->delete($extensao)) {
+            $this->Flash->success(__('The extensao has been deleted.'));
         } else {
-            $this->Flash->error(__('The extenso could not be deleted. Please, try again.'));
+            $this->Flash->error(__('The extensao could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

@@ -1,13 +1,13 @@
 <?php
 /**
  * @var \App\View\AppView $this
- * @var \App\Model\Entity\Plano $plano
+ * @var \App\Model\Entity\Extensao $extensao
+ * @var \Cake\Collection\CollectionInterface|string[] $estabelecimentos
  */
 ?>
-
 <?php
 
-$this->BreadcrumbsPlus->add([['title' => 'Planos', 'url'=>['controller' => 'Planos', 'action' => 'index']],['title'=> 'Novo']]);
+$this->BreadcrumbsPlus->add([['title' => 'Extensoes', 'url'=>['controller' => 'Extensoes', 'action' => 'index']],['title'=> 'Novo']]);
 
 ?>
 
@@ -17,10 +17,10 @@ $this->BreadcrumbsPlus->add([['title' => 'Planos', 'url'=>['controller' => 'Plan
     <div class="px-4 py-3 border-bottom">
         <div class="card-body p-4">
             <div class="d-flex mb-3 align-items-center">
-                <h4 class="card-title mb-0"><?= __('Planos') ?></h4>
+                <h4 class="card-title mb-0"><?= __('Extensoes') ?></h4>
             </div>
-            
-            <?= $this->Form->create($plano) ?>
+
+            <?= $this->Form->create($extensao) ?>
             <div class="row">
             <div class="col-md-3 mb-3">
                     <?= $this->Form->control('nome',['label' => 'nome','class' => 'form-control',]); ?>
@@ -29,14 +29,14 @@ $this->BreadcrumbsPlus->add([['title' => 'Planos', 'url'=>['controller' => 'Plan
                     <?= $this->Form->control('descricao',['label' => 'descricao','class' => 'form-control',]); ?>
             </div>
             <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('resumo',['label' => 'resumo','class' => 'form-control',]); ?>
-            </div>
-            <div class="col-md-3 mb-3">
                     <?= $this->Form->control('valor',['label' => 'valor','class' => 'form-control',]); ?>
             </div>
             <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('numero_whatsapp',['label' => 'numero_whatsapp','class' => 'form-control',]); ?>
+                    <?= $this->Form->control('ativar',['label' => 'ativar','class' => 'form-control',]); ?>
             </div>
+    <div class="col-md-3 mb-3">
+                    <?= $this->Form->control('estabelecimentos._ids', ['label' => '','class' => 'form-control','options' => $estabelecimentos]); ?>
+    </div>
     <div class="col-md-12">
     <div class="row">
         <div class="col-md-2 offset-md-10  mb-3">

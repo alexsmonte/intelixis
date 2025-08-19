@@ -33,7 +33,7 @@ class AssinaturasController extends AppController
      */
     public function view($id = null)
     {
-        $assinatura = $this->Assinaturas->get($id, contain: ['Contas', 'Planos', 'Whatsapps']);
+        $assinatura = $this->Assinaturas->get($id, contain: ['Contas', 'Planos', 'Estabelecimentos']);
         $this->set(compact('assinatura'));
     }
 

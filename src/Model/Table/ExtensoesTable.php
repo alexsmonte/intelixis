@@ -11,6 +11,8 @@ use Cake\Validation\Validator;
 /**
  * Extensoes Model
  *
+ * @property \App\Model\Table\EstabelecimentosTable&\Cake\ORM\Association\BelongsToMany $Estabelecimentos
+ *
  * @method \App\Model\Entity\Extensao newEmptyEntity()
  * @method \App\Model\Entity\Extensao newEntity(array $data, array $options = [])
  * @method array<\App\Model\Entity\Extensao> newEntities(array $data, array $options = [])

@@ -28,11 +28,11 @@ class AssinaturasFixture extends TestFixture
                 'id' => 1,
                 'conta_id' => 1,
                 'plano_id' => 1,
-                'data_vencimento' => '2025-08-17',
+                'data_vencimento' => '2025-08-19',
                 'desconto' => 1.5,
                 'status' => 'Lorem ipsum dolor sit amet',
-                'created' => '2025-08-17 02:00:12',
-                'modified' => '2025-08-17 02:00:12',
+                'created' => '2025-08-19 02:35:15',
+                'modified' => '2025-08-19 02:35:15',
             ],
         ];
         parent::init();
