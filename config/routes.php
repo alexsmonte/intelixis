@@ -56,6 +56,7 @@ return function (RouteBuilder $routes): void {
          * to use (in this case, templates/Pages/display.php)...
          */
         $builder->connect('/', ['controller' => 'Usuarios', 'action' => 'login']);
+        $builder->connect('meu-perfil', ['controller' => 'Usuarios', 'action' => 'meuPerfil']);
         $builder->connect('/dashboard', ['controller' => 'Pages', 'action' => 'index']);
 
         /*

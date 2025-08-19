@@ -1232,13 +1232,13 @@
                             <a class="nav-link position-relative ms-6" href="javascript:void(0)" id="drop1" aria-expanded="false">
                                 <div class="d-flex align-items-center flex-shrink-0">
                                     <div class="user-profile me-sm-3 me-2">
-                                        <img src="/img/profile/user-1.jpg" width="40" class="rounded-circle" alt="spike-img">
+                                        <?= $this->Html->image('profile/usuario-padrao.png',['width'=>'40', 'class'=>'rounded-circle']); ?>
                                     </div>
                                     <span class="d-sm-none d-block"><iconify-icon icon="solar:alt-arrow-down-line-duotone"></iconify-icon></span>
 
                                     <div class="d-none d-sm-block">
                                         <h6 class="fs-4 mb-1 profile-name">
-                                            <?= $this->request->getAttribute('identity')->nome_completo; ?>
+                                            <?= $this->request->getAttribute('identity')->nome; ?>
                                         </h6>
                                         <p class="fs-3 lh-base mb-0 profile-subtext">
                                             Admin
@@ -1253,8 +1253,7 @@
                                     </div>
 
                                     <div class="d-flex align-items-center mx-7 py-9 border-bottom">
-
-                                        <img src="img/profile/user-1.jpg" alt="user" width="90" class="rounded-circle" />
+                                        <?= $this->Html->image('profile/usuario-padrao.png',['width'=>'90', 'class'=>'rounded-circle']); ?>
                                         <div class="ms-4">
                                             <h4 class="mb-0 fs-5 fw-normal"><?= $this->request->getAttribute('identity')->nome; ?></h4>
                                             <span class="text-muted">super admin</span>
@@ -1266,10 +1265,10 @@
                                     </div>
 
                                     <div class="message-body">
-                                        <a href="../horizontal/page-user-profile.html" class="dropdown-item px-7 d-flex align-items-center py-6">
-                                                            <span class="btn px-3 py-2 bg-info-subtle rounded-1 text-info shadow-none">
-                                                              <iconify-icon icon="solar:wallet-2-line-duotone" class="fs-7"></iconify-icon>
-                                                            </span>
+                                        <a href="<?= $this->Url->build(['controller' => 'Usuarios','action' => 'meuPerfil'],['fullBase' => true]);?>" class="dropdown-item px-7 d-flex align-items-center py-6">
+                                            <span class="btn px-3 py-2 bg-info-subtle rounded-1 text-info shadow-none">
+                                              <iconify-icon icon="solar:wallet-2-line-duotone" class="fs-7"></iconify-icon>
+                                            </span>
                                             <div class="w-100 ps-3 ms-1">
                                                 <h5 class="mb-0 mt-1 fs-4 fw-normal">Meu perfil</h5>
                                                 <span class="fs-3 d-block mt-1 text-muted">Dados da conta</span>

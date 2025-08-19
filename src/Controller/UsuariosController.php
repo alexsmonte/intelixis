@@ -19,6 +19,13 @@ class UsuariosController extends AppController
         // the infinite redirect loop issue
         $this->Authentication->addUnauthenticatedActions(['login']);
     }
+
+
+    public function meuPerfil()
+    {
+
+    }
+
     /**
      * Index method
      *

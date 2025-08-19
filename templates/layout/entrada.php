@@ -5,7 +5,7 @@ use Cake\Core\Configure;
 
 ?>
 <!DOCTYPE html>
-<html lang="en" dir="ltr" data-bs-theme="light" data-color-theme="Blue_Theme" data-layout="horizontal">
+<html lang="pt" dir="ltr" data-bs-theme="light" data-color-theme="Blue_Theme" data-layout="horizontal">
 <head>
     <!-- Required meta tags -->
     <meta charset="UTF-8" />
