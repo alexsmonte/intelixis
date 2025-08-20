@@ -753,54 +753,51 @@
 
                 <!-- multi level -->
                 <li class="sidebar-item">
-                    <a class="sidebar-link has-arrow success-hover-bg" href="javascript:void(0)" aria-expanded="false">
+                    <a class="sidebar-link has-arrow primary-hover-bg" href="javascript:void(0)" aria-expanded="false">
                         <iconify-icon icon="solar:layers-line-duotone" class="fs-6 aside-icon"></iconify-icon>
-                        <span class="hide-menu ps-1">Multi DD</span>
+                        <span class="hide-menu ps-1">Configurações</span>
                     </a>
                     <ul aria-expanded="false" class="collapse first-level">
                         <li class="sidebar-item">
-                            <a href="../docs/index.html" class="sidebar-link">
+                            <a href="<?= $this->Url->build(['controller' => 'Assinaturas','action' => 'index'],['fullBase' => true]);?>" class="sidebar-link">
                                 <i class="ti ti-circle"></i>
-                                <span class="hide-menu">Documentation</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a href="javascript:void(0)" class="sidebar-link">
-                                <i class="ti ti-circle"></i>
-                                <span class="hide-menu">Page 1</span>
+                                <span class="hide-menu">Assinatura</span>
                             </a>
                         </li>
                         <li class="sidebar-item">
                             <a href="javascript:void(0)" class="sidebar-link has-arrow">
                                 <i class="ti ti-circle"></i>
-                                <span class="hide-menu">Page 2</span>
+                                <span class="hide-menu">Planos</span>
                             </a>
                             <ul aria-expanded="false" class="collapse second-level">
                                 <li class="sidebar-item">
-                                    <a href="javascript:void(0)" class="sidebar-link">
+                                    <a href="<?= $this->Url->build(['controller' => 'Planos','action' => 'index'],['fullBase' => true]);?>" class="sidebar-link">
                                         <i class="ti ti-circle"></i>
-                                        <span class="hide-menu">Page 2.1</span>
-                                    </a>
-                                </li>
-                                <li class="sidebar-item">
-                                    <a href="javascript:void(0)" class="sidebar-link">
-                                        <i class="ti ti-circle"></i>
-                                        <span class="hide-menu">Page 2.2</span>
-                                    </a>
-                                </li>
-                                <li class="sidebar-item">
-                                    <a href="javascript:void(0)" class="sidebar-link">
-                                        <i class="ti ti-circle"></i>
-                                        <span class="hide-menu">Page 2.3</span>
+                                        <span class="hide-menu">Visualizar</span>
                                     </a>
                                 </li>
                             </ul>
                         </li>
+
                         <li class="sidebar-item">
-                            <a href="javascript:void(0)" class="sidebar-link">
+                            <a href="javascript:void(0)" class="sidebar-link has-arrow">
                                 <i class="ti ti-circle"></i>
-                                <span class="hide-menu">Page 3</span>
+                                <span class="hide-menu">Usuários</span>
                             </a>
+                            <ul aria-expanded="false" class="collapse second-level">
+                                <li class="sidebar-item">
+                                    <a href="<?= $this->Url->build(['controller' => 'Usuarios','action' => 'index'],['fullBase' => true]);?>" class="sidebar-link">
+                                        <i class="ti ti-circle"></i>
+                                        <span class="hide-menu">Visualizar</span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item">
+                                    <a href="<?= $this->Url->build(['controller' => 'Usuarios','action' => 'novo'],['fullBase' => true]);?>" class="sidebar-link">
+                                        <i class="ti ti-circle"></i>
+                                        <span class="hide-menu">Adicionar</span>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                     </ul>
                 </li>

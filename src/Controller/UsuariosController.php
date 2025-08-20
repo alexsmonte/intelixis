@@ -60,21 +60,22 @@ class UsuariosController extends AppController
      *
      * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
      */
-    public function add()
+    public function novo()
     {
         $usuario = $this->Usuarios->newEmptyEntity();
         if ($this->request->is('post')) {
             $usuario = $this->Usuarios->patchEntity($usuario, $this->request->getData());
             if ($this->Usuarios->save($usuario)) {
-                $this->Flash->success(__('The usuario has been saved.'));
+                $this->Flash->success(__('O usuário foi criado com sucesso.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The usuario could not be saved. Please, try again.'));
+            $this->Flash->error(__('Ocorreu um erro na tentativa de criar o usuário. Por favor tente novamente.'));
         }
-        $contas = $this->Usuarios->Contas->find('list', limit: 200)->all();
-        $whatsapps = $this->Usuarios->Whatsapps->find('list', limit: 200)->all();
-        $this->set(compact('usuario', 'contas', 'whatsapps'));
+        $contas = $this->Usuarios->Contas->find('list')->all();
+
+        $title = 'Adicionar usuário';
+        $this->set(compact('usuario', 'contas', 'title'));
     }
 
     /**
