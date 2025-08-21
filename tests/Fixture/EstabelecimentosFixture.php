@@ -38,8 +38,8 @@ class EstabelecimentosFixture extends TestFixture
                 'telefone' => 'Lorem ipsum dolor ',
                 'celular' => 'Lorem ipsum dolor ',
                 'ativar' => 1,
-                'created' => '2025-08-19 02:56:25',
-                'modified' => '2025-08-19 02:56:25',
+                'created' => 1755663706,
+                'modified' => 1755663706,
             ],
         ];
         parent::init();

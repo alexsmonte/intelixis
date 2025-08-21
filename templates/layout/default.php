@@ -9,6 +9,8 @@ use Cake\Core\Configure;
 <html lang="pt_br" dir="ltr" data-bs-theme="light" data-color-theme="Blue_Theme" data-layout="horizontal">
 
 <head>
+<?= $this->Html->meta('csrfToken', $this->request->getAttribute('csrfToken')); ?>
+
     <!-- Required meta tags -->
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -28,9 +30,34 @@ use Cake\Core\Configure;
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
     <?= $this->fetch('script') ?>
+
+    <!-- vue  -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 </head>
 
 <body class="link-sidebar">
+<?= $this->Html->script('app.js') ?>
+<!-- Modal Excluir -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 id="deleteModalLabel" class="modal-title text-danger"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body text-start">
+        <p id="deleteModalMessage"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger btn-sm" id="confirmDeleteBtn">Excluir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 <!-- Preloader -->
 <div class="preloader">
     <img src="img/logos/favicon.png" alt="loader" class="lds-ripple img-fluid" />
@@ -115,6 +142,13 @@ use Cake\Core\Configure;
 <!-- solar icons -->
 <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
 
+
+
+<!-- imask.js -->
+<script src="https://unpkg.com/imask"></script>
+
+
+
 <!-- highlight.js (code view) -->
 
 <script>
@@ -129,6 +163,39 @@ use Cake\Core\Configure;
 <style>
 
 </style>
+
+
+<!-- imask.js -->
+<script src="https://unpkg.com/imask"></script>
+<?= $this->Html->script('mascaras.js') ?>
+
+
+
+
+
+<?= $this->fetch('script') ?>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+      setTimeout(() => {
+        alert.classList.remove('show');
+        alert.classList.add('fade');
+        setTimeout(() => alert.remove(), 500);
+      }, 5000); // tempo em ms
+    });
+  });
+</script>
+
+
+
+
+
+
+
+</body>
+</html>
+
 
 </body>
 

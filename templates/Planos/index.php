@@ -76,7 +76,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Planos']]);
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                     <li><?= $this->Html->link('Visualizar', ['action' => 'view', $plano->id],['class'=>'dropdown-item','escape'=>false]) ?></li>
-                                    <li><?= $this->Html->link('Editar', ['action' => 'edit', $plano->id],['class'=>'dropdown-item','escape'=>false]) ?> </li>
+                                    <li><?= $this->Html->link('Editar', ['action' => 'editar', $plano->id],['class'=>'dropdown-item','escape'=>false]) ?> </li>
                                     <li>
                                         <?= $this->Form->postLink(
                                         'Excluir',

@@ -41,7 +41,7 @@ class PlanosController extends AppController
      *
      * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
      */
-    public function add()
+    public function novo()
     {
         $plano = $this->Planos->newEmptyEntity();
         if ($this->request->is('post')) {
@@ -63,7 +63,7 @@ class PlanosController extends AppController
      * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function edit($id = null)
+    public function editar($id = null)
     {
         $plano = $this->Planos->get($id, contain: []);
         if ($this->request->is(['patch', 'post', 'put'])) {
