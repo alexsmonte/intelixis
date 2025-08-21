@@ -113,6 +113,52 @@ class UsuariosTable extends Table
         return $validator;
     }
 
+
+    public function validationCriarUsuario(Validator $validator): Validator
+    {
+        $validator
+            ->integer('conta_id')
+            ->notEmptyString('conta_id');
+
+        $validator
+            ->scalar('nome')
+            ->maxLength('nome', 255,'Máximo de 255 caracteres')
+            ->requirePresence('nome', 'create', 'Informe o nome completo')
+            ->notEmptyString('nome', 'O nome não pode ser vazio');
+
+        $validator
+            ->email('email',false,'Informe um e-mail válido')
+            ->maxLength('email', 255,'Máximo de 255 caracteres')
+            ->requirePresence('email', 'create','Informe um e-mail')
+            ->notEmptyString('email','O e-mail não pode ser vazio')
+            ->add('email', 'unique', ['rule' => 'validateUnique', 'provider' => 'table','message'=>'E-Mail já está em uso']);
+
+        $validator
+            ->scalar('password')
+            ->minLength('password', 6,'Mínimo de 6 caracteres')
+            ->allowEmptyString('password','Informe uma senha','create');
+
+        $validator
+            ->scalar('password_confirm')
+            ->requirePresence('password_confirm', 'create')
+            ->notEmptyString('password_confirm', 'Confirme a senha')
+            ->add('password_confirm', 'custom', [
+                'rule' => function ($value, $context) {
+                    return isset($context['data']['password']) && $value === $context['data']['password'];
+                },
+                'message' => 'As senhas não conferem'
+            ]);
+
+        $validator
+            ->boolean('ativar')
+            ->allowEmptyString('ativar');
+
+        $validator
+            ->scalar('tipo')
+            ->notEmptyString('tipo');
+
+        return $validator;
+    }
     /**
      * Returns a rules checker object that will be used for validating
      * application integrity.
@@ -122,8 +168,8 @@ class UsuariosTable extends Table
      */
     public function buildRules(RulesChecker $rules): RulesChecker
     {
-        $rules->add($rules->isUnique(['email']), ['errorField' => 'email']);
-        $rules->add($rules->existsIn(['conta_id'], 'Contas'), ['errorField' => 'conta_id']);
+        $rules->add($rules->isUnique(['email'],'E-Mail já esta em uso'), ['errorField' => 'email']);
+        $rules->add($rules->existsIn(['conta_id'], 'Contas','Verifique o ID da conta.'), ['errorField' => 'conta_id']);
 
         return $rules;
     }

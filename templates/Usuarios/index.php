@@ -20,6 +20,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Usuarios']]);
                     </ul>
                 </div>
             </div>
+            <?= $this->Form->create(null,['method'=>'get']) ?>
             <div class="row">
                 <div class="col-md-3 mb-3">
                     <?= $this->Form->control('nome', ['label'=>'Nome', 'class'=>'form-control']); ?>
@@ -36,12 +37,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Usuarios']]);
                 <div class="col-md-12 mb-3">
                     <div class="row">
                         <div class="col-md-2 offset-md-10  mb-3">
-                            <button type="button" class="justify-content-center w-100 btn btn-primary d-flex align-items-center">Pesquisar</button>
+                            <button type="submit" class="justify-content-center w-100 btn btn-primary d-flex align-items-center">Pesquisar</button>
                         </div>
                     </div>
                 </div>
             </div>
-
+            <?= $this->Form->end() ?>
             <div class="table-responsive mb-4 border rounded-1">
                 <table class="table table-striped text-nowrap mb-0 align-middle">
                     <thead class="text-dark fs-4">

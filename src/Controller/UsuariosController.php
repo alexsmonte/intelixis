@@ -35,6 +35,7 @@ class UsuariosController extends AppController
     {
         $query = $this->Usuarios->find()
             ->contain(['Contas']);
+
         $usuarios = $this->paginate($query);
 
         $title  =   'Meus usuários';
@@ -64,7 +65,11 @@ class UsuariosController extends AppController
     {
         $usuario = $this->Usuarios->newEmptyEntity();
         if ($this->request->is('post')) {
-            $usuario = $this->Usuarios->patchEntity($usuario, $this->request->getData());
+
+            $dadosUsuarios      =   $this->request->getData();
+            $dadosUsuarios["conta_id"]  =   $this->request->getSession()->read('Usuario.conta_id');
+
+            $usuario = $this->Usuarios->patchEntity($usuario, $dadosUsuarios,['validate' => 'criarUsuario']);
             if ($this->Usuarios->save($usuario)) {
                 $this->Flash->success(__('O usuário foi criado com sucesso.'));
 
@@ -87,19 +92,23 @@ class UsuariosController extends AppController
      */
     public function editar($id = null)
     {
-        $usuario = $this->Usuarios->get($id, contain: ['Whatsapps']);
+        $usuario = $this->Usuarios->get($id);
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $usuario = $this->Usuarios->patchEntity($usuario, $this->request->getData());
+
+            $dadosUsuarios              =   $this->request->getData();
+            $dadosUsuarios["conta_id"]  =   $this->request->getSession()->read('Usuario.conta_id');
+
+            $usuario = $this->Usuarios->patchEntity($usuario, $dadosUsuarios);
             if ($this->Usuarios->save($usuario)) {
-                $this->Flash->success(__('The usuario has been saved.'));
+                $this->Flash->success(__('Dados do usuário salvo com sucesso.'));
 
                 return $this->redirect(['action' => 'index']);
             }
             $this->Flash->error(__('The usuario could not be saved. Please, try again.'));
         }
-        $contas = $this->Usuarios->Contas->find('list', limit: 200)->all();
-        $whatsapps = $this->Usuarios->Whatsapps->find('list', limit: 200)->all();
-        $this->set(compact('usuario', 'contas', 'whatsapps'));
+
+        $title = "Editar dados do usuário";
+        $this->set(compact('usuario', 'title'));
     }
 
     /**
