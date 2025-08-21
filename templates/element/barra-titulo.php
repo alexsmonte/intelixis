@@ -9,7 +9,7 @@ $this->Breadcrumbs->setTemplates([
 
 
 $this->BreadcrumbsPlus->setFirstCrumb(
-    ['title' => '<iconify-icon icon="solar:home-linear" class="fs-6 aside-icon"></iconify-icon>', 'url' => ['controller' => 'Usuarios', 'action' => 'index']]
+    ['title' => '<iconify-icon icon="solar:home-linear" class="fs-6 aside-icon"></iconify-icon>', 'url' => ['controller' => 'Pages', 'action' => 'index']]
 );
 
 ?>
