@@ -8,6 +8,7 @@ use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 use Cake\ORM\Query;
+use Cake\Event\Event;
 
 
 /**
@@ -93,8 +94,7 @@ class UsuariosTable extends Table
 
         $validator
             ->scalar('password_confirm')
-            ->requirePresence('password_confirm', 'create')
-            ->notEmptyString('password_confirm', 'Confirme a senha')
+            ->allowEmptyString('password_confirm')
             ->add('password_confirm', 'custom', [
                 'rule' => function ($value, $context) {
                     return isset($context['data']['password']) && $value === $context['data']['password'];
@@ -159,6 +159,55 @@ class UsuariosTable extends Table
 
         return $validator;
     }
+
+
+    public function validationEditarUsuario(Validator $validator): Validator
+    {
+        $validator
+            ->integer('conta_id')
+            ->notEmptyString('conta_id');
+
+        $validator
+            ->scalar('nome')
+            ->maxLength('nome', 255,'Máximo de 255 caracteres')
+            ->requirePresence('nome', 'create', 'Informe o nome completo')
+            ->notEmptyString('nome', 'O nome não pode ser vazio');
+
+        $validator
+            ->email('email',false,'Informe um e-mail válido')
+            ->maxLength('email', 255,'Máximo de 255 caracteres')
+            ->requirePresence('email', 'create','Informe um e-mail')
+            ->notEmptyString('email','O e-mail não pode ser vazio')
+            ->add('email', 'unique', ['rule' => 'validateUnique', 'provider' => 'table','message'=>'E-Mail já está em uso']);
+
+        $validator
+            ->scalar('password')
+            ->requirePresence('password', 'create')
+            ->minLength('password', 6,'Mínimo de 6 caracteres');
+
+        $validator
+            ->scalar('password_confirm')
+            ->requirePresence('password_confirm', 'create')
+            ->add('password_confirm', 'custom', [
+                'rule' => function ($value, $context) {
+                    if (!isset($context['data']['password']) || $context['data']['password'] === '') {
+                        return true;
+                    }
+                    return $value === $context['data']['password'];
+                },
+                'message' => 'As senhas não conferem'
+            ]);
+
+        $validator
+            ->boolean('ativar')
+            ->allowEmptyString('ativar');
+
+        $validator
+            ->scalar('tipo')
+            ->notEmptyString('tipo');
+
+        return $validator;
+    }
     /**
      * Returns a rules checker object that will be used for validating
      * application integrity.
@@ -172,6 +221,13 @@ class UsuariosTable extends Table
         $rules->add($rules->existsIn(['conta_id'], 'Contas','Verifique o ID da conta.'), ['errorField' => 'conta_id']);
 
         return $rules;
+    }
+
+    public function beforeMarshal(Event $event, \ArrayObject $data, \ArrayObject $options)
+    {
+
+        if(isset($data['password']) && empty($data['password']))
+            unset($data['password']);
     }
 
     public function findAtivos(Query $query, array $options)
