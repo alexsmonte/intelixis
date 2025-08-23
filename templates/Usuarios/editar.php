@@ -8,6 +8,7 @@
 
 $this->BreadcrumbsPlus->add([['title' => 'Usuarios', 'url'=>['controller' => 'Usuarios', 'action' => 'index']],['title'=> 'Novo']]);
 
+$usuario->password  =   '';
 ?>
 
 <?= $this->element('barra-titulo',['title' => $title]); ?>
@@ -31,13 +32,15 @@ $this->BreadcrumbsPlus->add([['title' => 'Usuarios', 'url'=>['controller' => 'Us
                 </div>
             </div>
             <div class="col-md-3 mb-3">
-                <?= $this->Form->control('password',['label' => 'Senha','class' => 'form-control',]); ?>
+                <?= $this->Form->control('password',['label' => 'Senha','class' => 'form-control','required'=>'false']); ?>
             </div>
             <div class="col-md-3 mb-3">
                 <?= $this->Form->control('password_confirm',['type'=>'password','label' => 'Confirme sua senha','class' => 'form-control',]); ?>
             </div>
-            <div class="col-md-3 mb-3 form-check form-check-inline">
-                <?= $this->Form->control('ativar',['label' => 'Ativar','class' => 'form-check-input',]); ?>
+            <div class="col-md-3 mb-3">
+                <div class="form-check form-switch py-2">
+                    <?= $this->Form->control('ativar',['label' => 'Ativar','class' => 'form-check-input','id'=>'flexSwitchCheckChecked']); ?>
+                </div>
             </div>
             <div class="col-md-3 mb-3">
                 <?php $this->Form->control('estabelecimentos._ids', ['label' => 'Unidades','class' => 'form-control','options' => $estabelecimentos]); ?>
