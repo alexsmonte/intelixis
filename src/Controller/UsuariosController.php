@@ -2,6 +2,8 @@
 declare(strict_types=1);
 
 namespace App\Controller;
+use App\Controller\Traits\SearchableTrait;
+use Cake\Datasource\Exception\RecordNotFoundException;
 
 /**
  * Usuarios Controller
@@ -33,8 +35,14 @@ class UsuariosController extends AppController
      */
     public function index()
     {
+
+        if($this->request->getAttribute('identity')->tipo == 'usuario')
+            $conditions =   ['Usuarios.conta_id' => $this->request->getAttribute('identity')->conta_id, 'Usuarios.tipo' => 'usuario'];
+        else
+            $conditions =   ['Usuarios.conta_id' => $this->request->getAttribute('identity')->conta_id];
+
         $query = $this->Usuarios->find()
-            ->contain(['Contas']);
+            ->where($conditions);
 
         $usuarios = $this->paginate($query);
 
@@ -50,11 +58,17 @@ class UsuariosController extends AppController
      * @return \Cake\Http\Response|null|void Renders view
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function view($id = null)
+    public function visualizar($id = null)
     {
-        $usuario = $this->Usuarios->get($id, contain: ['Contas', 'Whatsapps']);
+        $usuario = $this->Usuarios->get($id);
         $this->set(compact('usuario'));
+
+        if ($this->request->is('ajax')) {
+            $this->viewBuilder()->disableAutoLayout();
+            $this->render('visualizar'); // view com HTML puro
+        }
     }
+
 
     /**
      * Add method
@@ -67,7 +81,7 @@ class UsuariosController extends AppController
         if ($this->request->is('post')) {
 
             $dadosUsuarios      =   $this->request->getData();
-            $dadosUsuarios["conta_id"]  =   $this->request->getSession()->read('Usuario.conta_id');
+            $dadosUsuarios["conta_id"]  =   $this->request->getAttribute('identity')->conta_id;
 
             $usuario = $this->Usuarios->patchEntity($usuario, $dadosUsuarios,['validate' => 'criarUsuario']);
             if ($this->Usuarios->save($usuario)) {
@@ -92,19 +106,19 @@ class UsuariosController extends AppController
      */
     public function editar($id = null)
     {
-        $usuario = $this->Usuarios->get($id);
+        $usuario = $this->Usuarios->get($id,['validate' => 'editarUsuario','conditions' => ['Usuarios.conta_id' => $this->request->getAttribute('identity')->conta_id]]);
         if ($this->request->is(['patch', 'post', 'put'])) {
 
             $dadosUsuarios              =   $this->request->getData();
-            $dadosUsuarios["conta_id"]  =   $this->request->getSession()->read('Usuario.conta_id');
+            $dadosUsuarios["conta_id"]  =   $this->request->getAttribute('identity')->conta_id;
 
-            $usuario = $this->Usuarios->patchEntity($usuario, $dadosUsuarios);
+            $usuario = $this->Usuarios->patchEntity($usuario, $dadosUsuarios, ['validate' => 'editarUsuario']);
             if ($this->Usuarios->save($usuario)) {
                 $this->Flash->success(__('Dados do usuário salvo com sucesso.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The usuario could not be saved. Please, try again.'));
+            $this->Flash->error(__('Ocorreu um erro na tentativa de atualizar os dados do usuário. Por favor, tente novamente.'));
         }
 
         $title = "Editar dados do usuário";
@@ -121,15 +135,39 @@ class UsuariosController extends AppController
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
-        $usuario = $this->Usuarios->get($id);
-        if ($this->Usuarios->delete($usuario)) {
-            $this->Flash->success(__('The usuario has been deleted.'));
-        } else {
-            $this->Flash->error(__('The usuario could not be deleted. Please, try again.'));
+        $conditions = ['Usuarios.conta_id' => $this->request->getAttribute('identity')->conta_id, 'Usuarios.tipo' =>'usuario'];
+
+        try {
+            $usuario = $this->Usuarios->get($id, ['conditions' => $conditions]);
+        } catch (RecordNotFoundException $e) {
+            if (empty($usuario)) {
+                if ($this->request->is('ajax') || $this->request->accepts('application/json')) {
+                    return $this->response->withType('application/json')
+                        ->withStringBody(json_encode(['success' => false, 'message' => 'Usuário não encontrado.']));
+                }
+            }
         }
 
+        $success = $this->Usuarios->delete($usuario);
+        $message = $success ? __('O usuário foi excluído com sucesso.') : __('Ocorreu um erro na tentativa de excluir. Por favor, tente novamente.');
+
+        if ($this->request->is('ajax') || $this->request->accepts('application/json')) {
+
+            $this->autoRender = false;
+            $this->response = $this->response
+                ->withType('application/json')
+                ->withStringBody(json_encode(['success' => $success,'message' => $message]));
+            return;
+        }
+
+        if ($success) {
+            $this->Flash->success($message);
+        } else {
+            $this->Flash->error($message);
+        }
         return $this->redirect(['action' => 'index']);
     }
+
 
 	public function login()
     {
@@ -162,5 +200,33 @@ class UsuariosController extends AppController
 
             return $this->redirect(['controller' => 'Usuarios', 'action' => 'login']);
         }
+    }
+
+    public function search()
+    {
+        $this->request->allowMethod(['get']);
+        $q = $this->request->getQuery('q');
+
+        $query = $this->Usuarios->find();
+        if (!empty($q)) {
+
+            if($this->request->getAttribute('identity')->tipo == 'usuario')
+                $conditions =   ['Usuarios.conta_id' => $this->request->getAttribute('identity')->conta_id, 'Usuarios.tipo' => 'usuario'];
+            else
+                $conditions =   ['Usuarios.conta_id' => $this->request->getAttribute('identity')->conta_id];
+
+            $busca  =   ['OR' => ['Usuarios.nome LIKE' => "%$q%",'Usuarios.email LIKE' => "%$q%"]];
+
+            $conditions  =   array_merge($conditions, $busca);
+
+            $query->where($conditions);
+        }
+
+        $usuarios = $query->limit(50)->all()->toArray(); // toArray() obrigatório
+
+        $this->autoRender = false;
+        $this->response = $this->response
+            ->withType('application/json')
+            ->withStringBody(json_encode(['data' => $usuarios]));
     }
 }
