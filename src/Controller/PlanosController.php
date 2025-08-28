@@ -20,7 +20,8 @@ class PlanosController extends AppController
         $query = $this->Planos->find();
         $planos = $this->paginate($query);
 
-        $this->set(compact('planos'));
+        $title  =   "Planos";
+        $this->set(compact('planos', 'title'));
     }
 
     /**
@@ -30,12 +31,18 @@ class PlanosController extends AppController
      * @return \Cake\Http\Response|null|void Renders view
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function view($id = null)
+
+    public function visualizar($id = null)
     {
         $plano = $this->Planos->get($id, contain: ['Assinaturas']);
-        $this->set(compact('plano'));
-    }
 
+        $this->set(compact('plano'));
+
+        if ($this->request->is('ajax')) {
+            $this->viewBuilder()->disableAutoLayout();
+            $this->render('visualizar'); // view com HTML puro
+        }
+    }
     /**
      * Add method
      *
@@ -47,13 +54,15 @@ class PlanosController extends AppController
         if ($this->request->is('post')) {
             $plano = $this->Planos->patchEntity($plano, $this->request->getData());
             if ($this->Planos->save($plano)) {
-                $this->Flash->success(__('The plano has been saved.'));
+                $this->Flash->success(__('Plano criado com sucesso.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The plano could not be saved. Please, try again.'));
+            $this->Flash->error(__('Ocorreu um erro na tentativa de criar um plano. Por favor, tente novamente.'));
         }
-        $this->set(compact('plano'));
+
+        $title  =   'Novo plano';
+        $this->set(compact('plano', 'title'));
     }
 
     /**
@@ -69,12 +78,14 @@ class PlanosController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $plano = $this->Planos->patchEntity($plano, $this->request->getData());
             if ($this->Planos->save($plano)) {
-                $this->Flash->success(__('The plano has been saved.'));
+                $this->Flash->success(__('Plano editado com sucesso.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The plano could not be saved. Please, try again.'));
+            $this->Flash->error(__('Ocorreu um erro na tentativa de editar um plano. Por favor, tente novamente.'));
         }
+
+        $title  =   'Editar plano';
         $this->set(compact('plano'));
     }
 
@@ -96,5 +107,30 @@ class PlanosController extends AppController
         }
 
         return $this->redirect(['action' => 'index']);
+    }
+
+
+    public function search()
+    {
+        $this->request->allowMethod(['get']);
+        $q = $this->request->getQuery('q');
+
+        $query = $this->Usuarios->find();
+        if (!empty($q)) {
+            $conditions =   [];
+
+            $busca  =   ['OR' => ['Planos.nome LIKE' => "%$q%"]];
+
+            $conditions  =   array_merge($conditions, $busca);
+
+            $query->where($conditions);
+        }
+
+        $planos = $query->limit(50)->all()->toArray(); // toArray() obrigatório
+
+        $this->autoRender = false;
+        $this->response = $this->response
+            ->withType('application/json')
+            ->withStringBody(json_encode(['data' => $planos]));
     }
 }
