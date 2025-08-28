@@ -62,9 +62,9 @@ class PlanosTable extends Table
     {
         $validator
             ->scalar('nome')
-            ->maxLength('nome', 80)
-            ->requirePresence('nome', 'create')
-            ->notEmptyString('nome');
+            ->maxLength('nome', 80,'O nome do plano deve ter no máximo 80 caracteres')
+            ->requirePresence('nome', 'create', 'Informe o nome do plano')
+            ->notEmptyString('nome','Informe o nome do plano');
 
         $validator
             ->scalar('descricao')
@@ -76,11 +76,11 @@ class PlanosTable extends Table
             ->allowEmptyString('resumo');
 
         $validator
-            ->decimal('valor')
+            ->decimal('valor','Informe o valor do plano corretamente')
             ->allowEmptyString('valor');
 
         $validator
-            ->integer('numero_whatsapp')
+            ->integer('numero_whatsapp', 'Informe um número')
             ->allowEmptyString('numero_whatsapp');
 
         $validator
