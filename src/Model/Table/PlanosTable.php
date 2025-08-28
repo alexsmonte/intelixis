@@ -76,7 +76,7 @@ class PlanosTable extends Table
             ->allowEmptyString('resumo');
 
         $validator
-            ->decimal('valor','Informe o valor do plano corretamente')
+            ->decimal('valor')
             ->allowEmptyString('valor');
 
         $validator
