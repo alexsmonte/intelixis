@@ -174,7 +174,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Usuarios']]);
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
 
-            if (!res.ok) throw new Error('Erro ao carregar cliente');
+            if (!res.ok) throw new Error('Erro ao carregar usuário');
 
             const html = await res.text();
 
@@ -197,7 +197,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Usuarios']]);
 
     } catch (err) {
         console.error(err);
-        alert('Erro ao carregar cliente.');
+        alert('Erro ao carregar usuário.');
     }
     }
     }
