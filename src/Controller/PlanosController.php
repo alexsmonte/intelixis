@@ -115,7 +115,7 @@ class PlanosController extends AppController
         $this->request->allowMethod(['get']);
         $q = $this->request->getQuery('q');
 
-        $query = $this->Usuarios->find();
+        $query = $this->Planos->find();
         if (!empty($q)) {
             $conditions =   [];
 
