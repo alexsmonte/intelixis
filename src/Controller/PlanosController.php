@@ -86,7 +86,7 @@ class PlanosController extends AppController
         }
 
         $title  =   'Editar plano';
-        $this->set(compact('plano'));
+        $this->set(compact('plano', 'title'));
     }
 
     /**
