@@ -7,7 +7,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Usuarios']]);
 <?= $this->element('barra-titulo',['title' => $title]); ?>
 
 
-<!-- Modal Visualizar Cliente -->
+<!-- Modal Visualizar Usuario -->
 <div class="modal fade" id="view-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-md">
         <div class="modal-content">
