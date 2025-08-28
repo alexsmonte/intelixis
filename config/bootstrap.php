@@ -45,6 +45,7 @@ use Cake\Mailer\TransportFactory;
 use Cake\Routing\Router;
 use Cake\Utility\Security;
 use function Cake\Core\env;
+use Cake\Database\TypeFactory;
 
 /*
  * Load global functions for collections, translations, debugging etc.
@@ -74,10 +75,10 @@ require CAKE . 'functions.php';
 // }
 
 /*
- * Initializes default Config store and loads the main configuration file (app.php)
+ * Initializes default Config store and loads the main configuration file (app.php.PGBKP)
  *
  * CakePHP contains 2 configuration files after project creation:
- * - `config/app.php` for the default application configuration.
+ * - `config/app.php.PGBKP` for the default application configuration.
  * - `config/app_local.php` for environment specific configuration.
  */
 try {
@@ -233,5 +234,6 @@ ServerRequest::addDetector('tablet', function ($request) {
     \Cake\I18n\Date::setToStringFormat('dd/MM/yyyy');
     \Cake\I18n\Time::setToStringFormat('dd/MM/yyyy HH:mm');
     \Cake\I18n\Date::setToStringFormat('dd/MM/YYYY');
-
+    TypeFactory::build('decimal')->useLocaleParser();
+    TypeFactory::build('float')->useLocaleParser();
 require  __DIR__ . '/inflector.php';
