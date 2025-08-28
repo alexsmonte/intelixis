@@ -1,4 +1,5 @@
 <?php
+use Cake\I18n\Number;
 
 $this->BreadcrumbsPlus->add([['title' => 'Planos']]);
 
@@ -6,7 +7,24 @@ $this->BreadcrumbsPlus->add([['title' => 'Planos']]);
 
 <?= $this->element('barra-titulo',['title' => $title]); ?>
 
-<div class="card w-100 position-relative overflow-hidden">
+<!-- Modal Visualizar planos -->
+<div class="modal fade" id="view-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="pb-1 mb-2 border-bottom w-100">
+                    <h5>Detalhes do plano</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body text-start" id="modal-body-content">
+                <i class="fa fa-spinner fa-spin fa-2x"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="app" class="card w-100 position-relative overflow-hidden">
     <div class="px-4 py-3 border-bottom">
         <div class="card-body p-4">
             <div class="d-flex mb-3 align-items-center">
@@ -16,30 +34,17 @@ $this->BreadcrumbsPlus->add([['title' => 'Planos']]);
                         <i class="fa fa-bars" aria-hidden="true"></i>
                     </button>
                     <ul class="dropdown-menu animated flipInX">
-                                                <li><?= $this->Html->link('<i class="fa fa-plus" aria-hidden="true"></i> Novo Plano', ['action' => 'novo'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
-                                                <li><?= $this->Html->link('<i class="fa fa-print" aria-hidden="true"></i> Imprimir esta página', ['action' => 'imprimir'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
-                        <li><?= $this->Html->link('<i class="fa fa-print" aria-hidden="true"></i> Imprimir tudo', ['action' => 'imprimir'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
+                        <li><?= $this->Html->link('<i class="fa fa-plus" aria-hidden="true"></i> Novo Plano', ['action' => 'novo'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
                     </ul>
                 </div>
             </div>
-                        <div class="row">
+            <div class="row">
 
-                            <div class="col-md-3 mb-3">
-                                <?= $this->Form->control('nome', ['label'=>'nome', 'class'=>'form-control']); ?>
-                            </div>                            <div class="col-md-3 mb-3">
-                                <?= $this->Form->control('resumo', ['label'=>'resumo', 'class'=>'form-control']); ?>
-                            </div>                            <div class="col-md-3 mb-3">
-                                <?= $this->Form->control('valor', ['label'=>'valor', 'class'=>'form-control']); ?>
-                            </div>                            <div class="col-md-3 mb-3">
-                                <?= $this->Form->control('numero_whatsapp', ['label'=>'numero_whatsapp', 'class'=>'form-control']); ?>
-                            </div>                            <div class="col-md-3 mb-3">
-                                <?= $this->Form->control('ativar', ['label'=>'ativar', 'class'=>'form-control']); ?>
-                            </div>                <div class="col-md-12 mb-3">
-                    <div class="row">
-                        <div class="col-md-2 offset-md-10  mb-3">
-                            <button type="button" class="justify-content-center w-100 btn btn-primary d-flex align-items-center">Pesquisar</button>
-                        </div>
-                    </div>
+                <div class="col-md-5 mb-3">
+                    <?= $this->Form->control('nome', ['label'=>'Nome do plano', 'class'=>'form-control', 'placeholder'=>'Buscar pelo nome do plano','v-model'=>'query']); ?>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="justify-content-center w-100 btn btn-primary d-flex align-items-center mt-3" @click="onSearch">Pesquisar</button>
                 </div>
             </div>
 
@@ -47,53 +52,50 @@ $this->BreadcrumbsPlus->add([['title' => 'Planos']]);
                 <table class="table table-striped text-nowrap mb-0 align-middle">
                     <thead class="text-dark fs-4">
                     <tr>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('id') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('nome') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('resumo') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('valor') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('numero_whatsapp') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('ativar') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('created') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('modified') ?></h6></th>
+                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('nome') ?></h6></th>
+                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('valor') ?></h6></th>
+                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('numero_whatsapp') ?></h6></th>
+                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('ativar') ?></h6></th>
+                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('created','Criado em') ?></h6></th>
                         <th><?= __('Opções') ?></th>
                     </tr>
                     </thead>
                     <tbody>
-                    <?php foreach ($planos as $plano): ?>
-                    <tr>
-                                                                        <td><p class="mb-0 fw-normal fs-4"><?= $this->Number->format($plano->id) ?></p></td>
-                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= h($plano->nome) ?> </p></td>
-                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= h($plano->resumo) ?> </p></td>
-                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= $plano->valor === null ? '' : $this->Number->format($plano->valor) ?></p></td>
-                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= $plano->numero_whatsapp === null ? '' : $this->Number->format($plano->numero_whatsapp) ?></p></td>
-                                                                                    <td><?= $plano->ativar == 1 ? '<span class="badge bg-success-subtle text-success">Ativo</span>' : '<span class="badge bg-warning-subtle text-warning">Não</span>'; ?></td>
-                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= h($plano->created) ?> </p></td>
-                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= h($plano->modified) ?> </p></td>
-                                    <td>
-                            <div class="btn-group">
-                                <button class="btn btn-warning dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Opções
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <li><?= $this->Html->link('Visualizar', ['action' => 'view', $plano->id],['class'=>'dropdown-item','escape'=>false]) ?></li>
-                                    <li><?= $this->Html->link('Editar', ['action' => 'editar', $plano->id],['class'=>'dropdown-item','escape'=>false]) ?> </li>
-                                    <li>
-                                        <?= $this->Form->postLink(
-                                        'Excluir',
-                                        ['action' => 'delete', $plano->id],
-                                        [
-                                        'class'=>'dropdown-item',
-                                        'escape'=>false,
-                                        'method' => 'delete',
-                                        'confirm' => __('Tem certeza que deseja excluir # {0}?', $plano->id),
-                                        ]
-                                        ) ?>
-                                    </li>
-                                </ul>
-                            </div>
+                    <tr v-if="planos.length === 0">
+                        <td colspan="5" class="text-center">
+                            Nenhum registro encontrado
                         </td>
                     </tr>
-                    <?php endforeach; ?>
+                        <tr v-for="plano in planos" :key="plano.id">
+                            <td><p class="mb-0 fw-normal fs-4">{{plano.nome}}</p></td>
+                            <td><p class="mb-0 fw-normal fs-4">{{ Number(plano.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</p></td>
+                            <td><p class="mb-0 fw-normal fs-4">{{plano.numero_whatsapp}}</p></td>
+                            <td>
+                                <span v-if="plano.ativar == 1" class="badge bg-success-subtle text-success">Ativo</span>
+                                <span v-else class="badge bg-warning-subtle text-warning">Não</span>
+                            </td>
+                            <td><p class="mb-0 fw-normal fs-4">
+                                    {{ new Date(plano.created).toLocaleDateString('pt-BR', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                    }) }}</p>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-warning dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Opções
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <li><?= $this->Html->link('Visualizar','#',['@click'=>'viewCliente(plano.id)','class'=>'dropdown-item','escape'=>false]) ?></li>
+                                        <li><a class="dropdown-item" :href="`<?= $this->Url->build(['controller' => 'Planos', 'action' => 'editar'], ['fullBase' => true]); ?>/${plano.id}`">Editar</a></li>
+                                        <li><a class="dropdown-item" href="#" @click.prevent="onDelete(plano.id, plano.nome)">Excluir</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
                 <div class="paginator mt-4">
@@ -109,3 +111,99 @@ $this->BreadcrumbsPlus->add([['title' => 'Planos']]);
         </div>
     </div>
 </div>
+
+
+
+<script>
+    const planosInit = <?= json_encode($planos->toArray()) ?>;
+
+    Vue.createApp({
+        data() {
+            return {
+                query: '',
+                planos: planosInit,
+                planoId: null,
+            }
+        },
+        methods: {
+            async onSearch() {
+        try {
+            const params = new URLSearchParams()
+
+            if (this.query) {
+                params.append("q", this.query)
+            }
+
+            // URL absoluta do endpoint
+            const url = "<?= $this->Url->build(['controller' => 'Planos', 'action' => 'search']); ?>?" + params.toString();
+
+            const res = await fetch(url, {
+                credentials: 'same-origin' // envia cookies de sessão
+            });
+
+            // lê JSON mesmo que haja redirect
+            const data = await res.json();
+            this.planos = data.data || [];
+        } catch(err) {
+            console.error(err);
+            alert('Erro ao buscar planos.');
+        }
+    },
+    async onDelete(id, nome) {
+        if (confirm(`Tem certeza que deseja excluir #${nome}?`)) {
+            const response = await fetch(`<?= $this->Url->build(['controller' => 'Planos', 'action' => 'delete']); ?>/${id}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-Token': '<?= $this->request->getAttribute('csrfToken') ?>',
+                    'X-HTTP-Method-Override': 'DELETE',
+                    'Accept': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert(data.message);
+                // Atualizar a lista
+                this.onSearch();
+            } else {
+                alert('Erro: ' + data.message);
+            }
+        }
+    },
+    async viewCliente(id) {
+        try {
+            const res = await fetch(`<?= $this->Url->build(['controller' => 'Planos', 'action' => 'visualizar']); ?>/${id}`, {
+                credentials: 'same-origin',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+
+            if (!res.ok) throw new Error('Erro ao carregar plano');
+
+            const html = await res.text();
+
+            // Adiciona o conteúdo no modal e inclui botão Editar
+            const modalEl = document.getElementById('view-modal');
+
+            modalEl.querySelector('#modal-body-content').innerHTML = `
+  <div>
+    ${html} <!-- conteúdo da view visualizar_tabela.php -->
+                <div class="modal-footer mt-3">
+                <a href="<?= $this->Url->build(['controller' => 'Planos', 'action' => 'editar'], ['fullBase' => true]); ?>/${id}"
+                class="btn btn-primary">Editar</a>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
+                </div>
+                </div>
+                `;
+        // Inicializa e abre o modal
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+
+    } catch (err) {
+        console.error(err);
+        alert('Erro ao carregar plano.');
+    }
+    }
+    }
+}).mount('#app');
+</script>
