@@ -767,6 +767,26 @@
                         <li class="sidebar-item">
                             <a href="javascript:void(0)" class="sidebar-link has-arrow">
                                 <i class="ti ti-circle"></i>
+                                <span class="hide-menu">Extensões</span>
+                            </a>
+                            <ul aria-expanded="false" class="collapse second-level">
+                                <li class="sidebar-item">
+                                    <a href="<?= $this->Url->build(['controller' => 'Extensoes','action' => 'index'],['fullBase' => true]);?>" class="sidebar-link">
+                                        <i class="ti ti-circle"></i>
+                                        <span class="hide-menu">Visualizar</span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item">
+                                    <a href="<?= $this->Url->build(['controller' => 'Extensoes','action' => 'novo'],['fullBase' => true]);?>" class="sidebar-link">
+                                        <i class="ti ti-circle"></i>
+                                        <span class="hide-menu">Adicionar</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="javascript:void(0)" class="sidebar-link has-arrow">
+                                <i class="ti ti-circle"></i>
                                 <span class="hide-menu">Planos</span>
                             </a>
                             <ul aria-expanded="false" class="collapse second-level">
