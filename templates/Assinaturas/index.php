@@ -16,25 +16,30 @@ $this->BreadcrumbsPlus->add([['title' => 'Assinaturas']]);
                         <i class="fa fa-bars" aria-hidden="true"></i>
                     </button>
                     <ul class="dropdown-menu animated flipInX">
-                                                <li><?= $this->Html->link('<i class="fa fa-plus" aria-hidden="true"></i> Novo Assinatura', ['action' => 'novo'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
-                                                <li><?= $this->Html->link('<i class="fa fa-print" aria-hidden="true"></i> Imprimir esta página', ['action' => 'imprimir'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
+                        <li><?= $this->Html->link('<i class="fa fa-plus" aria-hidden="true"></i> Nova Assinatura', ['action' => 'novo'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
+                        <li><?= $this->Html->link('<i class="fa fa-print" aria-hidden="true"></i> Imprimir esta página', ['action' => 'imprimir'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
                         <li><?= $this->Html->link('<i class="fa fa-print" aria-hidden="true"></i> Imprimir tudo', ['action' => 'imprimir'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
                     </ul>
                 </div>
             </div>
-                        <div class="row">
+            <div class="row">
 
-                                <div class="col-md-3 mb-3">
-                                    <?=  $this->Form->control('conta_id', ['label'=>'conta_id','options' => $contas]); ?>
-                                </div>                                <div class="col-md-3 mb-3">
-                                    <?=  $this->Form->control('plano_id', ['label'=>'plano_id','options' => $planos]); ?>
-                                </div>                            <div class="col-md-3 mb-3">
-                                <?= $this->Form->control('data_vencimento', ['label'=>'data_vencimento', 'class'=>'form-control']); ?>
-                            </div>                            <div class="col-md-3 mb-3">
-                                <?= $this->Form->control('desconto', ['label'=>'desconto', 'class'=>'form-control']); ?>
-                            </div>                            <div class="col-md-3 mb-3">
-                                <?= $this->Form->control('status', ['label'=>'status', 'class'=>'form-control']); ?>
-                            </div>                <div class="col-md-12 mb-3">
+                <div class="col-md-3 mb-3">
+                    <?=  $this->Form->control('conta_id', ['label'=>'conta_id','options' => $contas]); ?>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <?=  $this->Form->control('plano_id', ['label'=>'plano_id','options' => $planos]); ?>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <?= $this->Form->control('data_vencimento', ['label'=>'data_vencimento', 'class'=>'form-control']); ?>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <?= $this->Form->control('desconto', ['label'=>'desconto', 'class'=>'form-control']); ?>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <?= $this->Form->control('status', ['label'=>'status', 'class'=>'form-control']); ?>
+                </div>
+                <div class="col-md-12 mb-3">
                     <div class="row">
                         <div class="col-md-2 offset-md-10  mb-3">
                             <button type="button" class="justify-content-center w-100 btn btn-primary d-flex align-items-center">Pesquisar</button>
@@ -47,52 +52,52 @@ $this->BreadcrumbsPlus->add([['title' => 'Assinaturas']]);
                 <table class="table table-striped text-nowrap mb-0 align-middle">
                     <thead class="text-dark fs-4">
                     <tr>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('id') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('conta_id') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('plano_id') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('data_vencimento') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('desconto') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('status') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('created') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('modified') ?></h6></th>
+                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('id') ?></h6></th>
+                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('conta_id') ?></h6></th>
+                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('plano_id') ?></h6></th>
+                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('data_vencimento') ?></h6></th>
+                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('desconto') ?></h6></th>
+                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('status') ?></h6></th>
+                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('created') ?></h6></th>
+                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('modified') ?></h6></th>
                         <th><?= __('Opções') ?></th>
                     </tr>
                     </thead>
                     <tbody>
                     <?php foreach ($assinaturas as $assinatura): ?>
-                    <tr>
-                                                                                                                            <td><p class="mb-0 fw-normal fs-4"><?= $this->Number->format($assinatura->id) ?></p></td>
-                                                                                                <td><p class="mb-0 fw-normal fs-4"><?= $assinatura->hasValue('conta') ? $this->Html->link($assinatura->conta->cpf_cnpj, ['controller' => 'Contas', 'action' => 'view', $assinatura->conta->id]) : '' ?></p></td>
-                                                                                                                                                        <td><p class="mb-0 fw-normal fs-4"><?= $assinatura->hasValue('plano') ? $this->Html->link($assinatura->plano->nome, ['controller' => 'Planos', 'action' => 'view', $assinatura->plano->id]) : '' ?></p></td>
-                                                                                                                                                        <td><p class="mb-0 fw-normal fs-4"><?= h($assinatura->data_vencimento) ?> </p></td>
-                                                                                                                                        <td><p class="mb-0 fw-normal fs-4"><?= $assinatura->desconto === null ? '' : $this->Number->format($assinatura->desconto) ?></p></td>
-                                                                                                                                        <td><p class="mb-0 fw-normal fs-4"><?= h($assinatura->status) ?> </p></td>
-                                                                                                                                        <td><p class="mb-0 fw-normal fs-4"><?= h($assinatura->created) ?> </p></td>
-                                                                                                                                        <td><p class="mb-0 fw-normal fs-4"><?= h($assinatura->modified) ?> </p></td>
-                                    <td>
-                            <div class="btn-group">
-                                <button class="btn btn-warning dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Opções
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <li><?= $this->Html->link('Visualizar', ['action' => 'view', $assinatura->id],['class'=>'dropdown-item','escape'=>false]) ?></li>
-                                    <li><?= $this->Html->link('Editar', ['action' => 'edit', $assinatura->id],['class'=>'dropdown-item','escape'=>false]) ?> </li>
-                                    <li>
-                                        <?= $this->Form->postLink(
-                                        'Excluir',
-                                        ['action' => 'delete', $assinatura->id],
-                                        [
-                                        'class'=>'dropdown-item',
-                                        'escape'=>false,
-                                        'method' => 'delete',
-                                        'confirm' => __('Tem certeza que deseja excluir # {0}?', $assinatura->id),
-                                        ]
-                                        ) ?>
-                                    </li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td><p class="mb-0 fw-normal fs-4"><?= $this->Number->format($assinatura->id) ?></p></td>
+                            <td><p class="mb-0 fw-normal fs-4"><?= $assinatura->hasValue('conta') ? $this->Html->link($assinatura->conta->cpf_cnpj, ['controller' => 'Contas', 'action' => 'view', $assinatura->conta->id]) : '' ?></p></td>
+                            <td><p class="mb-0 fw-normal fs-4"><?= $assinatura->hasValue('plano') ? $this->Html->link($assinatura->plano->nome, ['controller' => 'Planos', 'action' => 'view', $assinatura->plano->id]) : '' ?></p></td>
+                            <td><p class="mb-0 fw-normal fs-4"><?= h($assinatura->data_vencimento) ?> </p></td>
+                            <td><p class="mb-0 fw-normal fs-4"><?= $assinatura->desconto === null ? '' : $this->Number->format($assinatura->desconto) ?></p></td>
+                            <td><p class="mb-0 fw-normal fs-4"><?= h($assinatura->status) ?> </p></td>
+                            <td><p class="mb-0 fw-normal fs-4"><?= h($assinatura->created) ?> </p></td>
+                            <td><p class="mb-0 fw-normal fs-4"><?= h($assinatura->modified) ?> </p></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-warning dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Opções
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <li><?= $this->Html->link('Visualizar', ['action' => 'view', $assinatura->id],['class'=>'dropdown-item','escape'=>false]) ?></li>
+                                        <li><?= $this->Html->link('Editar', ['action' => 'edit', $assinatura->id],['class'=>'dropdown-item','escape'=>false]) ?> </li>
+                                        <li>
+                                            <?= $this->Form->postLink(
+                                                'Excluir',
+                                                ['action' => 'delete', $assinatura->id],
+                                                [
+                                                    'class'=>'dropdown-item',
+                                                    'escape'=>false,
+                                                    'method' => 'delete',
+                                                    'confirm' => __('Tem certeza que deseja excluir # {0}?', $assinatura->id),
+                                                ]
+                                            ) ?>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
                     <?php endforeach; ?>
                     </tbody>
                 </table>
