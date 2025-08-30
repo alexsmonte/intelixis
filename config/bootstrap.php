@@ -234,6 +234,19 @@ ServerRequest::addDetector('tablet', function ($request) {
     \Cake\I18n\Date::setToStringFormat('dd/MM/yyyy');
     \Cake\I18n\Time::setToStringFormat('dd/MM/yyyy HH:mm');
     \Cake\I18n\Date::setToStringFormat('dd/MM/YYYY');
+
+// Habilita o parseamento de datas localizadas
+    TypeFactory::build('date')
+            ->useLocaleParser()
+            ->setLocaleFormat('dd/MM/yyyy');
+
+    TypeFactory::build('datetime')
+            ->useLocaleParser()
+            ->setLocaleFormat('dd/MM/yyyy HH:mm:ss');
+
+    TypeFactory::build('timestamp')
+            ->useLocaleParser()
+            ->setLocaleFormat('dd/MM/yyyy HH:mm:ss');
     TypeFactory::build('decimal')->useLocaleParser();
     TypeFactory::build('float')->useLocaleParser();
 require  __DIR__ . '/inflector.php';
