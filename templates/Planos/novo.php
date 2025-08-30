@@ -1,10 +1,4 @@
 <?php
-/**
- * @var \App\View\AppView $this
- * @var \App\Model\Entity\Plano $plano
- */
-?>
-<?php
 
 $this->BreadcrumbsPlus->add([['title' => 'Planos', 'url'=>['controller' => 'Planos', 'action' => 'index']],['title'=> 'Novo']]);
 
