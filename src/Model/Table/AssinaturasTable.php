@@ -3,10 +3,13 @@ declare(strict_types=1);
 
 namespace App\Model\Table;
 
+use App\Model\Entity\Assinatura;
+use App\Model\Entity\Conta;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+
 
 /**
  * Assinaturas Model
@@ -79,7 +82,7 @@ class AssinaturasTable extends Table
             ->notEmptyString('plano_id');
 
         $validator
-            ->date('data_vencimento')
+            ->date('data_vencimento',['dmy'],'Informe uma data válida')
             ->requirePresence('data_vencimento', 'create')
             ->notEmptyDate('data_vencimento');
 
@@ -107,5 +110,12 @@ class AssinaturasTable extends Table
         $rules->add($rules->existsIn(['plano_id'], 'Planos'), ['errorField' => 'plano_id']);
 
         return $rules;
+    }
+
+    public function findVerificar(SelectQuery $query, $contaId)
+    {
+        return $query
+            ->contain(['Estabelecimentos'])
+            ->where(['Assinaturas.conta_id' => $contaId]);
     }
 }
