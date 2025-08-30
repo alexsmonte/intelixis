@@ -5,8 +5,6 @@
  */
 
 use Cake\I18n\Number;
-?>
-<?php
 
 $this->BreadcrumbsPlus->add([['title' => 'Planos', 'url'=>['controller' => 'Planos', 'action' => 'index']],['title'=> 'Editar']]);
 $plano->valor   =   Number::precision($plano->valor,2);
