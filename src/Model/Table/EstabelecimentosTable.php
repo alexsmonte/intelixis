@@ -7,6 +7,7 @@ use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\Event\Event;
 
 /**
  * Estabelecimentos Model
@@ -194,5 +195,24 @@ class EstabelecimentosTable extends Table
         $rules->add($rules->existsIn(['assinatura_id'], 'Assinaturas'), ['errorField' => 'assinatura_id']);
 
         return $rules;
+    }
+
+    public function beforeMarshal(Event $event, \ArrayObject $data, \ArrayObject $options)
+    {
+
+        $caracterInvalido   =   [" ",".","-","/",")","(",","];
+
+        if(isset($data['cpf_cnpj']))
+            $data['cpf_cnpj']      =   str_replace($caracterInvalido, "", $data['cpf_cnpj']);
+
+        if(isset($data['cep']))
+            $data['cep']           =   str_replace($caracterInvalido, "", $data['cep']);
+
+        if(isset($data['telefone']))
+            $data['telefone']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['telefone']));
+
+        if(isset($data['celular']))
+            $data['celular']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['celular']));
+
     }
 }
