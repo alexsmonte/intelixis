@@ -143,7 +143,12 @@ class EstabelecimentosTable extends Table
             ->scalar('cpf_cnpj')
             ->maxLength('cpf_cnpj', 21)
             ->requirePresence('cpf_cnpj', 'create')
-            ->notEmptyString('cpf_cnpj');
+            ->notEmptyString('cpf_cnpj','Você precis informa o CPF/CNPJ');
+
+        $validator
+            ->scalar('cep')
+            ->maxLength('cep', 9)
+            ->allowEmptyString('logradouro');
 
         $validator
             ->scalar('logradouro')
