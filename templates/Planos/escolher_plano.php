@@ -45,7 +45,11 @@ use Cake\I18n\Number;
             <div class="d-flex flex-column gap-3 mb-2">
                 A maioria das mensagens de whatsapp é gratuita, e a Intelixis ajuda você a reduzir custos quando houver tarifação da Meta.
             </div>
-            <a href="javascript:void(0)" class="btn btn-dark">Comprar agora</a>
+            <?= $this->Form->create(null, ['url' => ['controller'=>'Assinaturas','action' => 'novo','id'=>'frmPlano'.$plano->id]]);
+            echo $this->Form->control('plano_id',['type' => 'hidden', 'value'=>$plano->id]);
+            ?>
+            <button type="submit" class="btn btn-dark">Comprar agora</button>
+            <?= $this->Form->end(); ?>
         </div>
     </div>
     <?php } ?>
