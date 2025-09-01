@@ -185,9 +185,12 @@ class UsuariosController extends AppController
 
             $estabelecimentos = $usuario->estabelecimentos;
 
+            unset($usuario->estabelecimentos);
+
             // Caso só exista 1 estabelecimento, salva direto
             if (count($estabelecimentos) === 1) {
 
+                $this->getRequest()->getSession()->write('Auth',$usuario);
                 $this->getRequest()->getSession()->write('Auth.Estabelecimento.id',$estabelecimentos[0]->id);
                 $this->getRequest()->getSession()->write('Auth.Estabelecimento.nome_fantasia',$estabelecimentos[0]->nome_fantasia);
                 $this->getRequest()->getSession()->write('Auth.Assinatura.id',$estabelecimentos[0]->assinatura_id);
