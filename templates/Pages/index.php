@@ -3,7 +3,7 @@
         <div class="card">
             <div class="card-body position-relative">
                 <div>
-                    <h4 class="card-title mb-1">Seja bem-vindo <?= $this->request->getAttribute('identity')->nome; ?></h4>
+                    <h4 class="card-title mb-1">Olá <?= $this->request->getAttribute('identity')->nome; ?></h4>
                     <p class="card-subtitle mb-3 pb-1">Check All The Statastics</p>
                     <button class="btn btn-primary rounded-pill" type="button">
                         Visit Now
@@ -65,3 +65,4 @@
         </div>
     </div>
 </div>
+
