@@ -110,6 +110,14 @@ class PlanosController extends AppController
     }
 
 
+    public function escolherPlano()
+    {
+        $planos = $this->Planos->find()->where(['Planos.ativar' => 1]);
+
+        $this->set(compact('planos'));
+    }
+
+
     public function search()
     {
         $this->request->allowMethod(['get']);
