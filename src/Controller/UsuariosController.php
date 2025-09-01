@@ -177,6 +177,26 @@ class UsuariosController extends AppController
 
         if ($result && $result->isValid()) {
 
+            $usuario    = $this->Authentication->getIdentity();
+            $usuarioId  = $usuario->id;
+
+            // Busca os estabelecimentos da conta dele
+            $usuario = $this->fetchTable('Usuarios')->get($usuarioId, contain: ['Estabelecimentos']);
+
+            $estabelecimentos = $usuario->estabelecimentos;
+
+            // Caso só exista 1 estabelecimento, salva direto
+            if (count($estabelecimentos) === 1) {
+
+                $this->getRequest()->getSession()->write('Auth.Estabelecimento.id',$estabelecimentos[0]->id);
+                $this->getRequest()->getSession()->write('Auth.Estabelecimento.nome_fantasia',$estabelecimentos[0]->nome_fantasia);
+                $this->getRequest()->getSession()->write('Auth.Assinatura.id',$estabelecimentos[0]->assinatura_id);
+
+            } elseif (count($estabelecimentos) > 1){
+                // Redireciona para escolher o estabelecimento
+                return $this->redirect(['controller' => 'Estabelecimentos', 'action' => 'selecionar']);
+            }
+
             $redirect = $this->request->getQuery('redirect', [
                 'controller' => 'Pages',
                 'action' => 'index',
