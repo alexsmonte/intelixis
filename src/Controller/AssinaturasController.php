@@ -44,19 +44,26 @@ class AssinaturasController extends AppController
      */
     public function novo()
     {
+
         $assinatura = $this->Assinaturas->newEmptyEntity();
         if ($this->request->is('post')) {
-            $assinatura = $this->Assinaturas->patchEntity($assinatura, $this->request->getData());
-            if ($this->Assinaturas->save($assinatura)) {
-                $this->Flash->success(__('The assinatura has been saved.'));
 
-                return $this->redirect(['action' => 'index']);
+            $dadosAssinatura    =   $this->request->getData();
+            $dadosAssinatura["conta_id"]    =   $this->request->getAttribute('identity')->conta_id;
+            $dadosAssinatura["data_vencimento"]    =   date("d/m/Y", strtotime("+30 days"));
+            $assinatura = $this->Assinaturas->patchEntity($assinatura, $dadosAssinatura);
+
+
+            if ($this->Assinaturas->save($assinatura)) {
+                $this->Flash->success(__('Parabéns! assinatura do plano realizada com successo.'));
+
+                $this->request->getSession()->write('Assinatura.id', $assinatura->id);
+                return $this->redirect(['controller'=>'Estabelecimentos','action' => 'configuracoes']);
             }
-            $this->Flash->error(__('The assinatura could not be saved. Please, try again.'));
+            $this->Flash->error(__('Ocorreu um erro ao tentar finalizar a assinatura. Por favor, tente novamente.'));
         }
-        $contas = $this->Assinaturas->Contas->find('list', limit: 200)->all();
-        $planos = $this->Assinaturas->Planos->find('list', limit: 200)->all();
-        $this->set(compact('assinatura', 'contas', 'planos'));
+
+        $this->set(compact('assinatura'));
     }
 
     /**
