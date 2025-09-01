@@ -56,6 +56,7 @@ class Estabelecimento extends Entity
         'razao_social' => true,
         'nome_fantasia' => true,
         'cpf_cnpj' => true,
+        'cep' => true,
         'logradouro' => true,
         'numero' => true,
         'complemento' => true,
