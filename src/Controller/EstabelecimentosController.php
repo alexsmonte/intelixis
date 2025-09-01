@@ -106,4 +106,41 @@ class EstabelecimentosController extends AppController
 
         return $this->redirect(['action' => 'index']);
     }
+
+    public function selecionar()
+    {
+
+    }
+
+    public function configuracoes()
+    {
+
+        if($this->request->getSession()->check('Auth.Estabelecimento.id'))
+            $estabelecimento = $this->Estabelecimentos->get($this->request->getSession()->read('Auth.Estabelecimento.id'), contain: ['Extensoes', 'Usuarios','Assinaturas' => ['Planos']]);
+        else
+            $estabelecimento = $this->Estabelecimentos->newEmptyEntity();
+
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            $dadosEstabelecimento   =   $this->request->getData();
+            $dadosEstabelecimento["assinatura_id"]  =   $this->request->getSession()->read('Auth.Assinatura.id');
+            $dadosEstabelecimento["conta_id"]       =   $this->request->getAttribute('identity')->conta_id;
+
+            if ($this->request->getAttribute('identity')->tipo == 'master')
+            $dadosEstabelecimento["usuarios"]["_ids"]   =   [$this->request->getAttribute('identity')->id];
+
+            $estabelecimento = $this->Estabelecimentos->patchEntity($estabelecimento, $dadosEstabelecimento);
+
+            if ($this->Estabelecimentos->save($estabelecimento)) {
+                $this->Flash->success(__('Os dados foram salvos com sucesso.'));
+
+                $this->request->getSession()->write('Estabelecimento.id', $estabelecimento->id);
+                return $this->redirect(['action' => 'configuracoes']);
+            }
+            $this->Flash->error(__('Ocorreu um erro ao tentar salvar os dados do estabelecimento. Por favor, tente novamente.'));
+        }
+
+        $title  =   'Configurações do estabelecimento';
+
+        $this->set(compact('estabelecimento', 'title'));
+    }
 }
