@@ -21,6 +21,7 @@ use Cake\Http\Exception\ForbiddenException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
 use Cake\View\Exception\MissingTemplateException;
+use Cake\ORM\Locator\LocatorAwareTrait;
 
 /**
  * Static content controller
@@ -34,6 +35,19 @@ class PagesController extends AppController
 
     public function index()
     {
-        //imp
+
+        if ($this->request->getAttribute('identity')->tipo == 'master')
+        {
+            $assinaturas        =   $this->fetchTable('Assinaturas');
+            $queryAssinaturas   =   $assinaturas->find('verificar', $this->request->getAttribute('identity')->conta_id);
+
+            $existeAssinatura   =   $queryAssinaturas->count()>0?true:false;
+
+            if($existeAssinatura == false){
+                return $this->redirect('/planos/escolher-plano', 301);
+            }
+
+        }
+
     }
 }
