@@ -164,9 +164,6 @@ class ClientesController extends AppController
         ->withStringBody(json_encode(['data' => $clientes]));
 }
 
-    
-
-
-    
+      
 
 }

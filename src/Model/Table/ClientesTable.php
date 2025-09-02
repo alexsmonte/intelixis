@@ -96,7 +96,7 @@ class ClientesTable extends Table
 
         $validator
             ->scalar('telefone')
-            ->minLength('telefone', 11, __('O Telefone deve conter 11 caracteres.'))
+            ->minLength('telefone', 10, __('O Telefone deve conter 10 caracteres.'))
             ->maxLength('telefone', 14)
             ->allowEmptyString('telefone');
 

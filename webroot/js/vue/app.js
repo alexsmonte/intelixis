@@ -1,33 +1,75 @@
-let deleteUrl = '';
+// webroot/vue/app.js
 
-function openDeleteModal(url, entityName) {
-    deleteUrl = url;
-    document.getElementById('deleteModalLabel').textContent = `Excluir ${entityName}`;
-    document.getElementById('deleteModalMessage').textContent = `Tem certeza que deseja excluir este ${entityName}?`;
+const tableData = window.TABLE_DATA || [];
+const controller = window.TABLE_CONTROLLER || '';
+const csrfToken = window.CSRF_TOKEN;
+console.log("Dados da tabela: ",tableData);
+console.log("Controller: ",controller);
+console.log("TOKEN: ",csrfToken);
 
-    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-    modal.show();
-}
+Vue.createApp({
+    data() {
+        return {
+            query: '',
+            records: tableData,
+            csrfToken: csrfToken
+        }
+    },
+    methods: {
+        async onSearch() {
+            try {
+                const url = `/painel/${controller.toLowerCase()}/search?q=` + encodeURIComponent(this.query);
+                const res = await fetch(url, { credentials: 'same-origin' });
+                const data = await res.json();
+                this.records = data.data || [];
+            } catch (err) {
+                console.error(err);
+                alert('Erro ao buscar registros.');
+            }
+        },
+        async viewRecord(id) {
+            try {
+                const res = await fetch(`/painel/${controller.toLowerCase()}/visualizar/${id}`, {
+                    credentials: 'same-origin',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (!res.ok) throw new Error('Erro ao carregar registro');
 
-document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
-    if (!deleteUrl) return;
+                const html = await res.text();
 
-    try {
-        const res = await fetch(deleteUrl, {
-            method: 'POST', // ou DELETE se sua rota aceitar
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        });
+                const modalEl = document.getElementById('view-modal');
+                modalEl.querySelector('#modal-body-content').innerHTML = `
+                    <div>
+                        ${html}
+                        <div class="modal-footer mt-3">
+                            <a href="/painel/${controller.toLowerCase()}/editar/${id}" class="btn btn-primary">Editar</a>
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
+                        </div>
+                    </div>
+                `;
 
-        if (!res.ok) throw new Error('Erro ao excluir');
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            } catch (err) {
+                console.error(err);
+                alert('Erro ao carregar registro.');
+            }
+        },
+        confirmarExclusao(event) {
+            event.preventDefault();
+            const form = event.target;
 
-        // Fecha o modal
-        bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
-
-        // Atualiza tabela (pode ser recarregando via ajax ou removendo a linha)
-        location.reload(); // mais simples: recarrega a página/tabela
-    } catch (err) {
-        alert('Erro ao excluir.');
-        console.error(err);
+            Swal.fire({
+                title: `Tem certeza que deseja excluir este ${controller.slice(0, -1)}?`,
+                text: "Esta ação não pode ser desfeita.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Sim, excluir!"
+            }).then((result) => {
+                if (result.isConfirmed) form.submit();
+            });
+        }
     }
-});
-
+}).mount('#app');
