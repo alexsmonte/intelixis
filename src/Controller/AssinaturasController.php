@@ -57,7 +57,7 @@ class AssinaturasController extends AppController
             if ($this->Assinaturas->save($assinatura)) {
                 $this->Flash->success(__('Parabéns! assinatura do plano realizada com successo.'));
 
-                $this->request->getSession()->write('Assinatura.id', $assinatura->id);
+                $this->request->getSession()->write('Auth.Assinatura.id', $assinatura->id);
                 return $this->redirect(['controller'=>'Estabelecimentos','action' => 'configuracoes']);
             }
             $this->Flash->error(__('Ocorreu um erro ao tentar finalizar a assinatura. Por favor, tente novamente.'));
