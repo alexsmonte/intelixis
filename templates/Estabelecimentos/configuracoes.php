@@ -2,9 +2,7 @@
 use Cake\I18n\Number;
 
 $this->BreadcrumbsPlus->add([['title' => 'Estabelecimento']]);
-
 ?>
-
 <?= $this->element('barra-titulo',['title' => $title]); ?>
 <?= $this->Form->create($estabelecimento) ?>
 <div class="card">
