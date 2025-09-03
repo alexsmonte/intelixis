@@ -30,6 +30,7 @@ class UsuariosController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
 
             $dadosUsuarios              =   $this->request->getData();
+
             $dadosUsuarios["conta_id"]  =   $this->request->getAttribute('identity')->conta_id;
 
             $usuarioEntity = $this->Usuarios->patchEntity($usuario, $dadosUsuarios, ['validate' => 'editarUsuario']);
