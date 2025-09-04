@@ -37,6 +37,7 @@ class Usuario extends Entity
         'conta_id' => true,
         'nome' => true,
         'email' => true,
+        'foto' => true,
         'password' => true,
         'ativar' => true,
         'tipo' => true,

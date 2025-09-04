@@ -25,7 +25,25 @@ class UsuariosController extends AppController
 
     public function meuPerfil()
     {
+        $usuario = $this->Usuarios->get($this->request->getAttribute('identity')->id,['conditions' => ['Usuarios.conta_id' => $this->request->getAttribute('identity')->conta_id]]);
 
+        if ($this->request->is(['patch', 'post', 'put'])) {
+
+            $dadosUsuarios              =   $this->request->getData();
+            $dadosUsuarios["conta_id"]  =   $this->request->getAttribute('identity')->conta_id;
+
+            $usuarioEntity = $this->Usuarios->patchEntity($usuario, $dadosUsuarios, ['validate' => 'editarUsuario']);
+
+            if ($this->Usuarios->save($usuarioEntity)) {
+                $this->Flash->success(__('Dados do usuário salvo com sucesso.'));
+
+                return $this->redirect(['action' => 'meuPerfil']);
+            }
+            $this->Flash->error(__('Ocorreu um erro na tentativa de atualizar os dados do usuário. Por favor, tente novamente.'));
+        }
+
+        $title  =   'Meu perfil';
+        $this->set(compact('title','usuario'));
     }
 
     /**

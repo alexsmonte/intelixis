@@ -39,12 +39,19 @@ class PagesController extends AppController
         if ($this->request->getAttribute('identity')->tipo == 'master')
         {
             $assinaturas        =   $this->fetchTable('Assinaturas');
-            $queryAssinaturas   =   $assinaturas->find('verificar', $this->request->getAttribute('identity')->conta_id);
+            $queryAssinaturas   =   $assinaturas->find('verificar', $this->request->getAttribute('identity')->conta_id)->toArray();
 
-            $existeAssinatura   =   $queryAssinaturas->count()>0?true:false;
+
+            $existeAssinatura       =   count($queryAssinaturas)>0?true:false;
+            $existeEstabelecimento  =   false;
+
+            if(!empty($queryAssinaturas[0]->estabelecimentos))
+                $existeEstabelecimento   =   count($queryAssinaturas[0]->estabelecimentos)>0?true:false;
 
             if($existeAssinatura == false){
                 return $this->redirect('/planos/escolher-plano', 301);
+            }elseif($existeEstabelecimento == false){
+                return $this->redirect('/Estabelecimentos/configuracoes', 301);
             }
 
         }
