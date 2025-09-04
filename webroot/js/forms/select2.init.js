@@ -429,3 +429,45 @@ $(".select2-with-border").each(function (i, obj) {
     containerCssClass: className,
   });
 });
+
+//todos
+
+
+$(document).ready(function () {
+    $('.select2-multiple').each(function () {
+        const $select = $(this);
+
+        $select.select2({
+            placeholder: "Nenhum",
+            allowClear: true,
+            width: '100%',
+            closeOnSelect: false
+        });
+
+        $select.on('select2:open', function() {
+            let $dropdown = $('.select2-results');
+
+            // Evita duplicar os itens
+            if ($dropdown.find('.select-all-item').length === 0) {
+                $dropdown.prepend('<div class="select-all-item" style="padding:6px; cursor:pointer; font-weight:bold; color:#007bff;">Selecionar todos</div>');
+            }
+            if ($dropdown.find('.deselect-all-item').length === 0) {
+                $dropdown.prepend('<div class="deselect-all-item" style="padding:6px; cursor:pointer; font-weight:bold; color:#dc3545;">Desmarcar todos</div>');
+            }
+
+            // Clique em "Selecionar todos" (somente para o select atual)
+            $dropdown.off('click', '.select-all-item').on('click', '.select-all-item', function() {
+                let allValues = [];
+                $select.find('option').each(function() {
+                    allValues.push($(this).val());
+                });
+                $select.val(allValues).trigger('change');
+            });
+
+            // Clique em "Desmarcar todos" (somente para o select atual)
+            $dropdown.off('click', '.deselect-all-item').on('click', '.deselect-all-item', function() {
+                $select.val(null).trigger('change');
+            });
+        });
+    });
+});

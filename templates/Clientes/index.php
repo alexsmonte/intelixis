@@ -3,6 +3,10 @@ $this->BreadcrumbsPlus->add([['title' => 'Clientes']]);
 ?>
 <?= $this->element('barra-titulo',['title' => $title]); ?>
 
+ 
+
+
+
 <!-- Modal Visualizar Cliente -->
 <div class="modal fade" id="view-modal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-md">
@@ -19,28 +23,6 @@ $this->BreadcrumbsPlus->add([['title' => 'Clientes']]);
     </div>
   </div>
 </div>
-
-<!-- Modal Visualizar Cliente -->
-<div class="modal fade" id="view-modal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-md">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="pb-1 mb-2 border-bottom w-100">
-          <h5>Excluir Registro?</h5>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-      </div>
-      <div class="modal-body text-start" id="modal-body-content">
-        <i class="fa fa-spinner fa-spin fa-2x"></i>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-
-
 
 
 <div id="app" class="card w-100 position-relative overflow-hidden">
@@ -73,7 +55,6 @@ $this->BreadcrumbsPlus->add([['title' => 'Clientes']]);
                 <table class="table table-striped text-nowrap mb-0 align-middle">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Estabelecimento</th>
                             <th>Nome</th>
                             <th>Documento</th>
@@ -85,7 +66,6 @@ $this->BreadcrumbsPlus->add([['title' => 'Clientes']]);
                     </thead>
                     <tbody>
                         <tr v-for="cliente in clientes" :key="cliente.id">
-                            <td>{{ cliente.id }}</td>
                             <td>{{ cliente.estabelecimento?.razao_social || '' }}</td>
                             <td>{{ cliente.nome }}</td>
                             <td>{{ cliente.documento }}</td>
@@ -96,30 +76,25 @@ $this->BreadcrumbsPlus->add([['title' => 'Clientes']]);
                                 <div class="btn-group">
                                     <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown">Opções</button>
                                     <ul class="dropdown-menu">
-                                    <li>
-                                        <button class="dropdown-item btn btn-primary btn-sm" @click="viewCliente(cliente.id)">Visualizar</button>
+                                     <li>
+                                        <button class="dropdown-item btn btn-primary btn-md" @click="viewCliente(cliente.id)">Visualizar</button>
            
                                     </li>
-                                        <li><a class="dropdown-item" :href="`/painel/clientes/editar/${cliente.id}`">Editar</a></li>
-                                        <li>
-                                            <form :action="`/painel/clientes/delete/${cliente.id}`" method="post" @submit.prevent="confirmDelete($event)">
-                                                <button type="submit" class="dropdown-item">Excluir</button>
-                                               
-                                            </form>
+                                        <li><a class="dropdown-item" :href="`<?= $this->Url->build(['controller' => 'Clientes', 'action' => 'editar']);?>/${cliente.id}`">Editar</a></li>
 
-                                            
-                                            
-                                         
+                                    <li>
+                                        <form :action="'<?= $this->Url->build(['controller' => 'Clientes', 'action' => 'delete']);?>/' + cliente.id" method="post" @submit.prevent="confirmarExclusao($event)">
+                                            <input type="hidden" name="_method" value="DELETE">
+                                            <input type="hidden" name="_csrfToken" :value="csrfToken">
+                                            <button type="submit" class="dropdown-item btn btn-primary btn-md">Excluir</button>
+                                        </form>
+                                    </li>
+
 
                                     </ul>
                                 </div>
                             </td>
                         </tr>
-
-                        
-                        
-
-
                         <tr v-if="clientes.length === 0">
                             <td colspan="8" class="text-center">Nenhum cliente encontrado</td>
                         </tr>
@@ -149,19 +124,23 @@ $this->BreadcrumbsPlus->add([['title' => 'Clientes']]);
 <script>
 const clientesInit = <?= json_encode($clientes->toArray()) ?>;
 
+
 Vue.createApp({
     data() {
         return {
             query: '',
             clientes: clientesInit,
             clienteId: null,
+            csrfToken: "<?= $this->request->getAttribute('csrfToken'); ?>"
         }
     },
     methods: {
         async onSearch() {
             try {
-                // URL absoluta do endpoint
-                const url = "/painel/clientes/search?q=" + encodeURIComponent(this.query);
+                // URL relativa do endpoint
+                const url = "<?= $this->Url->build(['controller' => 'Clientes', 'action' => 'search']); ?>?q=" + encodeURIComponent(this.query);
+               
+
 
                 const res = await fetch(url, {
                     credentials: 'same-origin' // envia cookies de sessão
@@ -175,16 +154,9 @@ Vue.createApp({
                 alert('Erro ao buscar clientes. Verifique console para detalhes.');
             }
         },
-        confirmDelete(event) {
-            if(!confirm('Tem certeza que deseja excluir este cliente?')) {
-                event.preventDefault();
-            } else {
-                event.target.submit();
-            }
-        },
         async viewCliente(id) {
             try {
-        const res = await fetch(`/painel/clientes/visualizar/${id}`, {
+        const res = await fetch(`<?= $this->Url->build(['controller' => 'Clientes', 'action' => 'visualizar']);?>/${id}`, {
             credentials: 'same-origin',
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         });
@@ -199,7 +171,7 @@ Vue.createApp({
             <div>
                 ${html} <!-- conteúdo da view visualizar_tabela.php -->
                 <div class="modal-footer mt-3">
-                    <a href="/painel/clientes/editar/${id}" class="btn btn-primary">Editar</a>
+                    <a href="<?= $this->Url->build(['controller' => 'Clientes', 'action' => 'editar']);?>/${id}" class="btn btn-primary">Editar</a>
                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
                 </div>
             </div>
@@ -213,13 +185,30 @@ Vue.createApp({
         console.error(err);
         alert('Erro ao carregar cliente.');
     }
+
+    },
+
+        confirmarExclusao(event) {
+            event.preventDefault();
+            const form = event.target;
+
+            Swal.fire({
+                title: "Tem certeza que deseja excluir este Cliente?",
+                text: "Esta ação não pode ser desfeita.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Sim, excluir!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit(); // só envia se confirmar
+                }
+            });
+  }
+
     }
 
-        
-        
-
-
-
-    }
 }).mount('#app');
 </script>
+

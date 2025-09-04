@@ -8,8 +8,11 @@ use Cake\Core\Configure;
 <!DOCTYPE html>
 <html lang="pt_br" dir="ltr" data-bs-theme="light" data-color-theme="Blue_Theme" data-layout="horizontal">
 
+
 <head>
-<?= $this->Html->meta('csrfToken', $this->request->getAttribute('csrfToken')); ?>
+
+
+
 
     <!-- Required meta tags -->
     <meta charset="UTF-8" />
@@ -31,12 +34,25 @@ use Cake\Core\Configure;
     <?= $this->fetch('css') ?>
     <?= $this->fetch('script') ?>
 
-    <!-- vue  -->
-    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+
+   <!-- Sweet Alert-->
+   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+   
+
+
+
 </head>
 
 <body class="link-sidebar">
-<?= $this->Html->script('app.js') ?>
+ 
+
+
+
+
+<!-- vue  -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+
+
 <!-- Modal Excluir -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-sm">
@@ -136,8 +152,13 @@ use Cake\Core\Configure;
     </div>
     <div class="dark-transparent sidebartoggler"></div>
 </div>
+
+
+  
+
+
 <!-- Import Js Files -->
-<?= $this->Html->script(['/libs/bootstrap/dist/js/bootstrap.bundle.min.js', '/libs/simplebar/dist/simplebar.min.js', '/js/theme/app.horizontal.init.js', '/js/theme/theme.js','/js/theme/app.min.js','/js/theme/sidebarmenu.js','/js/theme/feather.min.js', '/js/highlights/highlight.min.js']) ?>
+<?= $this->Html->script(['/libs/bootstrap/dist/js/bootstrap.bundle.min.js', '/libs/simplebar/dist/simplebar.min.js', '/js/theme/rmhorizontal.init.js', '/js/theme/theme.js','/js/theme/app.min.js','/js/theme/sidebarmenu.js','/js/theme/feather.min.js', '/js/highlights/highlight.min.js']) ?>
 
 <!-- solar icons -->
 <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
@@ -168,12 +189,13 @@ use Cake\Core\Configure;
 <!-- imask.js -->
 <script src="https://unpkg.com/imask"></script>
 <?= $this->Html->script('mascaras.js') ?>
+<!-- select2 -->
 
 
 
 
 
-<?= $this->fetch('script') ?>
+<!-- Fecha Alert-->
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     const alerts = document.querySelectorAll('.alert');
@@ -188,15 +210,21 @@ use Cake\Core\Configure;
 </script>
 
 
+<!-- CSS do Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- jQuery (necessário para Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<!-- JS do Select2 -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<?= $this->Html->script('forms/select2.init.js') ?>
 
 
-
-
+<?= $this->fetch('script') ?>
 
 </body>
 </html>
 
+ 
 
-</body>
-
-</html>
