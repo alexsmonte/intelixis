@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace App\Controller;
+use App\Controller\Traits\SearchableTrait;
 
 /**
  * Convenios Controller
@@ -20,8 +21,8 @@ class ConveniosController extends AppController
         $query = $this->Convenios->find()
             ->contain(['Estabelecimentos']);
         $convenios = $this->paginate($query);
-
-        $this->set(compact('convenios'));
+        $title = 'Convênios'; // defina o título
+        $this->set(compact('convenios', 'title'));
     }
 
     /**
@@ -57,7 +58,8 @@ class ConveniosController extends AppController
         $estabelecimentos = $this->Convenios->Estabelecimentos->find('list', limit: 200)->all();
         $profissionais = $this->Convenios->Profissionais->find('list', limit: 200)->all();
         $servicos = $this->Convenios->Servicos->find('list', limit: 200)->all();
-        $this->set(compact('convenio', 'estabelecimentos', 'profissionais', 'servicos'));
+        $title = 'Convênios'; // defina o título
+        $this->set(compact('convenio', 'estabelecimentos', 'profissionais', 'servicos', 'title'));
     }
 
     /**
@@ -104,4 +106,33 @@ class ConveniosController extends AppController
 
         return $this->redirect(['action' => 'index']);
     }
+
+
+    use SearchableTrait;
+
+    public function search()
+{
+    $this->request->allowMethod(['get']);
+    $q = $this->request->getQuery('q');
+
+    $query = $this->Servicos->find()->contain(['Estabelecimentos','Profissionais', 'Servicos']);
+    if (!empty($q)) {
+        $query->where([
+            'OR' => [
+                'Convenios.nome LIKE' => "%$q%",
+                
+            ]
+        ]);
+    }
+
+    $convenios = $query->limit(50)->all()->toArray(); // toArray() obrigatório
+
+    $this->autoRender = false;
+    $this->response = $this->response
+        ->withType('application/json')
+        ->withStringBody(json_encode(['data' => $convenios]));
+}
+
+
+
 }

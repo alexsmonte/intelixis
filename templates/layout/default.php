@@ -10,7 +10,7 @@ use Cake\Core\Configure;
 
 
 <head>
-<?= $this->Html->meta('csrfToken', $this->request->getAttribute('csrfToken')); ?>
+
 
 
 

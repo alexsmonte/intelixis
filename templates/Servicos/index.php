@@ -3,7 +3,6 @@ $this->BreadcrumbsPlus->add([['title' => 'Servicos']]);
 ?>
 <?= $this->element('barra-titulo',['title' => $title]); ?>
 
- 
 
 
 
@@ -126,15 +125,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Servicos']]);
 <script>
 const servicosInit = <?= json_encode($servicos->toArray()) ?>;
 
-
-const csrfToken = document.querySelector('meta[name="csrfToken"]').getAttribute('content');
 Vue.createApp({
     data() {
         return {
             query: '',
             Servicos: servicosInit,
             servicoId: null,
-            csrfToken: csrfToken
+            csrfToken: "<?= $this->request->getAttribute('csrfToken'); ?>"
         }
     },
     methods: {

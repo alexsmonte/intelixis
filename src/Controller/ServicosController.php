@@ -19,7 +19,17 @@ class ServicosController extends AppController
      */
    
 
+     protected $estabelecimento_id;
 
+     public function initialize(): void
+    {
+        parent::initialize();
+
+        // Exemplo: pegar da sessão e armazenar na propriedade
+        //$session = $this->getRequest()->getSession();
+        //$this->estabelecimento_id = $session->read('Estabelecimento.id');
+        $this->estabelecimento_id = 2;
+    }
 
 
     public function index()
@@ -114,10 +124,10 @@ public function novo()
 {
     $servico = $this->Servicos->newEmptyEntity();
    
-
+     
     if ($this->request->is('post')) {
         $data = $this->request->getData();
-
+    
         // --------- NORMALIZA M2M (_ids) ----------
         $normalizaIds = function ($entrada, $chave) {
             $ids = [];
@@ -189,6 +199,8 @@ public function novo()
             $data['periodos'] = $periodos;
         } else {
             unset($data['periodos']);
+           
+
         }
          
         
@@ -196,11 +208,11 @@ public function novo()
 
         // ---------- PATCH ENTITY ----------
         $servico = $this->Servicos->patchEntity($servico, $data, [
-            'associated' => ['Periodos', 'Profissionais', 'Convenios']
+            'associated' => ['Periodos', 'Profissionais', 'Convenios' ]
         ]);
 
-        debug($servico);
-        die;
+        //debug($servico);
+        //die;
 
         if ($this->Servicos->save($servico, ['associated' => ['Periodos', 'Profissionais', 'Convenios']])) {
             $this->Flash->success(__('Serviço cadastrado com sucesso.'));
@@ -208,16 +220,23 @@ public function novo()
         }
 
         $this->Flash->error(__('Serviço não cadastrado. Verifique os campos e tente novamente.'));
-        Log::error('[SERVICOS::novo] Erros ao salvar: ' . json_encode($servico->getErrors(), JSON_UNESCAPED_UNICODE));
+        //Log::error('[SERVICOS::novo] Erros ao salvar: ' . json_encode($servico->getErrors(), JSON_UNESCAPED_UNICODE));
     }
 
     render_form:
-    $estabelecimentos = $this->Servicos->Estabelecimentos->find('list', limit: 200)->all();
-    $convenios        = $this->Servicos->Convenios->find('list', limit: 200)->all();
-    $profissionais    = $this->Servicos->Profissionais->find('list', limit: 200)->all();
+    //$estabelecimentos = $this->Servicos->Estabelecimentos->find('list', limit: 200)->all();
+    //$convenios        = $this->Servicos->Convenios->find('list', limit: 200)->all();
+
+    
+    $convenios = $this->Servicos->Convenios->find('list', [
+        'limit' => 200
+    ])
+    ->where(['estabelecimento_id' => $this->estabelecimento_id])
+    ->all();
+    $profissionais    = $this->Servicos->Profissionais->find('list', limit: 200) ->where(['estabelecimento_id' => $this->estabelecimento_id]) ->all();
 
     $title = 'Novo Serviço';
-    $this->set(compact('servico', 'estabelecimentos', 'convenios', 'profissionais', 'title'));
+    $this->set(compact('servico', 'convenios', 'profissionais', 'title'));
 }
 
     /**
@@ -227,11 +246,14 @@ public function novo()
      * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function editar($id = null)
+    /*public function editar($id = null)
     {
-        $servico = $this->Servicos->get($id, contain: ['Convenios', 'Profissionais']);
+        $servico = $this->Servicos->get($id, contain: ['Convenios', 'Profissionais', 'Periodos']);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $servico = $this->Servicos->patchEntity($servico, $this->request->getData());
+
+            debug($servico);
+            die;
             if ($this->Servicos->save($servico)) {
                 $this->Flash->success(__('Serviço atualizado com sucesso.'));
 
@@ -242,9 +264,88 @@ public function novo()
         $estabelecimentos = $this->Servicos->Estabelecimentos->find('list', limit: 200)->all();
         $convenios = $this->Servicos->Convenios->find('list', limit: 200)->all();
         $profissionais = $this->Servicos->Profissionais->find('list', limit: 200)->all();
+        $periodos = $this->Servicos->Periodos->find('list', limit: 200)->all();
         $title = 'Novo Serviço'; // defina o título
-        $this->set(compact('servico', 'estabelecimentos', 'convenios', 'profissionais','title'));
+        $this->set(compact('servico', 'estabelecimentos', 'convenios', 'profissionais', 'periodos','title'));
+    }*/
+
+    public function editar($id = null)
+{
+    $servico = $this->Servicos->get($id, [
+        'contain' => ['Profissionais', 'Convenios', 'Periodos']
+    ]);
+
+    if ($this->request->is(['patch', 'post', 'put'])) {
+        $data = $this->request->getData();
+
+        // Atualiza campos normais e associações BelongsToMany
+        $servico = $this->Servicos->patchEntity($servico, $data, [
+            'associated' => ['Profissionais', 'Convenios']
+        ]);
+
+        // Programação semanal
+        $habilitar = !empty($data['habilitar_programacao']) && $data['habilitar_programacao'] == 1;
+        $periodosTable = $this->Servicos->Periodos;
+
+        if ($habilitar) {
+            $diasSemana = range(1, 7);
+            $periodosParaSalvar = [];
+
+            foreach ($diasSemana as $diaId) {
+                if (!empty($data['periodos'][$diaId])) {
+                    $p = $data['periodos'][$diaId];
+                    $periodosParaSalvar[] = $periodosTable->newEntity([
+                        'servico_id' => $servico->id,
+                        'estabelecimento_id' => $servico->estabelecimento_id,
+                        'dia_semana' => $diaId,
+                        'data_hora_inicio' => $p['data_hora_inicio'],
+                        'data_hora_fim' => $p['data_hora_fim'],
+                        'cadeia_id' => 'semanal',
+                        'status' => 'disponivel',
+                    ]);
+                } else {
+                    $periodosParaSalvar[] = $periodosTable->newEntity([
+                        'servico_id' => $servico->id,
+                        'estabelecimento_id' => $servico->estabelecimento_id,
+                        'dia_semana' => $diaId,
+                        'data_hora_inicio' => '1970-01-01 00:00:00',
+                        'data_hora_fim' => '1970-01-01 00:00:00',
+                        'cadeia_id' => 'semanal',
+                        'status' => 'indisponivel',
+                    ]);
+                }
+            }
+
+            // Substitui os periodos existentes de cadeia semanal
+            $servico->periodos = $periodosParaSalvar;
+        } else {
+            // Se desabilitado, remove todos os periodos da cadeia semanal
+            $this->Servicos->Periodos->deleteAll([
+                'servico_id' => $servico->id,
+                'cadeia_id' => 'semanal'
+            ]);
+            $servico->periodos = [];
+        }
+
+        // Salva serviço e todas associações de uma vez
+        if ($this->Servicos->save($servico, ['associated' => ['Periodos', 'Profissionais', 'Convenios']])) {
+            $this->Flash->success(__('Serviço atualizado com sucesso.'));
+            return $this->redirect(['action' => 'index']);
+        } else {
+            $this->Flash->error(__('Não foi possível atualizar o serviço.'));
+        }
     }
+
+    $estabelecimentos = $this->Servicos->Estabelecimentos->find('list');
+    $convenios = $this->Servicos->Convenios->find('list');
+    $profissionais = $this->Servicos->Profissionais->find('list');
+    $periodos = $this->Servicos->Periodos->find('list', ['limit' => 200])->all();
+
+    $title = 'Editar Serviço';
+    $this->set(compact('servico', 'estabelecimentos', 'convenios', 'profissionais', 'periodos', 'title'));
+}
+
+
 
     /**
      * Delete method

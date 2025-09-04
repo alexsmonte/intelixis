@@ -125,14 +125,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Clientes']]);
 const clientesInit = <?= json_encode($clientes->toArray()) ?>;
 
 
-const csrfToken = document.querySelector('meta[name="csrfToken"]').getAttribute('content');
 Vue.createApp({
     data() {
         return {
             query: '',
             clientes: clientesInit,
             clienteId: null,
-            csrfToken: csrfToken
+            csrfToken: "<?= $this->request->getAttribute('csrfToken'); ?>"
         }
     },
     methods: {

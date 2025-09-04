@@ -121,15 +121,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais']]);
 <script>
 const profissionaisInit = <?= json_encode($profissionais->toArray()) ?>;
 
-
-const csrfToken = document.querySelector('meta[name="csrfToken"]').getAttribute('content');
 Vue.createApp({
     data() {
         return {
             query: '',
             profissionais: profissionaisInit,
             profissionalId: null,
-            csrfToken: csrfToken
+            csrfToken: "<?= $this->request->getAttribute('csrfToken'); ?>"
         }
     },
     methods: {

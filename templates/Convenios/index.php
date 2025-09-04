@@ -1,117 +1,115 @@
 <?php
-
 $this->BreadcrumbsPlus->add([['title' => 'Convenios']]);
-
 ?>
-
 <?= $this->element('barra-titulo',['title' => $title]); ?>
 
-<div class="card w-100 position-relative overflow-hidden">
+
+
+
+<!-- Modal Visualizar Servico -->
+<div class="modal fade" id="view-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="pb-1 mb-2 border-bottom w-100">
+          <h5>Detalhes do Convênio</h5>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body text-start" id="modal-body-content">
+        <i class="fa fa-spinner fa-spin fa-2x"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div id="app" class="card w-100 position-relative overflow-hidden">
     <div class="px-4 py-3 border-bottom">
         <div class="card-body p-4">
-            <div class="d-flex mb-3 align-items-center">
-                <h4 class="card-title mb-0"><?= __('Convenios') ?></h4>
+             
+        <div class="d-flex mb-3 align-items-center">
+                <h4 class="card-title mb-0"><?= __('Convênios') ?></h4>
                 <div class="ms-auto flex-shrink-0">
                     <button class="btn bg-primary-subtle text-primary "  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fa fa-bars" aria-hidden="true"></i>
                     </button>
                     <ul class="dropdown-menu animated flipInX">
-                                                <li><?= $this->Html->link('<i class="fa fa-plus" aria-hidden="true"></i> Novo Convenio', ['action' => 'novo'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
-                                                <li><?= $this->Html->link('<i class="fa fa-print" aria-hidden="true"></i> Imprimir esta página', ['action' => 'imprimir'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
-                        <li><?= $this->Html->link('<i class="fa fa-print" aria-hidden="true"></i> Imprimir tudo', ['action' => 'imprimir'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
+                        <li><?= $this->Html->link('<i class="fa fa-plus" aria-hidden="true"></i> Novo Convênio', ['action' => 'novo'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
                     </ul>
                 </div>
             </div>
-                        <div class="row">
 
-                                <div class="col-md-3 mb-3">
-                                    <?=  $this->Form->control('estabelecimento_id', ['label'=>'estabelecimento_id','options' => $estabelecimentos]); ?>
-                                </div>                            <div class="col-md-3 mb-3">
-                                <?= $this->Form->control('nome', ['label'=>'nome', 'class'=>'form-control']); ?>
-                            </div>                            <div class="col-md-3 mb-3">
-                                <?= $this->Form->control('registro_ans', ['label'=>'registro_ans', 'class'=>'form-control']); ?>
-                            </div>                            <div class="col-md-3 mb-3">
-                                <?= $this->Form->control('cnpj', ['label'=>'cnpj', 'class'=>'form-control']); ?>
-                            </div>                            <div class="col-md-3 mb-3">
-                                <?= $this->Form->control('telefone', ['label'=>'telefone', 'class'=>'form-control']); ?>
-                            </div>                            <div class="col-md-3 mb-3">
-                                <?= $this->Form->control('email', ['label'=>'email', 'class'=>'form-control']); ?>
-                            </div>                            <div class="col-md-3 mb-3">
-                                <?= $this->Form->control('site', ['label'=>'site', 'class'=>'form-control']); ?>
-                            </div>                            <div class="col-md-3 mb-3">
-                                <?= $this->Form->control('ativar', ['label'=>'ativar', 'class'=>'form-control']); ?>
-                            </div>                        <div class="col-md-3 mb-3">
-                            <?=  $this->Form->control('profissionais._ids', ['label'=>'', 'class'=>'form-control', 'options' => $profissionais]); ?>
-                        </div>                        <div class="col-md-3 mb-3">
-                            <?=  $this->Form->control('servicos._ids', ['label'=>'', 'class'=>'form-control', 'options' => $servicos]); ?>
-                        </div>                                <div class="col-md-12 mb-3">
-                    <div class="row">
-                        <div class="col-md-2 offset-md-10  mb-3">
-                            <button type="button" class="justify-content-center w-100 btn btn-primary d-flex align-items-center">Pesquisar</button>
-                        </div>
-                    </div>
+
+            <!-- BUSCA -->
+            <div class="row mb-3">
+                <div class="col-md-6 d-flex">
+                    <input v-model="query" type="text" class="form-control" placeholder="Buscar Serviços por nome">
+                    <button class="btn btn-primary ms-2" @click="onSearch">Pesquisar</button>
                 </div>
             </div>
 
+            <!-- TABELA -->
             <div class="table-responsive mb-4 border rounded-1">
                 <table class="table table-striped text-nowrap mb-0 align-middle">
-                    <thead class="text-dark fs-4">
-                    <tr>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('id') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('estabelecimento_id') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('nome') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('registro_ans') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('cnpj') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('telefone') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('email') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('site') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('ativar') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('created') ?></h6></th>
-                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('modified') ?></h6></th>
-                        <th><?= __('Opções') ?></th>
-                    </tr>
+                    <thead>
+                        <tr>
+                            <th>Estabelecimento</th>
+                            <th>Nome</th>
+                            <th>Registro ANS</th>
+                            <th>CNPJ</th>
+                            <th>Telefone</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Opções</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    <?php foreach ($convenios as $convenio): ?>
-                    <tr>
-                                                                                                        <td><p class="mb-0 fw-normal fs-4"><?= $this->Number->format($convenio->id) ?></p></td>
-                                                                                                <td><p class="mb-0 fw-normal fs-4"><?= $convenio->hasValue('estabelecimento') ? $this->Html->link($convenio->estabelecimento->razao_social, ['controller' => 'Estabelecimentos', 'action' => 'view', $convenio->estabelecimento->id]) : '' ?></p></td>
-                                                                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= h($convenio->nome) ?> </p></td>
-                                                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= h($convenio->registro_ans) ?> </p></td>
-                                                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= h($convenio->cnpj) ?> </p></td>
-                                                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= h($convenio->telefone) ?> </p></td>
-                                                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= h($convenio->email) ?> </p></td>
-                                                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= h($convenio->site) ?> </p></td>
-                                                                                                                    <td><?= $convenio->ativar == 1 ? '<span class="badge bg-success-subtle text-success">Ativo</span>' : '<span class="badge bg-warning-subtle text-warning">Não</span>'; ?></td>
-                                                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= h($convenio->created) ?> </p></td>
-                                                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= h($convenio->modified) ?> </p></td>
-                                    <td>
-                            <div class="btn-group">
-                                <button class="btn btn-warning dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Opções
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <li><?= $this->Html->link('Visualizar', ['action' => 'view', $convenio->id],['class'=>'dropdown-item','escape'=>false]) ?></li>
-                                    <li><?= $this->Html->link('Editar', ['action' => 'edit', $convenio->id],['class'=>'dropdown-item','escape'=>false]) ?> </li>
-                                    <li>
-                                        <?= $this->Form->postLink(
-                                        'Excluir',
-                                        ['action' => 'delete', $convenio->id],
-                                        [
-                                        'class'=>'dropdown-item',
-                                        'escape'=>false,
-                                        'method' => 'delete',
-                                        'confirm' => __('Tem certeza que deseja excluir # {0}?', $convenio->id),
-                                        ]
-                                        ) ?>
+                        <tr v-for="convenio in Convenios" :key="convenio.id">
+                            <td>{{ convenio.estabelecimento.razao_social || '' }}</td>
+                            <td>{{ convenio.nome }}</td>
+                            <td>{{ convenio.registro_ans }}</td>
+                            <td>{{ convenio.cnpj }}</td>
+                            <td>{{ convenio.telefone }}</td>
+                            <td>{{ convenio.email }}</td>
+                            <td><span v-if="convenio.ativar" class="badge bg-success-subtle text-success">Ativo</span>
+                                <span v-else class="badge bg-danger-subtle text-danger">Inativo</span>
+                            </td>
+                            
+                            
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown">Opções</button>
+                                    <ul class="dropdown-menu">
+                                     <li>
+                                        <button class="dropdown-item btn btn-primary btn-md" @click="viewServico(convenio.id)">Visualizar</button>
+           
                                     </li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
+                                        <li><a class="dropdown-item" :href="`<?= $this->Url->build(['controller' => 'Convenios', 'action' => 'editar']);?>/${convenio.id}`">Editar</a></li>
+
+                                    <li>
+                                        <form :action="'<?= $this->Url->build(['controller' => 'Convenios', 'action' => 'delete']);?>/' + convenio.id" method="post" @submit.prevent="confirmarExclusao($event)">
+                                            <input type="hidden" name="_method" value="DELETE">
+                                            <input type="hidden" name="_csrfToken" :value="csrfToken">
+                                            <button type="submit" class="dropdown-item btn btn-primary btn-md">Excluir</button>
+                                        </form>
+                                    </li>
+
+
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr v-if="Convenios.length === 0">
+                            <td colspan="8" class="text-center">Nenhum convenio encontrado</td>
+                        </tr>
                     </tbody>
                 </table>
+                
+                
+
+
+
                 <div class="paginator mt-4">
                     <ul class="pagination justify-content-center">
                         <?= $this->Paginator->first('<< ') ?>
@@ -125,3 +123,97 @@ $this->BreadcrumbsPlus->add([['title' => 'Convenios']]);
         </div>
     </div>
 </div>
+
+
+
+<script>
+const conveniosInit = <?= json_encode($convenios->toArray()) ?>;
+
+Vue.createApp({
+    data() {
+        return {
+            query: '',
+            Convenios: conveniosInit,
+            convenioId: null,
+            csrfToken: "<?= $this->request->getAttribute('csrfToken'); ?>"
+        }
+    },
+    methods: {
+        async onSearch() {
+            try {
+                // URL relativa do endpoint
+                const url = "<?= $this->Url->build(['controller' => 'Convenios', 'action' => 'search']); ?>?q=" + encodeURIComponent(this.query);
+               
+
+
+                const res = await fetch(url, {
+                    credentials: 'same-origin' // envia cookies de sessão
+                });
+
+                // lê JSON mesmo que haja redirect
+                const data = await res.json();
+                this.Convenios = data.data || [];
+            } catch(err) {
+                console.error(err);
+                alert('Erro ao buscar Convênios. Verifique console para detalhes.');
+            }
+        },
+
+        async viewServico(id) {
+            try {
+        const res = await fetch(`<?= $this->Url->build(['controller' => 'Convenios', 'action' => 'visualizar']);?>/${id}`, {
+            credentials: 'same-origin',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+
+        if (!res.ok) throw new Error('Erro ao carregar convênio');
+
+        const html = await res.text();
+
+        // Adiciona o conteúdo no modal e inclui botão Editar
+        const modalEl = document.getElementById('view-modal');
+        modalEl.querySelector('#modal-body-content').innerHTML = `
+            <div>
+                ${html} <!-- conteúdo da view visualizar_tabela.php -->
+                <div class="modal-footer mt-3">
+                    <a href="<?= $this->Url->build(['controller' => 'Convenios', 'action' => 'editar']);?>/${id}" class="btn btn-primary">Editar</a>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        `;
+
+        // Inicializa e abre o modal
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+
+    } catch (err) {
+        console.error(err);
+        alert('Erro ao carregar convênio.');
+    }
+
+    },
+
+        confirmarExclusao(event) {
+            event.preventDefault();
+            const form = event.target;
+
+            Swal.fire({
+                title: "Tem certeza que deseja excluir este Convênio?",
+                text: "Esta ação não pode ser desfeita.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Sim, excluir!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit(); // só envia se confirmar
+                }
+            });
+  }
+
+    }
+
+}).mount('#app');
+</script>
+

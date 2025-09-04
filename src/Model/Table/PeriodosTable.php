@@ -117,7 +117,7 @@ class PeriodosTable extends Table
             ->allowEmptyString('cadeia_id');
 
         $validator
-            ->boolean('status')
+            ->scalar('status')
             ->notEmptyString('status');
 
         return $validator;
