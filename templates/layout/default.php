@@ -34,24 +34,19 @@ use Cake\Core\Configure;
     <?= $this->fetch('css') ?>
     <?= $this->fetch('script') ?>
 
+    <!-- Import Js Files -->
+    <?= $this->Html->script(['/libs/bootstrap/dist/js/bootstrap.bundle.min.js', '/libs/simplebar/dist/simplebar.min.js', '/js/theme/rmhorizontal.init.js', '/js/theme/theme.js','/js/theme/app.min.js','/js/theme/sidebarmenu.js','/js/theme/feather.min.js', '/js/highlights/highlight.min.js']) ?>
 
    <!-- Sweet Alert-->
    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-   
+    <!-- vue  -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 
 
 
 </head>
 
 <body class="link-sidebar">
- 
-
-
-
-
-<!-- vue  -->
-<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-
 
 <!-- Modal Excluir -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
@@ -76,7 +71,7 @@ use Cake\Core\Configure;
 
 <!-- Preloader -->
 <div class="preloader">
-    <img src="img/logos/favicon.png" alt="loader" class="lds-ripple img-fluid" />
+    <img src="img/logos/favicon.png" alt="carregando" class="lds-ripple img-fluid" />
 </div>
 <div id="main-wrapper">
     <!-- Sidebar Start -->
@@ -157,44 +152,24 @@ use Cake\Core\Configure;
   
 
 
-<!-- Import Js Files -->
-<?= $this->Html->script(['/libs/bootstrap/dist/js/bootstrap.bundle.min.js', '/libs/simplebar/dist/simplebar.min.js', '/js/theme/rmhorizontal.init.js', '/js/theme/theme.js','/js/theme/app.min.js','/js/theme/sidebarmenu.js','/js/theme/feather.min.js', '/js/highlights/highlight.min.js']) ?>
 
 <!-- solar icons -->
 <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
 
-
-
 <!-- imask.js -->
 <script src="https://unpkg.com/imask"></script>
 
-
-
 <!-- highlight.js (code view) -->
-
 <script>
     hljs.initHighlightingOnLoad();
-
-
     document.querySelectorAll("pre.code-view > code").forEach((codeBlock) => {
         codeBlock.textContent = codeBlock.innerHTML;
     });
 </script>
-
-<style>
-
-</style>
-
-
 <!-- imask.js -->
 <script src="https://unpkg.com/imask"></script>
 <?= $this->Html->script('mascaras.js') ?>
 <!-- select2 -->
-
-
-
-
-
 <!-- Fecha Alert-->
 <script>
   document.addEventListener("DOMContentLoaded", function() {
@@ -208,20 +183,13 @@ use Cake\Core\Configure;
     });
   });
 </script>
-
-
 <!-- CSS do Select2 -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
 <!-- jQuery (necessário para Select2) -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
 <!-- JS do Select2 -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <?= $this->Html->script('forms/select2.init.js') ?>
-
-
-<?= $this->fetch('script') ?>
 
 </body>
 </html>
