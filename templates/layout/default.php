@@ -49,7 +49,8 @@ use Cake\Core\Configure;
 
 
 
-
+<!-- vue  -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 
 
 <!-- Modal Excluir -->
