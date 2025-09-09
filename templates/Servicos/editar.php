@@ -7,10 +7,6 @@
  * @var string[]|\Cake\Collection\CollectionInterface $profissionais
  * @var string[]|\Cake\Collection\CollectionInterface $periodos
  */
-$estabelecimento_id = $servico->estabelecimento_id;
-
-
-
 $this->BreadcrumbsPlus->add([
     ['title' => 'Serviços', 'url' => ['controller' => 'Servicos', 'action' => 'index']],
     ['title' => 'Editar']
@@ -38,16 +34,8 @@ $this->BreadcrumbsPlus->add([
                     <?= $this->Form->label('ativar', 'Ativar', ['class' => 'form-check-label']) ?>
                 </div>
             </div>
-
+            
             <div class="row">
-                <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('estabelecimento_id', [
-                        'label' => 'Estabelecimento',
-                        'class' => 'form-control',
-                        'options' => $estabelecimentos
-                    ]); ?>
-                </div>
-
                 <div class="col-md-6 mb-3">
                     <?= $this->Form->control('nome', [
                         'label' => 'Nome do Serviço',
@@ -68,7 +56,7 @@ $this->BreadcrumbsPlus->add([
                         <span style="position: absolute; top: 50%; align: center; right: 70px; transform: translateY(0%); pointer-events: none; color: #6c757d;">Minutos</span>
                     </div>
                 </div>
-            </div>
+            </div>    
 
             <div class="row"> 
                 <div class="col-md-12 mb-3">
@@ -102,18 +90,23 @@ $this->BreadcrumbsPlus->add([
                 </div>
             </div>
 
-            
+            <!-- Programação semanal Vue -->
+            <div data-vue="programacao-semanal" 
+                 data-programacao-inicial='<?= json_encode($servico->periodos ?? []) ?>'>
+                <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
+            </div>
 
-            <div 
-  data-vue="programacao-semanal" 
-  data-estabelecimento-id="<?= h($estabelecimento_id) ?>" 
-  data-programacao-inicial='<?= json_encode($servico->periodos ?? []) ?>'>
- 
-</div>
+            <div data-vue="programacao-personalizada" 
+                data-programacao-inicial='<?= json_encode($servico->periodos ?? []) ?>'>
+                 <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
+            </div>
 
-           
+            <div data-vue="dias-indisponiveis" 
+                data-periodos-iniciais='<?= json_encode($servico->periodos ?? []) ?>'>
+            </div>
 
-            <div class="row">
+
+            <div class="row mt-3">
                 <div class="col-md-2 offset-md-10 mb-3">
                     <?= $this->Form->button(__('Salvar'), ['class' => 'justify-content-center w-100 btn btn-success d-flex align-items-center']) ?>
                 </div>
@@ -124,17 +117,9 @@ $this->BreadcrumbsPlus->add([
     </div>
 </div>
 
-<!-- Vue e componente programacao-semanal.js -->
-
+<!-- vue  -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<!-- Vue e componentes programacao.js -->
 <?= $this->Html->script('vue/programacao-semanal.js') ?>
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const el = document.querySelector('[data-vue="programacao-semanal"]');
-    const app = Vue.createApp(ProgramacaoSemanal, {
-        estabelecimentoId: el.dataset.estabelecimentoId,
-        programacaoInicial: <?= json_encode($servico->periodos ?? []) ?>
-    });
-    app.mount(el);
-});
-</script>
+<?= $this->Html->script('vue/programacao-personalizada.js') ?>
+<?= $this->Html->script('vue/programacao-indisponivel.js') ?>

@@ -109,7 +109,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Usuarios']]);
 </div>
 
 
-
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script>
     const usuariosInit = <?= json_encode($usuarios->toArray()) ?>;
 

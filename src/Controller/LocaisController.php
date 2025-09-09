@@ -20,8 +20,9 @@ class LocaisController extends AppController
         $query = $this->Locais->find()
             ->contain(['Estabelecimentos']);
         $locais = $this->paginate($query);
+        $title = "Locais";
 
-        $this->set(compact('locais'));
+        $this->set(compact('locais', 'title'));
     }
 
     /**
@@ -31,9 +32,11 @@ class LocaisController extends AppController
      * @return \Cake\Http\Response|null|void Renders view
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function view($id = null)
+    public function visualizar($id = null)
     {
-        $local = $this->Locais->get($id, contain: ['Estabelecimentos', 'Agendamentos', 'Bloqueios', 'Periodos']);
+        
+        $title = "Locais";
+        $local = $this->Locais->get($id, contain: ['Estabelecimentos', 'Agendamentos', 'Bloqueios', 'Periodos','title' ]);
         $this->set(compact('local'));
     }
 
@@ -42,11 +45,12 @@ class LocaisController extends AppController
      *
      * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
      */
-    public function add()
+    public function novo()
     {
         $local = $this->Locais->newEmptyEntity();
         if ($this->request->is('post')) {
             $local = $this->Locais->patchEntity($local, $this->request->getData());
+            $local["estabelecimento_id"] = $this->getRequest()->getSession()->read('Auth.Estabelecimento.id');
             if ($this->Locais->save($local)) {
                 $this->Flash->success(__('The local has been saved.'));
 
@@ -55,7 +59,8 @@ class LocaisController extends AppController
             $this->Flash->error(__('The local could not be saved. Please, try again.'));
         }
         $estabelecimentos = $this->Locais->Estabelecimentos->find('list', limit: 200)->all();
-        $this->set(compact('local', 'estabelecimentos'));
+        $title = "Locais";
+        $this->set(compact('local', 'estabelecimentos', 'title'));
     }
 
     /**
@@ -65,7 +70,7 @@ class LocaisController extends AppController
      * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function edit($id = null)
+    public function editar($id = null)
     {
         $local = $this->Locais->get($id, contain: []);
         if ($this->request->is(['patch', 'post', 'put'])) {

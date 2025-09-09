@@ -1,5 +1,7 @@
 <?php
 $this->BreadcrumbsPlus->add([['title' => 'Servicos']]);
+
+
 ?>
 <?= $this->element('barra-titulo',['title' => $title]); ?>
 
@@ -122,6 +124,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Servicos']]);
 
 
 
+<!-- vue  -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script>
 const servicosInit = <?= json_encode($servicos->toArray()) ?>;
 
@@ -139,11 +143,8 @@ Vue.createApp({
             try {
                 // URL relativa do endpoint
                 const url = "<?= $this->Url->build(['controller' => 'Servicos', 'action' => 'search']); ?>?q=" + encodeURIComponent(this.query);
-               
-
-
                 const res = await fetch(url, {
-                    credentials: 'same-origin' // envia cookies de sessão
+                    credentials: 'same-origin', // envia cookies de sessão
                 });
 
                 // lê JSON mesmo que haja redirect
@@ -151,7 +152,7 @@ Vue.createApp({
                 this.Servicos = data.data || [];
             } catch(err) {
                 console.error(err);
-                alert('Erro ao buscar Servicos. Verifique console para detalhes.');
+                alert('Erro ao buscar serviços. Verifique console para detalhes.');
             }
         },
 

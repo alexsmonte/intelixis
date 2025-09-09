@@ -29,61 +29,75 @@
 
       // Inicializa a programação caso venha do backend
       onMounted(() => {
-       
-        if (props.programacaoInicial.length > 0) {
-          habilitar.value = true; // 🔹 já vem habilitado
-          props.programacaoInicial.forEach((p) => {
-            const dia = dias.value.find((d) => d.id === p.dia_semana);
-            if (dia) {
-              //dia.ativo = true;
-              dia.ativo = p.status !== "indisponivel";
-              dia.inicio = p.data_hora_inicio.slice(11, 16); // HH:MM
-              dia.fim = p.data_hora_fim.slice(11, 16);
-            }
-          });
+        // 1. Verifique se existe alguma programação semanal
+        const temProgramacaoSemanal = props.programacaoInicial.some(p => p.cadeia_id === 'semanal');
+        
+        // 2. Habilite o toggle apenas se a condição for verdadeira
+        if (temProgramacaoSemanal) {
+            habilitar.value = true;
+            
+            // Agora, itere sobre os dados para preencher os dias
+            props.programacaoInicial.forEach((p) => {
+                if (p.cadeia_id === 'semanal') {
+                    const dia = dias.value.find((d) => d.id === p.dia_semana);
+                    if (dia) {
+                        dia.ativo = p.status !== "indisponivel";
+                        dia.inicio = p.data_hora_inicio.slice(11, 16); // HH:MM
+                        dia.fim = p.data_hora_fim.slice(11, 16);
+                    }
+                }
+            });
         }
-      });
+    });
 
       const periodos = computed(() =>
-        dias.value
-          .filter((d) => d.ativo && d.inicio && d.fim)
-          .map((d) => ({
-            dia_semana: d.id,
-            data_hora_inicio: `${hojeStr()}T${d.inicio}:00.000`,
-            data_hora_fim: `${hojeStr()}T${d.fim}:00.000`,
-            cadeia_id: "semanal",
-            estabelecimento_id: props.estabelecimentoId,
-          }))
+        dias.value.filter((d) => habilitar.value && d.ativo && d.inicio && d.fim).map((d) => {
+          if (habilitar.value && d.ativo && d.inicio && d.fim) {
+            return {
+              dia_semana: d.id,
+              data_hora_inicio: `${hojeStr()}T${d.inicio}:00.000`,
+              data_hora_fim: `${hojeStr()}T${d.fim}:00.000`,
+              cadeia_id: "semanal",
+              //status: "disponivel",
+            };
+          } else {
+            return {
+
+            };
+          }
+        })
       );
+      
 
       return { habilitar, dias, periodos };
     },
 
     template: `
-      <div class="border rounded p-3">
-        <!-- Toggle principal -->
+     <label class="form-label  d-block">Definir Programação Semanal</label>  
+     <!-- Toggle principal -->
+       
         <div class="form-group mb-4">
-          <label class="form-label fw-bold d-block">Definir Programação Semanal</label>
+          
           <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" v-model="habilitar">
             <label class="form-check-label">Habilitar Programação</label>
           </div>
         </div>
-
+    <div class="border rounded p-3">
         <!-- Dias da semana -->
-        <div v-if="habilitar" class="mt-3">
-          <div class="row align-items-center mb-3 border-bottom pb-2" v-for="dia in dias" :key="dia.id">
+        <div v-if="habilitar" class="mt-2">
+          <div class="row align-items-center mb-3 border-bottom pb-2" v-for="dia in dias" :key="dia.id" >
             <div class="col-md-3">
               <div class="form-check form-switch">
                 <input class="form-check-input toggle-dia" type="checkbox" v-model="dia.ativo">
                 <label class="form-check-label">{{ dia.nome }}</label>
               </div>
             </div>
-            <div class="col-md-4" v-if="dia.ativo">
+            <div class="col-md-2" v-if="dia.ativo">
               <label class="form-label small">Início</label>
               <input type="time" class="form-control hora-inicio" v-model="dia.inicio">
             </div>
-            <div class="col-md-4" v-if="dia.ativo">
+            <div class="col-md-2" v-if="dia.ativo">
               <label class="form-label small">Fim</label>
               <input type="time" class="form-control hora-fim" v-model="dia.fim">
             </div>
@@ -92,13 +106,12 @@
 
         <!-- Hidden inputs -->
         <input type="hidden" name="habilitar_programacao" :value="habilitar ? 1 : 0">
-        <template v-for="p in periodos" :key="p.dia_semana">
+        <div v-for="p in periodos" :key="p.dia_semana">
           <input type="hidden" :name="'periodos['+p.dia_semana+'][data_hora_inicio]'" :value="p.data_hora_inicio">
           <input type="hidden" :name="'periodos['+p.dia_semana+'][data_hora_fim]'" :value="p.data_hora_fim">
           <input type="hidden" :name="'periodos['+p.dia_semana+'][dia_semana]'" :value="p.dia_semana">
           <input type="hidden" :name="'periodos['+p.dia_semana+'][cadeia_id]'" :value="p.cadeia_id">
-          <input type="hidden" :name="'periodos['+p.dia_semana+'][estabelecimento_id]'" :value="p.estabelecimento_id">
-        </template>
+        </div>
       </div>
     `,
   };
@@ -108,17 +121,14 @@
     document.addEventListener("DOMContentLoaded", () => {
       const nodes = document.querySelectorAll('[data-vue="programacao-semanal"]');
       nodes.forEach((el) => {
-        const estabelecimentoId = el.dataset.estabelecimentoId || "";
         const programacaoInicial = el.dataset.programacaoInicial
           ? JSON.parse(el.dataset.programacaoInicial)
           : [];
         createApp(ProgramacaoSemanal, {
-          estabelecimentoId,
           programacaoInicial, // 🔹 agora realmente passa a programação inicial
         }).mount(el);
       });
     });
   }
-
   if (typeof module !== "undefined") module.exports = ProgramacaoSemanal;
 })();
