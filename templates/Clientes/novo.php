@@ -21,13 +21,7 @@ $this->BreadcrumbsPlus->add([
 
             <?= $this->Form->create($cliente, ['id' => 'cliente-form']) ?>
             <div class="row">
-                <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('estabelecimento_id', [
-                        'label' => 'Selecione o Estabelecimento',
-                        'class' => 'form-control',
-                        'options' => $estabelecimentos
-                    ]); ?>
-                </div>
+                
                 <div class="col-md-3 mb-3">
                     <?= $this->Form->control('nome',['label' => 'Nome Completo','class' => 'form-control']); ?>
                 </div>

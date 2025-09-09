@@ -62,6 +62,9 @@ class LocaisTable extends Table
         ]);
         $this->hasMany('Periodos', [
             'foreignKey' => 'local_id',
+            'saveStrategy' => 'replace',
+            'dependent' => true,
+            'cascadeCallbacks' => true,
         ]);
     }
 
@@ -76,16 +79,16 @@ class LocaisTable extends Table
         $validator
             ->notEmptyString('estabelecimento_id');
 
-        $validator
+            $validator
             ->scalar('nome')
-            ->maxLength('nome', 255)
+            ->maxLength('nome', 150)
             ->requirePresence('nome', 'create')
-            ->notEmptyString('nome');
+            ->notEmptyString('nome', __('O nome do local é obrigatório.'));
 
         $validator
             ->scalar('endereco')
             ->requirePresence('endereco', 'create')
-            ->notEmptyString('endereco');
+            ->notEmptyString('endereco', __('O Endereço do local é obrigatório.'));
 
         $validator
             ->boolean('ativar')

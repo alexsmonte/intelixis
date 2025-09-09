@@ -3,23 +3,6 @@ $this->BreadcrumbsPlus->add([['title' => 'Locais']]);
 ?>
 <?= $this->element('barra-titulo', ['title' => $title]); ?>
 
-<!-- Modal Visualizar Local -->
-<div class="modal fade" id="view-modal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-md">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="pb-1 mb-2 border-bottom w-100">
-                    <h5>Detalhes do Local</h5>
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-            </div>
-            <div class="modal-body text-start" id="modal-body-content">
-                <i class="ti ti-spinner fa-spin fa-2x"></i>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div id="app" class="card w-100 position-relative overflow-hidden">
     <div class="px-4 py-3 border-bottom">
         <div class="card-body p-4">
@@ -33,7 +16,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Locais']]);
             <div class="row mb-3">
                 <div class="col-md-6 d-flex">
                     <input v-model="query" type="text" class="form-control"
-                        placeholder="Buscar locais por nome ou email">
+                        placeholder="Buscar locais por nome">
                     <button class="btn btn-primary ms-2" @click="onSearch">Pesquisar</button>
                 </div>
             </div>
@@ -68,11 +51,18 @@ $this->BreadcrumbsPlus->add([['title' => 'Locais']]);
 
 
 
+                                <form
+                                    :action="'<?= $this->Url->build(['controller' => 'Locais', 'action' => 'delete']); ?>/' + local.id"
+                                    method="post" @submit.prevent="confirmarExclusao($event)">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <input type="hidden" name="_csrfToken" :value="csrfToken">
+                                    <button class="btn btn-danger btn-sm" data-bs-toggle="tooltip"
+                                        data-bs-placement="top" title="Excluir Local">
+                                        <i class="ti ti-trash"></i>
+                                    </button>
+                                </form>
 
-                                <button class="btn btn-danger btn-sm" data-bs-toggle="tooltip" data-bs-placement="top"
-                                    title="Excluir Local" @click="confirmarExclusao(local.id)">
-                                    <i class="ti ti-trash"></i>
-                                </button>
+
                             </div>
                         </div>
                     </div>
@@ -175,32 +165,11 @@ $this->BreadcrumbsPlus->add([['title' => 'Locais']]);
                     alert('Erro ao buscar locais. Verifique console para detalhes.');
                 }
             },
-            async viewLocal(id) {
-                try {
-                    const res = await fetch(`<?= $this->Url->build(['controller' => 'Locais', 'action' => 'visualizar']); ?>/${id}`, {
-                        credentials: 'same-origin',
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                    });
-                    if (!res.ok) throw new Error('Erro ao carregar local');
-                    const html = await res.text();
-                    const modalEl = document.getElementById('view-modal');
-                    modalEl.querySelector('#modal-body-content').innerHTML = `
-            <div>
-                ${html}
-                <div class="modal-footer mt-3">
-                    <a href="<?= $this->Url->build(['controller' => 'Locais', 'action' => 'editar']); ?>/${id}" class="btn btn-primary">Editar</a>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
-                </div>
-            </div>
-        `;
-                    const modal = new bootstrap.Modal(modalEl);
-                    modal.show();
-                } catch (err) {
-                    console.error(err);
-                    alert('Erro ao carregar local.');
-                }
-            },
-            confirmarExclusao(localId) {
+
+            confirmarExclusao(event) {
+                event.preventDefault();
+                const form = event.target;
+
                 Swal.fire({
                     title: "Tem certeza que deseja excluir este Local?",
                     text: "Esta ação não pode ser desfeita.",
@@ -211,24 +180,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Locais']]);
                     confirmButtonText: "Sim, excluir!"
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        fetch(`<?= $this->Url->build(['controller' => 'Locais', 'action' => 'delete']); ?>/${localId}`, {
-                            method: 'POST',
-                            body: new URLSearchParams({
-                                '_method': 'DELETE',
-                                '_csrfToken': this.csrfToken
-                            }),
-                            credentials: 'same-origin'
-                        }).then(response => {
-                            if (response.ok) {
-                                this.locais = this.locais.filter(local => local.id !== localId);
-                                Swal.fire("Excluído!", "O local foi excluído com sucesso.", "success");
-                            } else {
-                                Swal.fire("Erro!", "Houve um problema ao excluir o local.", "error");
-                            }
-                        }).catch(err => {
-                            console.error(err);
-                            Swal.fire("Erro!", "Houve um problema ao excluir o local.", "error");
-                        });
+                        form.submit(); // só envia se confirmar
                     }
                 });
             }

@@ -38,11 +38,6 @@ $this->BreadcrumbsPlus->add([['title' => 'Clientes']]);
 </div>
 
 
-
-
-
-
-
 <div id="app" class="card w-100 position-relative overflow-hidden">
     <div class="px-4 py-3 border-bottom">
         <div class="card-body p-4">
@@ -73,8 +68,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Clientes']]);
                 <table class="table table-striped text-nowrap mb-0 align-middle">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Estabelecimento</th>
+
                             <th>Nome</th>
                             <th>Documento</th>
                             <th>Email</th>
@@ -85,8 +79,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Clientes']]);
                     </thead>
                     <tbody>
                         <tr v-for="cliente in clientes" :key="cliente.id">
-                            <td>{{ cliente.id }}</td>
-                            <td>{{ cliente.estabelecimento?.razao_social || '' }}</td>
+
+
                             <td>{{ cliente.nome }}</td>
                             <td>{{ cliente.documento }}</td>
                             <td>{{ cliente.email }}</td>
@@ -145,7 +139,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Clientes']]);
 </div>
 
 
-
+<!-- vue -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script>
 const clientesInit = <?= json_encode($clientes->toArray()) ?>;
 

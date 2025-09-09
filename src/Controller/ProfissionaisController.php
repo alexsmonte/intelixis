@@ -21,39 +21,47 @@ class ProfissionaisController extends AppController
     {
         $query = $this->Profissionais->find()
             ->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])
-            ->contain(['Estabelecimentos','Servicos', 'Convenios']);
-    // pega o parâmetro do GET
-    $estabelecimentoId = $this->request->getQuery('estabelecimento_id',);
-    if (!empty($estabelecimentoId)) {
-        $query->where(['Profissionais.estabelecimento_id' => $estabelecimentoId]);
-    }
-    $servicoId = $this->request->getQuery('servico_id',);
-    if (!empty($servicoId)) {
-        $query->where(['Profissionais.servico_id' => $servicoId ]);
-    }
-    $convenioId = $this->request->getQuery('convenio_id',);
-    if (!empty($convenioId)) {
-        $query->where(['Profissionais.convenio_id' => $convenioId]);
-    }
+            ->contain(['Estabelecimentos', 'Servicos', 'Convenios']);
+        // pega o parâmetro do GET
+        $estabelecimentoId = $this->request->getQuery('estabelecimento_id', );
+        if (!empty($estabelecimentoId)) {
+            $query->where(['Profissionais.estabelecimento_id' => $estabelecimentoId]);
+        }
+        $servicoId = $this->request->getQuery('servico_id', );
+        if (!empty($servicoId)) {
+            $query->where(['Profissionais.servico_id' => $servicoId]);
+        }
+        $convenioId = $this->request->getQuery('convenio_id', );
+        if (!empty($convenioId)) {
+            $query->where(['Profissionais.convenio_id' => $convenioId]);
+        }
         $profissionais = $this->paginate($query);
 
-        
-     // lista de estabelecimentos para o select
+
+        // lista de estabelecimentos para o select
         $estabelecimentos = $this->Profissionais->Estabelecimentos
-        ->find('list', ['keyField' => 'id', 'valueField' => 'nome_fantasia'])
-        ->order(['nome_fantasia' => 'ASC'])
-        ->all();
+            ->find('list', ['keyField' => 'id', 'valueField' => 'nome_fantasia'])
+            ->order(['nome_fantasia' => 'ASC'])
+            ->all();
         $servicos = $this->Profissionais->Servicos
-        ->find('list', ['keyField' => 'id', 'valueField' => 'nome'])
-        ->order(['nome' => 'ASC'])
-        ->all();
+            ->find('list', ['keyField' => 'id', 'valueField' => 'nome'])
+            ->order(['nome' => 'ASC'])
+            ->all();
         $convenios = $this->Profissionais->Convenios
-        ->find('list', ['keyField' => 'id', 'valueField' => 'nome'])
-        ->order(['nome' => 'ASC'])
-        ->all();
+            ->find('list', ['keyField' => 'id', 'valueField' => 'nome'])
+            ->order(['nome' => 'ASC'])
+            ->all();
         $title = 'Lista de Profissionais'; // defina o título
-        $this->set(compact('profissionais', 'estabelecimentos', 'estabelecimentoId',
-        'servicos', 'servicoId','convenios', 'convenioId', 'title'));
+        $this->set(compact(
+            'profissionais',
+            'estabelecimentos',
+            'estabelecimentoId',
+            'servicos',
+            'servicoId',
+            'convenios',
+            'convenioId',
+            'title'
+        ));
     }
 
     /**
@@ -68,7 +76,7 @@ class ProfissionaisController extends AppController
         //$profissional = $this->Profissionais->get($id, contain: ['Estabelecimentos', 'Convenios', 'Servicos', 'Agendamentos', 'Bloqueios', 'Periodos']);
         $profissional = $this->Profissionais->get($id, [
             'conditions' => ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
-            'contain' => ['Estabelecimentos','Convenios', 'Servicos' ]
+            'contain' => ['Estabelecimentos', 'Convenios', 'Servicos']
         ]);
         $this->set(compact('profissional'));
         if ($this->request->is('ajax')) {
@@ -82,7 +90,7 @@ class ProfissionaisController extends AppController
      *
      * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
      */
-     
+
 
     public function novo()
     {
@@ -170,10 +178,10 @@ class ProfissionaisController extends AppController
                 }
 
                 $data['periodos'] = $periodos;
-              
+
             } else {
                 unset($data['periodos']);
-               
+
 
             }
 
@@ -209,7 +217,7 @@ class ProfissionaisController extends AppController
         $title = 'Novo Profissional';
         $this->set(compact('profissional', 'convenios', 'servicos', 'title'));
     }
-    
+
     /**
      * Edit method
      *
@@ -217,154 +225,154 @@ class ProfissionaisController extends AppController
      * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-   
 
-        public function editar($id = null)
-        {
-            $profissional = $this->Profissionais->get($id, [
-                'conditions' => ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
-                'contain' => ['Servicos', 'Convenios', 'Periodos']
-            ]);
-    
-            if ($this->request->is(['patch', 'post', 'put'])) {
-                $data = $this->request->getData();
-    
-                // Remove máscaras
+
+    public function editar($id = null)
+    {
+        $profissional = $this->Profissionais->get($id, [
+            'conditions' => ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+            'contain' => ['Servicos', 'Convenios', 'Periodos']
+        ]);
+
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            $data = $this->request->getData();
+
+            // Remove máscaras
             $fieldsToClean = ['cnpj', 'telefone'];
             foreach ($fieldsToClean as $field) {
                 if (!empty($data[$field])) {
                     $data[$field] = preg_replace('/\D/', '', $data[$field]);
                 }
             }
-    
-                $profissional = $this->Profissionais->patchEntity($profissional, $data, [
-                    'associated' => ['Convenios', 'Servicos']
+
+            $profissional = $this->Profissionais->patchEntity($profissional, $data, [
+                'associated' => ['Convenios', 'Servicos']
+            ]);
+
+            $periodosTable = $this->Profissionais->Periodos;
+            $periodosParaSalvar = [];
+
+            /**
+             * ======================
+             * PROGRAMACAO SEMANAL
+             * ======================
+             */
+            $habilitar = !empty($data['habilitar_programacao']) && $data['habilitar_programacao'] == 1;
+
+            if ($habilitar) {
+                $diasSemana = range(1, 7);
+
+                foreach ($diasSemana as $diaId) {
+                    if (!empty($data['periodos'][$diaId])) {
+                        $p = $data['periodos'][$diaId];
+                        $periodosParaSalvar[] = $periodosTable->newEntity([
+                            'profissional_id' => $profissional->id,
+                            'estabelecimento_id' => $profissional->estabelecimento_id,
+                            'dia_semana' => $diaId,
+                            'data_hora_inicio' => $p['data_hora_inicio'],
+                            'data_hora_fim' => $p['data_hora_fim'],
+                            'cadeia_id' => 'semanal',
+                            'status' => 'disponivel',
+                        ]);
+                    } else {
+                        $periodosParaSalvar[] = $periodosTable->newEntity([
+                            'profissional_id' => $profissional->id,
+                            'estabelecimento_id' => $profissional->estabelecimento_id,
+                            'dia_semana' => $diaId,
+                            'data_hora_inicio' => '1970-01-01 00:00:00',
+                            'data_hora_fim' => '1970-01-01 00:00:00',
+                            'cadeia_id' => 'semanal',
+                            'status' => 'indisponivel',
+                        ]);
+                    }
+                }
+            } else {
+                // Se desabilitado, remove todos os períodos semanais
+                $this->Profissionais->Periodos->deleteAll([
+                    'profissional_id' => $profissional->id,
+                    'cadeia_id' => 'semanal'
                 ]);
-    
-                $periodosTable = $this->Profissionais->Periodos;
-                $periodosParaSalvar = [];
-    
-                /**
-                 * ======================
-                 * PROGRAMACAO SEMANAL
-                 * ======================
-                 */
-                $habilitar = !empty($data['habilitar_programacao']) && $data['habilitar_programacao'] == 1;
-    
-                if ($habilitar) {
-                    $diasSemana = range(1, 7);
-    
-                    foreach ($diasSemana as $diaId) {
-                        if (!empty($data['periodos'][$diaId])) {
-                            $p = $data['periodos'][$diaId];
+            }
+
+            /**
+             * ==============================
+             * PROGRAMACAO PERSONALIZADA + INDISPONIVEIS
+             * ==============================
+
+             */
+            $cadeiasEnviadas = [];
+
+            if (!empty($data['periodos'])) {
+                foreach ($data['periodos'] as $key => $bloco) {
+                    // Ignora os índices numéricos (1 a 7) -> já tratados no semanal
+                    if (is_numeric($key)) {
+                        continue;
+                    }
+
+                    $cadeia_id = $bloco['cadeia_id'] ?? $key;
+                    $cadeiasEnviadas[] = $cadeia_id;
+
+                    if (!empty($bloco['dia_semana'])) {
+                        foreach ($bloco['dia_semana'] as $idx => $diaSemana) {
                             $periodosParaSalvar[] = $periodosTable->newEntity([
                                 'profissional_id' => $profissional->id,
                                 'estabelecimento_id' => $profissional->estabelecimento_id,
-                                'dia_semana' => $diaId,
-                                'data_hora_inicio' => $p['data_hora_inicio'],
-                                'data_hora_fim' => $p['data_hora_fim'],
-                                'cadeia_id' => 'semanal',
-                                'status' => 'disponivel',
-                            ]);
-                        } else {
-                            $periodosParaSalvar[] = $periodosTable->newEntity([
-                                'profissional_id' => $profissional->id,
-                                'estabelecimento_id' => $profissional->estabelecimento_id,
-                                'dia_semana' => $diaId,
-                                'data_hora_inicio' => '1970-01-01 00:00:00',
-                                'data_hora_fim' => '1970-01-01 00:00:00',
-                                'cadeia_id' => 'semanal',
-                                'status' => 'indisponivel',
+                                'dia_semana' => $diaSemana,
+                                'data_hora_inicio' => $bloco['data_hora_inicio'][$idx],
+                                'data_hora_fim' => $bloco['data_hora_fim'][$idx],
+                                'data_personalizada' => $bloco['data_personalizada'][$idx],
+                                'cadeia_id' => $cadeia_id,
+                                'status' => $bloco['status'] ?? 'disponivel',
                             ]);
                         }
                     }
-                } else {
-                    // Se desabilitado, remove todos os períodos semanais
-                    $this->Profissionais->Periodos->deleteAll([
-                        'profissional_id' => $profissional->id,
-                        'cadeia_id' => 'semanal'
-                    ]);
-                }
-    
-                /**
-                 * ==============================
-                 * PROGRAMACAO PERSONALIZADA + INDISPONIVEIS
-                 * ==============================
-    
-                 */
-                $cadeiasEnviadas = [];
-    
-                if (!empty($data['periodos'])) {
-                    foreach ($data['periodos'] as $key => $bloco) {
-                        // Ignora os índices numéricos (1 a 7) -> já tratados no semanal
-                        if (is_numeric($key)) {
-                            continue;
-                        }
-    
-                        $cadeia_id = $bloco['cadeia_id'] ?? $key;
-                        $cadeiasEnviadas[] = $cadeia_id;
-    
-                        if (!empty($bloco['dia_semana'])) {
-                            foreach ($bloco['dia_semana'] as $idx => $diaSemana) {
-                                $periodosParaSalvar[] = $periodosTable->newEntity([
-                                    'profissional_id' => $profissional->id,
-                                    'estabelecimento_id' => $profissional->estabelecimento_id,
-                                    'dia_semana' => $diaSemana,
-                                    'data_hora_inicio' => $bloco['data_hora_inicio'][$idx],
-                                    'data_hora_fim' => $bloco['data_hora_fim'][$idx],
-                                    'data_personalizada' => $bloco['data_personalizada'][$idx],
-                                    'cadeia_id' => $cadeia_id,
-                                    'status' => $bloco['status'] ?? 'disponivel',
-                                ]);
-                            }
-                        }
-                    }
-                }
-    
-                // Apaga blocos removidos (apenas os não-semanais)
-                if (!empty($cadeiasEnviadas)) {
-                    $this->Profissionais->Periodos->deleteAll([
-                        'profissional_id' => $profissional->id,
-                        'cadeia_id !=' => 'semanal',
-                        'cadeia_id NOT IN' => $cadeiasEnviadas
-                    ]);
-                } else {
-                    $this->Profissionais->Periodos->deleteAll([
-                        'profissional_id' => $profissional->id,
-                        'cadeia_id !=' => 'semanal'
-                    ]);
-                }
-    
-                // Aplica os períodos processados ao serviço
-                if (!empty($periodosParaSalvar)) {
-                    $profissional->periodos = $periodosParaSalvar;
-                }
-                
-                //debug ($data);
-                //die;
-                // Salva profissional e associações
-                if ($this->Profissionais->save($profissional, ['associated' => ['Periodos', 'Servicos', 'Convenios']])) {
-                    $this->Flash->success(__('Profissional atualizado com sucesso.'));
-                    return $this->redirect(['action' => 'index']);
-                } else {
-                    $this->Flash->error(__('Não foi possível atualizar o profissional.'));
                 }
             }
-    
-            $convenios = $this->Profissionais->Convenios->find('list', ['limit' => 200])
-                ->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])
-                ->all();
-    
-            $servicos = $this->Profissionais->Servicos->find('list', ['limit' => 200])
-                ->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])
-                ->all();
-    
-            $periodos = $this->Profissionais->Periodos->find('list', ['limit' => 200])->all();
-            $estabelecimentos = $this->Profissionais->Estabelecimentos->find('list', ['limit' => 200])->all();
-    
-            $title = 'Editar Serviço';
-            $this->set(compact('profissional', 'convenios', 'estabelecimentos', 'servicos', 'periodos', 'title'));
+
+            // Apaga blocos removidos (apenas os não-semanais)
+            if (!empty($cadeiasEnviadas)) {
+                $this->Profissionais->Periodos->deleteAll([
+                    'profissional_id' => $profissional->id,
+                    'cadeia_id !=' => 'semanal',
+                    'cadeia_id NOT IN' => $cadeiasEnviadas
+                ]);
+            } else {
+                $this->Profissionais->Periodos->deleteAll([
+                    'profissional_id' => $profissional->id,
+                    'cadeia_id !=' => 'semanal'
+                ]);
+            }
+
+            // Aplica os períodos processados ao serviço
+            if (!empty($periodosParaSalvar)) {
+                $profissional->periodos = $periodosParaSalvar;
+            }
+
+            //debug ($data);
+            //die;
+            // Salva profissional e associações
+            if ($this->Profissionais->save($profissional, ['associated' => ['Periodos', 'Servicos', 'Convenios']])) {
+                $this->Flash->success(__('Profissional atualizado com sucesso.'));
+                return $this->redirect(['action' => 'index']);
+            } else {
+                $this->Flash->error(__('Não foi possível atualizar o profissional.'));
+            }
         }
+
+        $convenios = $this->Profissionais->Convenios->find('list', ['limit' => 200])
+            ->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])
+            ->all();
+
+        $servicos = $this->Profissionais->Servicos->find('list', ['limit' => 200])
+            ->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])
+            ->all();
+
+        $periodos = $this->Profissionais->Periodos->find('list', ['limit' => 200])->all();
+        $estabelecimentos = $this->Profissionais->Estabelecimentos->find('list', ['limit' => 200])->all();
+
+        $title = 'Editar Serviço';
+        $this->set(compact('profissional', 'convenios', 'estabelecimentos', 'servicos', 'periodos', 'title'));
+    }
 
     /**
      * Delete method
@@ -393,7 +401,7 @@ class ProfissionaisController extends AppController
 
     use SearchableTrait;
 
-    
+
 
     public function search()
     {
@@ -402,10 +410,9 @@ class ProfissionaisController extends AppController
             'estabelecimento_id' => ['field' => 'Profissionais.estabelecimento_id', 'value' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
             'nome' => ['field' => 'Profissionais.nome', 'operator' => 'LIKE'],
             'email' => ['field' => 'Profissionais.email', 'operator' => 'LIKE'],
-            
-        ];
 
-        return $this->doAdvancedSearch($this->Profissionais, $allowedFilters,['Profissionais.nome' => 'ASC'],['Estabelecimentos']);
+        ];
+        return $this->doAdvancedSearch($this->Profissionais, $allowedFilters, ['Profissionais.nome' => 'ASC'], ['Estabelecimentos']);
 
     }
 }
