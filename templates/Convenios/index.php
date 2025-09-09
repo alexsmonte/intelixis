@@ -125,7 +125,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Convenios']]);
 </div>
 
 
-
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script>
 const conveniosInit = <?= json_encode($convenios->toArray()) ?>;
 
@@ -143,9 +143,6 @@ Vue.createApp({
             try {
                 // URL relativa do endpoint
                 const url = "<?= $this->Url->build(['controller' => 'Convenios', 'action' => 'search']); ?>?q=" + encodeURIComponent(this.query);
-               
-
-
                 const res = await fetch(url, {
                     credentials: 'same-origin' // envia cookies de sessão
                 });

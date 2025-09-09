@@ -62,8 +62,14 @@ class ProfissionaisTable extends Table
         $this->hasMany('Bloqueios', [
             'foreignKey' => 'profissional_id',
         ]);
+        /*$this->hasMany('Periodos', [
+            'foreignKey' => 'profissional_id',
+        ]);*/
         $this->hasMany('Periodos', [
             'foreignKey' => 'profissional_id',
+            'saveStrategy' => 'replace',
+            'dependent' => true,
+            'cascadeCallbacks' => true,
         ]);
         $this->belongsToMany('Convenios', [
             'foreignKey' => 'profissional_id',

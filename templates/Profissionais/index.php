@@ -95,7 +95,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais']]);
                             </td>
                         </tr>
                         <tr v-if="profissionais.length === 0">
-                            <td colspan="8" class="text-center">Nenhum profissiona; encontrado</td>
+                            <td colspan="8" class="text-center">Nenhum profissional encontrado</td>
                         </tr>
                     </tbody>
                 </table>
@@ -118,6 +118,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais']]);
     </div>
 </div>
 
+<!-- vue  -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script>
 const profissionaisInit = <?= json_encode($profissionais->toArray()) ?>;
 

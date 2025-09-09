@@ -8,6 +8,7 @@ use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 
+
 /**
  * Convenios Model
  *
@@ -58,8 +59,14 @@ class ConveniosTable extends Table
         $this->hasMany('Agendamentos', [
             'foreignKey' => 'convenio_id',
         ]);
+        /*$this->hasMany('Periodos', [
+            'foreignKey' => 'convenio_id',
+        ]);*/
         $this->hasMany('Periodos', [
             'foreignKey' => 'convenio_id',
+            'saveStrategy' => 'replace',
+            'dependent' => true,
+            'cascadeCallbacks' => true,
         ]);
         $this->belongsToMany('Profissionais', [
             'foreignKey' => 'convenio_id',
@@ -88,7 +95,7 @@ class ConveniosTable extends Table
             ->scalar('nome')
             ->maxLength('nome', 150)
             ->requirePresence('nome', 'create')
-            ->notEmptyString('nome');
+            ->notEmptyString('nome', __('O nome do convênio é obrigatório.'));
 
         $validator
             ->scalar('registro_ans')
@@ -97,12 +104,17 @@ class ConveniosTable extends Table
 
         $validator
             ->scalar('cnpj')
-            ->maxLength('cnpj', 20)
-            ->allowEmptyString('cnpj');
+            ->maxLength('cnpj', 18)
+            ->allowEmptyString('cnpj')
+            ->add('cnpj', 'length', [
+                'rule' => ['lengthBetween', 18, 18],
+                'message' => __('O documento deve conter exatamente 14 caracteres.')
+            ]);
 
         $validator
             ->scalar('telefone')
-            ->maxLength('telefone', 20)
+            ->minLength('telefone', 10, __('O Telefone deve conter 10 caracteres.'))
+            ->maxLength('telefone', 14)
             ->allowEmptyString('telefone');
 
         $validator
@@ -116,7 +128,7 @@ class ConveniosTable extends Table
 
         $validator
             ->boolean('ativar')
-            ->allowEmptyString('ativar');
+            ->notEmptyString('ativar');
 
         return $validator;
     }
