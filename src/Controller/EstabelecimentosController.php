@@ -116,7 +116,7 @@ class EstabelecimentosController extends AppController
     {
 
         if($this->request->getSession()->check('Auth.Estabelecimento.id'))
-            $estabelecimento = $this->Estabelecimentos->get($this->request->getSession()->read('Auth.Estabelecimento.id'), contain: ['Extensoes', 'Usuarios','Assinaturas' => ['Planos']]);
+            $estabelecimento = $this->Estabelecimentos->get($this->request->getSession()->read('Auth.Estabelecimento.id'), contain: ['Extensoes', 'Usuarios','Periodos','Assinaturas' => ['Planos']]);
         else
             $estabelecimento = $this->Estabelecimentos->newEmptyEntity();
 
@@ -128,8 +128,11 @@ class EstabelecimentosController extends AppController
             if ($this->request->getAttribute('identity')->tipo == 'master')
             $dadosEstabelecimento["usuarios"]["_ids"]   =   [$this->request->getAttribute('identity')->id];
 
-            $estabelecimento = $this->Estabelecimentos->patchEntity($estabelecimento, $dadosEstabelecimento);
+debug($dadosEstabelecimento);
 
+            $estabelecimento = $this->Estabelecimentos->patchEntity($estabelecimento, $dadosEstabelecimento,['associated' => ['Periodos']]);
+debug($estabelecimento);
+exit;
             if ($this->Estabelecimentos->save($estabelecimento)) {
                 $this->Flash->success(__('Os dados foram salvos com sucesso.'));
 
