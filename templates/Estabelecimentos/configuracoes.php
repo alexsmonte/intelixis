@@ -156,93 +156,14 @@ $this->BreadcrumbsPlus->add([['title' => 'Estabelecimento']]);
             </div>
             <div class="tab-pane fade" id="pills-notifications" role="tabpanel" aria-labelledby="pills-notifications-tab" tabindex="0">
                 <div class="row justify-content-center">
-                    <div class="col-lg-9">
+                    <div class="col-lg-10">
                         <div class="card border shadow-none">
-                            <div class="card-body p-4">
-                                <h4 class="card-title">Notification Preferences</h4>
-                                <p class="card-subtitle mb-4">
-                                    Select the notificaitons ou would like to receive via email. Please note that you cannot opt
-                                    out of receving service
-                                    messages, such as payment, security or legal notifications.
-                                </p>
-                                <form class="mb-7">
-                                    <label for="exampleInputtext5" class="form-label">Email Address*</label>
-                                    <input type="text" class="form-control" id="exampleInputtext5" placeholder="" required="">
-                                    <p class="mb-0">Required for notificaitons.</p>
-                                </form>
-                                <div>
-                                    <div class="d-flex align-items-center justify-content-between mb-4">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                                <i class="ti ti-article text-dark d-block fs-7" width="22" height="22"></i>
-                                            </div>
-                                            <div>
-                                                <h5 class="fs-4 fw-semibold">Our newsletter</h5>
-                                                <p class="mb-0">We'll always let you know about important changes</p>
-                                            </div>
-                                        </div>
-                                        <div class="form-check form-switch mb-0">
-                                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked">
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-center justify-content-between mb-4">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                                <i class="ti ti-checkbox text-dark d-block fs-7" width="22" height="22"></i>
-                                            </div>
-                                            <div>
-                                                <h5 class="fs-4 fw-semibold">Order Confirmation</h5>
-                                                <p class="mb-0">You will be notified when customer order any product</p>
-                                            </div>
-                                        </div>
-                                        <div class="form-check form-switch mb-0">
-                                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked1" checked="">
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-center justify-content-between mb-4">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                                <i class="ti ti-clock-hour-4 text-dark d-block fs-7" width="22" height="22"></i>
-                                            </div>
-                                            <div>
-                                                <h5 class="fs-4 fw-semibold">Order Status Changed</h5>
-                                                <p class="mb-0">You will be notified when customer make changes to the order</p>
-                                            </div>
-                                        </div>
-                                        <div class="form-check form-switch mb-0">
-                                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked2" checked="">
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-center justify-content-between mb-4">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                                <i class="ti ti-truck-delivery text-dark d-block fs-7" width="22" height="22"></i>
-                                            </div>
-                                            <div>
-                                                <h5 class="fs-4 fw-semibold">Order Delivered</h5>
-                                                <p class="mb-0">You will be notified once the order is delivered</p>
-                                            </div>
-                                        </div>
-                                        <div class="form-check form-switch mb-0">
-                                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked3">
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                                <i class="ti ti-mail text-dark d-block fs-7" width="22" height="22"></i>
-                                            </div>
-                                            <div>
-                                                <h5 class="fs-4 fw-semibold">Email Notification</h5>
-                                                <p class="mb-0">Turn on email notificaiton to get updates through email</p>
-                                            </div>
-                                        </div>
-                                        <div class="form-check form-switch mb-0">
-                                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked4" checked="">
-                                        </div>
-                                    </div>
-                                </div>
+                            <div data-vue="programacao-semanal"
+                                 data-programacao-inicial='<?= json_encode($estabelecimento->periodos ?? []) ?>'
+								 data-habilitar-inicial="true">
+                                <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
                             </div>
+
                         </div>
                     </div>
                     <div class="col-lg-9">
@@ -485,3 +406,4 @@ $this->BreadcrumbsPlus->add([['title' => 'Estabelecimento']]);
     </div>
 </div>
 <?= $this->Form->end() ?>
+<?= $this->Html->script('vue/programacao-semanal.js') ?>
