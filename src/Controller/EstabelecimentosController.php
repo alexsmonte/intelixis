@@ -116,9 +116,23 @@ class EstabelecimentosController extends AppController
     {
 
         if($this->request->getSession()->check('Auth.Estabelecimento.id'))
-            $estabelecimento = $this->Estabelecimentos->get($this->request->getSession()->read('Auth.Estabelecimento.id'), contain: ['Extensoes', 'Usuarios','Periodos','Assinaturas' => ['Planos']]);
+            $estabelecimento = $this->Estabelecimentos->get($this->request->getSession()->read('Auth.Estabelecimento.id'),
+                contain: ['Extensoes',
+                                'Usuarios',
+                                'Periodos'  => function ($q) {
+                                                return $q->where([
+                                                    'Periodos.profissional_id IS NULL',
+                                                    'Periodos.servico_id IS NULL',
+                                                    'Periodos.local_id IS NULL',
+                                                    'Periodos.convenio_id IS NULL'
+                                                ]);
+                                                },
+                                'Assinaturas' => ['Planos']]);
         else
             $estabelecimento = $this->Estabelecimentos->newEmptyEntity();
+
+
+
 
         if ($this->request->is(['patch', 'post', 'put'])) {
             $dadosEstabelecimento   =   $this->request->getData();
@@ -128,11 +142,9 @@ class EstabelecimentosController extends AppController
             if ($this->request->getAttribute('identity')->tipo == 'master')
             $dadosEstabelecimento["usuarios"]["_ids"]   =   [$this->request->getAttribute('identity')->id];
 
-debug($dadosEstabelecimento);
 
             $estabelecimento = $this->Estabelecimentos->patchEntity($estabelecimento, $dadosEstabelecimento,['associated' => ['Periodos']]);
-debug($estabelecimento);
-exit;
+
             if ($this->Estabelecimentos->save($estabelecimento)) {
                 $this->Flash->success(__('Os dados foram salvos com sucesso.'));
 
