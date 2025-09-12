@@ -7,7 +7,7 @@ use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
-
+use Cake\Event\Event;
 /**
  * Profissionais Model
  *
@@ -197,5 +197,24 @@ class ProfissionaisTable extends Table
 
         // Precisa de pelo menos duas partes válidas
         return count($validParts) >= 2;
-    }   
+    }
+
+    public function beforeMarshal(Event $event, \ArrayObject $data, \ArrayObject $options)
+    {
+
+        $caracterInvalido   =   [" ",".","-","/",")","(",","];
+
+        if(isset($data['cpf_cnpj']))
+            $data['cpf_cnpj']      =   str_replace($caracterInvalido, "", $data['cpf_cnpj']);
+
+        if(isset($data['cep']))
+            $data['cep']           =   str_replace($caracterInvalido, "", $data['cep']);
+
+        if(isset($data['telefone']))
+            $data['telefone']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['telefone']));
+
+        if(isset($data['celular']))
+            $data['celular']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['celular']));
+
+    }
 }
