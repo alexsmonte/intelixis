@@ -157,10 +157,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Estabelecimento']]);
             <div class="tab-pane fade" id="pills-notifications" role="tabpanel" aria-labelledby="pills-notifications-tab" tabindex="0">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
-                        <div class="card border shadow-none">
+                        <div class="card border shadow-none p-4">
                             <div data-vue="programacao-semanal"
                                  data-programacao-inicial='<?= json_encode($estabelecimento->periodos ?? []) ?>'
-								 data-habilitar-inicial="true">
+								 data-habilitar-inicial="true"
+                                 data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
+                                 data-base-url="<?= $this->Url->build(['controller'=>'Periodos', 'action' =>'delete'], ['fullBase' => false]) ?>">
                                 <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
                             </div>
 
