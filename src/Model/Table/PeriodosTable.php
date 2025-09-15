@@ -94,12 +94,12 @@ class PeriodosTable extends Table
             ->allowEmptyString('convenio_id');
 
         $validator
-            ->dateTime('data_hora_inicio')
+            ->dateTime('data_hora_inicio',['dmy'])
             ->requirePresence('data_hora_inicio', 'create')
             ->notEmptyDateTime('data_hora_inicio');
 
         $validator
-            ->dateTime('data_hora_fim')
+            ->dateTime('data_hora_fim', ['dmy'])
             ->requirePresence('data_hora_fim', 'create')
             ->notEmptyDateTime('data_hora_fim');
 
@@ -108,7 +108,7 @@ class PeriodosTable extends Table
             ->notEmptyString('dia_semana');
 
         $validator
-            ->dateTime('data_personalizada')
+            ->dateTime('data_personalizada', ['dmy'])
             ->allowEmptyDateTime('data_personalizada');
 
         $validator
