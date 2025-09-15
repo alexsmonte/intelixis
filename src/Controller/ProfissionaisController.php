@@ -100,6 +100,14 @@ class ProfissionaisController extends AppController
 
         if ($this->request->is('post')) {
             $data = $this->request->getData();
+            $data["estabelecimento_id"] = $this->getRequest()->getSession()->read('Auth.Estabelecimento.id');
+
+            if (!empty($data['periodos'])) {
+                $data['periodos'] = array_map(
+                    fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+                    $data['periodos']);
+            }
+            /**
             //debug($data);
             //die;
             // Remove máscaras
@@ -184,14 +192,10 @@ class ProfissionaisController extends AppController
 
 
             }
+***/
 
             // ---------- PATCH ENTITY ----------
-            $profissional = $this->Profissionais->patchEntity($profissional, $data, [
-                'associated' => ['Periodos', 'Servicos', 'Convenios']
-            ]);
-
-            $profissional["estabelecimento_id"] = $this->getRequest()->getSession()->read('Auth.Estabelecimento.id');
-
+            $profissional = $this->Profissionais->patchEntity($profissional, $data, ['associated' => ['Periodos', 'Servicos', 'Convenios']]);
 
             if ($this->Profissionais->save($profissional, ['associated' => ['Periodos', 'Servicos', 'Convenios']])) {
                 $this->Flash->success(__('Profissional cadastrado com sucesso.'));
@@ -207,12 +211,10 @@ class ProfissionaisController extends AppController
         //$convenios        = $this->Servicos->Convenios->find('list', limit: 200)->all();
 
 
-        $convenios = $this->Profissionais->Convenios->find('list', [
-            'limit' => 200
-        ])
+        $convenios = $this->Profissionais->Convenios->find('list')
             ->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])
             ->all();
-        $servicos = $this->Profissionais->Servicos->find('list', limit: 200)->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])->all();
+        $servicos = $this->Profissionais->Servicos->find('list')->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])->all();
 
         $title = 'Novo Profissional';
         $this->set(compact('profissional', 'convenios', 'servicos', 'title'));
@@ -237,6 +239,13 @@ class ProfissionaisController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
 
+            if (!empty($data['periodos'])) {
+                $data['periodos'] = array_map(
+                    fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+                    $data['periodos']);
+            }
+
+/**
             // Remove máscaras
             $fieldsToClean = ['cnpj', 'telefone'];
             foreach ($fieldsToClean as $field) {
@@ -256,7 +265,7 @@ class ProfissionaisController extends AppController
              * ======================
              * PROGRAMACAO SEMANAL
              * ======================
-             */
+
             $habilitar = !empty($data['habilitar_programacao']) && $data['habilitar_programacao'] == 1;
 
             if ($habilitar) {
@@ -299,7 +308,7 @@ class ProfissionaisController extends AppController
              * PROGRAMACAO PERSONALIZADA + INDISPONIVEIS
              * ==============================
 
-             */
+
             $cadeiasEnviadas = [];
 
             if (!empty($data['periodos'])) {
@@ -347,11 +356,12 @@ class ProfissionaisController extends AppController
             if (!empty($periodosParaSalvar)) {
                 $profissional->periodos = $periodosParaSalvar;
             }
+***/
+            $profissional = $this->Profissionais->patchEntity($profissional, $data, ['associated' => ['Periodos', 'Servicos', 'Convenios']]);
 
-            //debug ($data);
             //die;
             // Salva profissional e associações
-            if ($this->Profissionais->save($profissional, ['associated' => ['Periodos', 'Servicos', 'Convenios']])) {
+            if ($this->Profissionais->save($profissional)) {
                 $this->Flash->success(__('Profissional atualizado com sucesso.'));
                 return $this->redirect(['action' => 'index']);
             } else {
