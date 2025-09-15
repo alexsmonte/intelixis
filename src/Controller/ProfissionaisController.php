@@ -369,16 +369,16 @@ class ProfissionaisController extends AppController
             }
         }
 
-        $convenios = $this->Profissionais->Convenios->find('list', ['limit' => 200])
+        $convenios = $this->Profissionais->Convenios->find('list')
             ->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])
             ->all();
 
-        $servicos = $this->Profissionais->Servicos->find('list', ['limit' => 200])
+        $servicos = $this->Profissionais->Servicos->find('list')
             ->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])
             ->all();
 
-        $periodos = $this->Profissionais->Periodos->find('list', ['limit' => 200])->all();
-        $estabelecimentos = $this->Profissionais->Estabelecimentos->find('list', ['limit' => 200])->all();
+        $periodos = $this->Profissionais->Periodos->find('list')->all();
+        $estabelecimentos = $this->Profissionais->Estabelecimentos->find('list')->all();
 
         $title = 'Editar Serviço';
         $this->set(compact('profissional', 'convenios', 'estabelecimentos', 'servicos', 'periodos', 'title'));
