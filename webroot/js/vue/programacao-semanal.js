@@ -65,6 +65,13 @@
                     dia.inicio = p.data_hora_inicio.slice(11, 16); // HH:MM
                     dia.fim = p.data_hora_fim.slice(11, 16);
                     dia.registroId = p.id;
+                    dia.profissional_id  =  p.profissional_id ?? null;
+                    dia.servico_id  =   p.servico_id ?? null;
+                    dia.local_id  =   p.local_id ?? null;
+                    dia.convenio_id  =   p.convenio_id ?? null;
+                    dia.servico_id  =   p.servico_id ?? null;
+                    dia.local_id  =   p.local_id ?? null;
+                    dia.convenio_id  =   p.convenio_id ?? null;
                 }
             }
         });
@@ -90,6 +97,13 @@
             if (habilitar.value && d.ativo && d.inicio && d.fim) {
             return {
                 id: d.registroId ?? null,
+                profissional_id: d.profissional_id ?? null,
+                servico_id: d.servico_id ?? null,
+                local_id: d.local_id ?? null,
+                convenio_id: d.convenio_id ?? null,
+                servico_id: d.servico_id ?? null,
+                local_id: d.local_id ?? null,
+                convenio_id: d.convenio_id ?? null,
                 dia_semana: d.id,
                 data_hora_inicio: `${hojeStr()} ${d.inicio}:00`,
                 data_hora_fim: `${hojeStr()} ${d.fim}:00`,
@@ -123,6 +137,7 @@
                             Swal.showLoading();
                 },
                 });
+
                     // faz request para apagar no backend
                     const resp = await fetch(`${props.baseUrl}/${dia.registroId}`, {
                         method: "POST",
@@ -217,23 +232,24 @@
               <input type="time" class="form-control hora-fim" v-model="dia.fim" @blur="validarDia(dia)">
             </div>
             <div class="col-md-2 mt-4" v-if="dia.ativo">
-            <button class="btn btn-danger" type="button" @click="removerDia(dia)"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M20 6.91L17.09 4L12 9.09L6.91 4L4 6.91L9.09 12L4 17.09L6.91 20L12 14.91L17.09 20L20 17.09L14.91 12z"/></svg></button>
+            <button class="btn btn-danger" type="button" @click="removerDia(dia)"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.75a2.25 2.25 0 0 0-2.122 1.5a.75.75 0 0 1-1.414-.5a3.751 3.751 0 0 1 7.073 0a.75.75 0 0 1-1.415.5A2.25 2.25 0 0 0 12 2.75M2.75 6a.75.75 0 0 1 .75-.75h17a.75.75 0 0 1 0 1.5h-17A.75.75 0 0 1 2.75 6m3.165 2.45a.75.75 0 1 0-1.497.1l.464 6.952c.085 1.282.154 2.318.316 3.132c.169.845.455 1.551 1.047 2.104s1.315.793 2.17.904c.822.108 1.86.108 3.146.108h.879c1.285 0 2.324 0 3.146-.108c.854-.111 1.578-.35 2.17-.904c.591-.553.877-1.26 1.046-2.104c.162-.814.23-1.85.316-3.132l.464-6.952a.75.75 0 0 0-1.497-.1l-.46 6.9c-.09 1.347-.154 2.285-.294 2.99c-.137.685-.327 1.047-.6 1.303c-.274.256-.648.422-1.34.512c-.713.093-1.653.095-3.004.095h-.774c-1.35 0-2.29-.002-3.004-.095c-.692-.09-1.066-.256-1.34-.512c-.273-.256-.463-.618-.6-1.303c-.14-.705-.204-1.643-.294-2.99z"/><path fill="currentColor" d="M9.425 10.254a.75.75 0 0 1 .821.671l.5 5a.75.75 0 0 1-1.492.15l-.5-5a.75.75 0 0 1 .671-.821m5.821.821a.75.75 0 0 0-1.492-.15l-.5 5a.75.75 0 0 0 1.492.15z"/></svg></button>
             </div>
           </div>
         </div>
 
         <!-- Hidden inputs -->
         <input type="hidden" name="habilitar_programacao" :value="habilitar ? 1 : 0">
-        <div v-for="p in periodos" :key="p.dia_semana">
-          <input type="hidden" :name="'periodos['+p.dia_semana+'][id]'" :value="p.id">
-          <input type="hidden" :name="'periodos['+p.dia_semana+'][profissional_id]'" :value="p.profissional_id">
-          <input type="hidden" :name="'periodos['+p.dia_semana+'][servico_id]'" :value="p.servico_id">
-          <input type="hidden" :name="'periodos['+p.dia_semana+'][local_id]'" :value="p.local_id">
-          <input type="hidden" :name="'periodos['+p.dia_semana+'][convenio_id]'" :value="p.convenio_id">
-          <input type="hidden" :name="'periodos['+p.dia_semana+'][data_hora_inicio]'" :value="p.data_hora_inicio">
-          <input type="hidden" :name="'periodos['+p.dia_semana+'][data_hora_fim]'" :value="p.data_hora_fim">
-          <input type="hidden" :name="'periodos['+p.dia_semana+'][dia_semana]'" :value="p.dia_semana">
-          <input type="hidden" :name="'periodos['+p.dia_semana+'][cadeia_id]'" :value="p.cadeia_id">
+        <div v-for="(p, key) in periodos" :key="p.dia_semana">
+          <input type="hidden" :name="'periodos[11'+key+'][id]'" :value="p.id">
+          <input type="hidden" :name="'periodos[11'+key+'][profissional_id]'" :value="p.profissional_id">
+          <input type="hidden" :name="'periodos[11'+key+'][servico_id]'" :value="p.servico_id">
+          <input type="hidden" :name="'periodos[11'+key+'][local_id]'" :value="p.local_id">
+          <input type="hidden" :name="'periodos[11'+key+'][convenio_id]'" :value="p.convenio_id">
+          <input type="hidden" :name="'periodos[11'+key+'][data_hora_inicio]'" :value="p.data_hora_inicio">
+          <input type="hidden" :name="'periodos[11'+key+'][data_hora_fim]'" :value="p.data_hora_fim">
+          <input type="hidden" :name="'periodos[11'+key+'][dia_semana]'" :value="p.dia_semana">
+          <input type="hidden" :name="'periodos[11'+key+'][cadeia_id]'" :value="p.cadeia_id">
+		  <input type="hidden" :name="'periodos[11'+key+'][status]'" value="1">
         </div>
       </div>
     `,
