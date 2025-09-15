@@ -10,8 +10,8 @@
             },
             token: {
                 type: String,
-                    required: false,
-            default: null,
+                required: false,
+                default: null,
             },
             baseUrl: {
                 type: String,
@@ -26,7 +26,7 @@
             const todos = [];
 
             (dadosIniciais || []).forEach(p => {
-                console.log("Item original:", p);
+
 
             const inicio = p.data_hora_inicio ? new Date(p.data_hora_inicio) : null;
             const fim = p.data_hora_fim ? new Date(p.data_hora_fim) : null;
@@ -186,7 +186,7 @@
                         });
                     }
                 } catch (e) {
-                    console.error("Erro ao remover programação:", e);
+
                     Swal.fire({
                         icon: "error",
                         title: "Oops...",
@@ -211,8 +211,8 @@
 
         return { programacoes, adicionar, remover, periodosPersonalizados };
     },
-  
-      template: `
+
+    template: `
         <label class="form-label d-block">Datas com Programação Personalizada</label>
         <div class="border rounded p-3 mb-3">
   
@@ -275,25 +275,23 @@
   
         </div>
       `,
-    };
-  
+};
+
     if (typeof document !== "undefined") {
-      document.addEventListener("DOMContentLoaded", () => {
-        const nodes = document.querySelectorAll('[data-vue="programacao-personalizada"]');
+        document.addEventListener("DOMContentLoaded", () => {
+            const nodes = document.querySelectorAll('[data-vue="programacao-personalizada"]');
 
 
         nodes.forEach((el) => {
-          const programacaoInicial = el.dataset.programacaoInicial
-            ? JSON.parse(el.dataset.programacaoInicial)
-            : [];
+            const programacaoInicial = el.dataset.programacaoInicial
+                ? JSON.parse(el.dataset.programacaoInicial)
+                : [];
         const token = el.dataset.token || null;
         const baseUrl = el.dataset.baseUrl || '/';
-          createApp(ProgramacaoPersonalizada, { programacaoInicial, token, baseUrl }).mount(el);
-        });
-      });
+        createApp(ProgramacaoPersonalizada, { programacaoInicial, token, baseUrl }).mount(el);
+    });
+    });
     }
-  
-    if (typeof module !== "undefined") module.exports = ProgramacaoPersonalizada;
-  })();
-  
 
+    if (typeof module !== "undefined") module.exports = ProgramacaoPersonalizada;
+})();
