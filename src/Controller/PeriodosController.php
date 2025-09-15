@@ -102,13 +102,36 @@ class PeriodosController extends AppController
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
-        $periodo = $this->Periodos->get($id);
-        if ($this->Periodos->delete($periodo)) {
-            $this->Flash->success(__('The periodo has been deleted.'));
-        } else {
-            $this->Flash->error(__('The periodo could not be deleted. Please, try again.'));
+        $conditions = ['Periodos.estabelecimento_id' => $this->request->getSession()->read('Auth.Estabelecimento.id')];
+
+        try {
+            $periodo = $this->Periodos->get($id, ['conditions' => $conditions]);
+        } catch (RecordNotFoundException $e) {
+            if (empty($periodo)) {
+                if ($this->request->is('ajax') || $this->request->accepts('application/json')) {
+                    return $this->response->withType('application/json')
+                        ->withStringBody(json_encode(['success' => false, 'message' => 'Período não encontrado.']));
+                }
+            }
         }
 
+        $success = $this->Periodos->delete($periodo);
+        $message = $success ? __('O período foi excluído com sucesso.') : __('Ocorreu um erro na tentativa de excluir. Por favor, tente novamente.');
+
+        if ($this->request->is('ajax') || $this->request->accepts('application/json')) {
+
+            $this->autoRender = false;
+            $this->response = $this->response
+                ->withType('application/json')
+                ->withStringBody(json_encode(['success' => $success,'message' => $message]));
+            return;
+        }
+
+        if ($success) {
+            $this->Flash->success($message);
+        } else {
+            $this->Flash->error($message);
+        }
         return $this->redirect(['action' => 'index']);
     }
 }
