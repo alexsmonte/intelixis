@@ -81,15 +81,6 @@ class ConveniosController extends AppController
                 );
             }
 
-            /* Remove máscaras: CPF, telefone, celular e CEP
-            $fieldsToClean = ['cnpj', 'telefone'];
-            foreach ($fieldsToClean as $field) {
-                if (!empty($data[$field])) {
-                    $data[$field] = preg_replace('/\D/', '', $data[$field]);
-                }
-            }*/
-
-
             // ---------- PATCH ENTITY ----------
             $convenio = $this->Convenios->patchEntity($convenio, $data, [
                 'associated' => ['Periodos', 'Servicos', 'Profissionais']
@@ -104,12 +95,10 @@ class ConveniosController extends AppController
             }
 
             $this->Flash->error(__('Ocorreu um erro. Verifique os dados e tente novamente.'));
-            //Log::error('[SERVICOS::novo] Erros ao salvar: ' . json_encode($servico->getErrors(), JSON_UNESCAPED_UNICODE));
+
         }
 
         render_form:
-        //$estabelecimentos = $this->Servicos->Estabelecimentos->find('list', limit: 200)->all();
-        //$convenios        = $this->Servicos->Convenios->find('list', limit: 200)->all();
 
 
         $profissionais = $this->Convenios->Profissionais->find('list', [
@@ -131,61 +120,6 @@ class ConveniosController extends AppController
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
 
-    /*
-        public function editar($id = null)
-        {
-            $convenio = $this->Convenios->get($id, [
-                'conditions' => ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
-                'contain' => ['Servicos', 'Profissionais', 'Periodos']
-            ]);
-
-            if ($this->request->is(['patch', 'post', 'put'])) {
-                $data = $this->request->getData();
-                $data["estabelecimento_id"] = $this->getRequest()->getSession()->read('Auth.Estabelecimento.id');
-
-                if (!empty($data['periodos'])) {
-                    $data['periodos'] = array_map(
-                        fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
-                        $data['periodos']);
-                }
-
-
-
-                // ---------- PATCH ENTITY ----------
-
-                $convenio = $this->Convenios->patchEntity($convenio, $data, ['associated' => ['Periodos', 'Servicos', 'Profissionais']]);
-                if ($this->Convenios->save($convenio, ['associated' => ['Periodos', 'Servicos', 'Profissionais']])) {
-                    $this->Flash->success(__('Convênio atualizado com sucesso.'));
-                    return $this->redirect(['action' => 'index']);
-                } else {
-                    $this->Flash->error(__('Não foi possível atualizar o convênio.'));
-                }
-            }
-
-
-
-            $profissionais = $this->Convenios->Profissionais->find('list', ['limit' => 200])
-                ->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])
-                ->all();
-
-            $servicos = $this->Convenios->Servicos->find('list', ['limit' => 200])
-                ->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])
-                ->all();
-
-            $periodos = $this->Convenios->Periodos->find('list', ['limit' => 200])->all();
-            $estabelecimentos = $this->Convenios->Estabelecimentos->find('list', ['limit' => 200])->all();
-
-            $title = 'Editar Convênio';
-            $this->set(compact('convenio', 'profissionais', 'estabelecimentos', 'servicos', 'periodos', 'title'));
-        }
-
-        /**
-         * Delete method
-         *
-         * @param string|null $id Convenio id.
-         * @return \Cake\Http\Response|null Redirects to index.
-         * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-         */
 
 
     public function editar($id = null)
@@ -204,8 +138,6 @@ class ConveniosController extends AppController
                     $data['periodos']
                 );
             }
-
-            //$data['data_nascimento'] = new FrozenDate($data['data_nascimento']);
 
             //debug($data);
             //die;

@@ -102,7 +102,6 @@ $this->BreadcrumbsPlus->add([
             <!-- Programação semanal Vue -->
             <div data-vue="programacao-semanal"
                                  data-programacao-inicial='<?= json_encode($semanal ?? []) ?>'
-                                 data-programacao-inicial='<?= json_encode($semanal ?? []) ?>'
                                  data-habilitar-inicial="<?= $servico->habilitar_programacao ? 'true' : 'false' ?>">
                                 <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
 	                            </div>
