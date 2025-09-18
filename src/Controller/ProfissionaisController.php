@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller;
 use App\Controller\Traits\SearchableTrait;
 use Cake\ORM\Query;
+use Cake\I18n\FrozenDate;
 /**
  * Profissionais Controller
  *
@@ -16,7 +17,11 @@ class ProfissionaisController extends AppController
      * Index method
      *
      * @return \Cake\Http\Response|null|void Renders view
+     * 
+     * 
      */
+
+
     public function index()
     {
         $query = $this->Profissionais->find()
@@ -102,10 +107,15 @@ class ProfissionaisController extends AppController
             $data = $this->request->getData();
             $data["estabelecimento_id"] = $this->getRequest()->getSession()->read('Auth.Estabelecimento.id');
 
+
+            //debug($data);
+            //die;
+
             if (!empty($data['periodos'])) {
                 $data['periodos'] = array_map(
                     fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
-                    $data['periodos']);
+                    $data['periodos']
+                );
             }
             /**
             //debug($data);
@@ -195,6 +205,7 @@ class ProfissionaisController extends AppController
 ***/
 
             // ---------- PATCH ENTITY ----------
+            $data['data_nascimento'] = new FrozenDate($data['data_nascimento']);
             $profissional = $this->Profissionais->patchEntity($profissional, $data, ['associated' => ['Periodos', 'Servicos', 'Convenios']]);
 
             if ($this->Profissionais->save($profissional, ['associated' => ['Periodos', 'Servicos', 'Convenios']])) {
@@ -242,123 +253,129 @@ class ProfissionaisController extends AppController
             if (!empty($data['periodos'])) {
                 $data['periodos'] = array_map(
                     fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
-                    $data['periodos']);
-            }
-
-/**
-            // Remove máscaras
-            $fieldsToClean = ['cnpj', 'telefone'];
-            foreach ($fieldsToClean as $field) {
-                if (!empty($data[$field])) {
-                    $data[$field] = preg_replace('/\D/', '', $data[$field]);
-                }
-            }
-
-            $profissional = $this->Profissionais->patchEntity($profissional, $data, [
-                'associated' => ['Convenios', 'Servicos']
-            ]);
-
-            $periodosTable = $this->Profissionais->Periodos;
-            $periodosParaSalvar = [];
-
-            /**
-             * ======================
-             * PROGRAMACAO SEMANAL
-             * ======================
-
-            $habilitar = !empty($data['habilitar_programacao']) && $data['habilitar_programacao'] == 1;
-
-            if ($habilitar) {
-                $diasSemana = range(1, 7);
-
-                foreach ($diasSemana as $diaId) {
-                    if (!empty($data['periodos'][$diaId])) {
-                        $p = $data['periodos'][$diaId];
-                        $periodosParaSalvar[] = $periodosTable->newEntity([
-                            'profissional_id' => $profissional->id,
-                            'estabelecimento_id' => $profissional->estabelecimento_id,
-                            'dia_semana' => $diaId,
-                            'data_hora_inicio' => $p['data_hora_inicio'],
-                            'data_hora_fim' => $p['data_hora_fim'],
-                            'cadeia_id' => 'semanal',
-                            'status' => 'disponivel',
-                        ]);
-                    } else {
-                        $periodosParaSalvar[] = $periodosTable->newEntity([
-                            'profissional_id' => $profissional->id,
-                            'estabelecimento_id' => $profissional->estabelecimento_id,
-                            'dia_semana' => $diaId,
-                            'data_hora_inicio' => '1970-01-01 00:00:00',
-                            'data_hora_fim' => '1970-01-01 00:00:00',
-                            'cadeia_id' => 'semanal',
-                            'status' => 'indisponivel',
-                        ]);
-                    }
-                }
-            } else {
-                // Se desabilitado, remove todos os períodos semanais
-                $this->Profissionais->Periodos->deleteAll([
-                    'profissional_id' => $profissional->id,
-                    'cadeia_id' => 'semanal'
-                ]);
+                    $data['periodos']
+                );
             }
 
             /**
-             * ==============================
-             * PROGRAMACAO PERSONALIZADA + INDISPONIVEIS
-             * ==============================
+                        // Remove máscaras
+                        $fieldsToClean = ['cnpj', 'telefone'];
+                        foreach ($fieldsToClean as $field) {
+                            if (!empty($data[$field])) {
+                                $data[$field] = preg_replace('/\D/', '', $data[$field]);
+                            }
+                        }
 
+                        $profissional = $this->Profissionais->patchEntity($profissional, $data, [
+                            'associated' => ['Convenios', 'Servicos']
+                        ]);
 
-            $cadeiasEnviadas = [];
+                        $periodosTable = $this->Profissionais->Periodos;
+                        $periodosParaSalvar = [];
 
-            if (!empty($data['periodos'])) {
-                foreach ($data['periodos'] as $key => $bloco) {
-                    // Ignora os índices numéricos (1 a 7) -> já tratados no semanal
-                    if (is_numeric($key)) {
-                        continue;
-                    }
+                        /**
+                         * ======================
+                         * PROGRAMACAO SEMANAL
+                         * ======================
 
-                    $cadeia_id = $bloco['cadeia_id'] ?? $key;
-                    $cadeiasEnviadas[] = $cadeia_id;
+                        $habilitar = !empty($data['habilitar_programacao']) && $data['habilitar_programacao'] == 1;
 
-                    if (!empty($bloco['dia_semana'])) {
-                        foreach ($bloco['dia_semana'] as $idx => $diaSemana) {
-                            $periodosParaSalvar[] = $periodosTable->newEntity([
+                        if ($habilitar) {
+                            $diasSemana = range(1, 7);
+
+                            foreach ($diasSemana as $diaId) {
+                                if (!empty($data['periodos'][$diaId])) {
+                                    $p = $data['periodos'][$diaId];
+                                    $periodosParaSalvar[] = $periodosTable->newEntity([
+                                        'profissional_id' => $profissional->id,
+                                        'estabelecimento_id' => $profissional->estabelecimento_id,
+                                        'dia_semana' => $diaId,
+                                        'data_hora_inicio' => $p['data_hora_inicio'],
+                                        'data_hora_fim' => $p['data_hora_fim'],
+                                        'cadeia_id' => 'semanal',
+                                        'status' => 'disponivel',
+                                    ]);
+                                } else {
+                                    $periodosParaSalvar[] = $periodosTable->newEntity([
+                                        'profissional_id' => $profissional->id,
+                                        'estabelecimento_id' => $profissional->estabelecimento_id,
+                                        'dia_semana' => $diaId,
+                                        'data_hora_inicio' => '1970-01-01 00:00:00',
+                                        'data_hora_fim' => '1970-01-01 00:00:00',
+                                        'cadeia_id' => 'semanal',
+                                        'status' => 'indisponivel',
+                                    ]);
+                                }
+                            }
+                        } else {
+                            // Se desabilitado, remove todos os períodos semanais
+                            $this->Profissionais->Periodos->deleteAll([
                                 'profissional_id' => $profissional->id,
-                                'estabelecimento_id' => $profissional->estabelecimento_id,
-                                'dia_semana' => $diaSemana,
-                                'data_hora_inicio' => $bloco['data_hora_inicio'][$idx],
-                                'data_hora_fim' => $bloco['data_hora_fim'][$idx],
-                                'data_personalizada' => $bloco['data_personalizada'][$idx],
-                                'cadeia_id' => $cadeia_id,
-                                'status' => $bloco['status'] ?? 'disponivel',
+                                'cadeia_id' => 'semanal'
                             ]);
                         }
-                    }
-                }
-            }
 
-            // Apaga blocos removidos (apenas os não-semanais)
-            if (!empty($cadeiasEnviadas)) {
-                $this->Profissionais->Periodos->deleteAll([
-                    'profissional_id' => $profissional->id,
-                    'cadeia_id !=' => 'semanal',
-                    'cadeia_id NOT IN' => $cadeiasEnviadas
-                ]);
-            } else {
-                $this->Profissionais->Periodos->deleteAll([
-                    'profissional_id' => $profissional->id,
-                    'cadeia_id !=' => 'semanal'
-                ]);
-            }
+                        /**
+                         * ==============================
+                         * PROGRAMACAO PERSONALIZADA + INDISPONIVEIS
+                         * ==============================
 
-            // Aplica os períodos processados ao serviço
-            if (!empty($periodosParaSalvar)) {
-                $profissional->periodos = $periodosParaSalvar;
-            }
-***/
+
+                        $cadeiasEnviadas = [];
+
+                        if (!empty($data['periodos'])) {
+                            foreach ($data['periodos'] as $key => $bloco) {
+                                // Ignora os índices numéricos (1 a 7) -> já tratados no semanal
+                                if (is_numeric($key)) {
+                                    continue;
+                                }
+
+                                $cadeia_id = $bloco['cadeia_id'] ?? $key;
+                                $cadeiasEnviadas[] = $cadeia_id;
+
+                                if (!empty($bloco['dia_semana'])) {
+                                    foreach ($bloco['dia_semana'] as $idx => $diaSemana) {
+                                        $periodosParaSalvar[] = $periodosTable->newEntity([
+                                            'profissional_id' => $profissional->id,
+                                            'estabelecimento_id' => $profissional->estabelecimento_id,
+                                            'dia_semana' => $diaSemana,
+                                            'data_hora_inicio' => $bloco['data_hora_inicio'][$idx],
+                                            'data_hora_fim' => $bloco['data_hora_fim'][$idx],
+                                            'data_personalizada' => $bloco['data_personalizada'][$idx],
+                                            'cadeia_id' => $cadeia_id,
+                                            'status' => $bloco['status'] ?? 'disponivel',
+                                        ]);
+                                    }
+                                }
+                            }
+                        }
+
+                        // Apaga blocos removidos (apenas os não-semanais)
+                        if (!empty($cadeiasEnviadas)) {
+                            $this->Profissionais->Periodos->deleteAll([
+                                'profissional_id' => $profissional->id,
+                                'cadeia_id !=' => 'semanal',
+                                'cadeia_id NOT IN' => $cadeiasEnviadas
+                            ]);
+                        } else {
+                            $this->Profissionais->Periodos->deleteAll([
+                                'profissional_id' => $profissional->id,
+                                'cadeia_id !=' => 'semanal'
+                            ]);
+                        }
+
+                        // Aplica os períodos processados ao serviço
+                        if (!empty($periodosParaSalvar)) {
+                            $profissional->periodos = $periodosParaSalvar;
+                        }
+
+            ***/
+            $data['data_nascimento'] = new FrozenDate($data['data_nascimento']);
+
+            //debug($data);
+            //die;
             $profissional = $this->Profissionais->patchEntity($profissional, $data, ['associated' => ['Periodos', 'Servicos', 'Convenios']]);
-
+            //debug ($profissional);
             //die;
             // Salva profissional e associações
             if ($this->Profissionais->save($profissional)) {

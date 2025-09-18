@@ -30,16 +30,18 @@
 
             const inicio = p.data_hora_inicio ? new Date(p.data_hora_inicio) : null;
             const fim = p.data_hora_fim ? new Date(p.data_hora_fim) : null;
+            const tipo = (inicio.getDate() === fim.getDate()) ? 'unico' : 'intervalo';
 
             if (!inicio || !fim) return;
 
             const dataISO = inicio.toISOString().slice(0, 10); // yyyy-mm-dd
             const horaInicio = inicio.toISOString().slice(11, 16);
             const horaFim = fim.toISOString().slice(11, 16);
+            
 
             todos.push({
                 id: p.id,
-                tipo: "unico",
+                tipo: tipo,
                 profissional_id: p.profissional_id ?? null,
                 servico_id: p.servico_id ?? null,
                 local_id: p.local_id ?? null,
@@ -227,8 +229,9 @@
               <div class="col-md-2">
                 <label class="form-label small">Tipo</label>
                 <select class="form-select" v-model="p.tipo">
-                  <option value="unico">Único</option>
                   <option value="intervalo">Intervalo</option>
+                  <option value="unico">Único</option>
+                  
                 </select>
               </div>
   

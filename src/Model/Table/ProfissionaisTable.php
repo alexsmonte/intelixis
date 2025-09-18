@@ -106,6 +106,15 @@ class ProfissionaisTable extends Table
             ->requirePresence('nome', 'create')
             ->notEmptyString('nome', __('O nome é obrigatório.'));
 
+            $validator
+            ->date('data_nascimento',['dmy'],'Informe uma data válida')
+            ->requirePresence('data_nascimento', 'create')
+            ->allowEmptyDate('data_nascimento');
+
+            $validator
+            ->scalar('conselho')
+            ->allowEmptyString('conselho');
+
         $validator
             ->email('email')
             ->allowEmptyString('email');

@@ -45,10 +45,15 @@ $this->BreadcrumbsPlus->add([['title' => 'Locais', 'url' => ['controller' => 'Lo
             </div>
 
             <div class="row">
-                                <div class="col-md-12 mb-3">
-                                        <div data-vue="programacao-semanal"></div>
-                                </div>
-                        </div>
+                <div class="col-md-12 mb-3">
+                    <div data-vue="programacao-semanal" data-programacao-inicial='<?= json_encode([]) ?>'
+                        data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
+                        data-base-url="<?= $this->Url->build(['controller' => 'Periodos', 'action' => 'delete'], ['fullBase' => false]) ?>">
+                        <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
+                    </div>
+                </div>
+
+            </div>
 
             <div class="col-md-12">
                 <div class="row">

@@ -1,11 +1,14 @@
 <?php
-/**
- * @var \App\View\AppView $this
- * @var \App\Model\Entity\Convenio $convenio
- * @var string[]|\Cake\Collection\CollectionInterface $estabelecimentos
- * @var string[]|\Cake\Collection\CollectionInterface $profissionais
- * @var string[]|\Cake\Collection\CollectionInterface $servicos
- */
+use Cake\Collection\Collection;
+
+
+$collection = new Collection($convenio->periodos);
+$agrupados      = $collection->groupBy('cadeia_id')->toArray();
+$semanal        = $agrupados['semanal'] ?? [];
+$disponiveis    = $agrupados['disponivel'] ?? [];
+$indisponiveis  = $agrupados['indisponivel'] ?? [];
+
+
 ?>
 
 <?php
@@ -83,19 +86,28 @@ $this->BreadcrumbsPlus->add([['title' => 'Convênios', 'url' => ['controller' =>
 
                 <!-- Programação semanal Vue -->
                 <div data-vue="programacao-semanal"
-                    data-programacao-inicial='<?= json_encode($convenio->periodos ?? []) ?>'>
-                    <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
-                </div>
+                                 data-habilitar-inicial="<?= $convenio->habilitar_programacao ? 'true' : 'false' ?>"
+                                 data-programacao-inicial='<?= json_encode($semanal ?? []) ?>'
+								
+                                 data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
+                                 data-base-url="<?= $this->Url->build(['controller'=>'Periodos', 'action' =>'delete'], ['fullBase' => true]) ?>">
+                                <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
+	                            </div>
 
                 <div data-vue="programacao-personalizada"
-                    data-programacao-inicial='<?= json_encode($convenio->periodos ?? []) ?>'>
-                    <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
-                </div>
+                                        data-programacao-inicial='<?= htmlspecialchars(json_encode($disponiveis ?? []), ENT_QUOTES, 'UTF-8') ?>'
+                                        data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
+                                        data-base-url="<?= $this->Url->build(['controller'=>'Periodos', 'action' =>'delete'], ['fullBase' => false]) ?>"
+                                >
+                                        <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
+                                </div>
 
-                <div data-vue="dias-indisponiveis"
-                    data-periodos-iniciais='<?= json_encode($convenio->periodos ?? []) ?>'>
-                    <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
-                </div>
+                                <div data-vue="dias-indisponiveis"
+                                        data-periodos-iniciais='<?= json_encode($indisponiveis ?? []) ?>'
+                                         data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
+                                         data-base-url="<?= $this->Url->build(['controller'=>'Periodos', 'action' =>'delete'], ['fullBase' => false]) ?>"
+                                >
+                                </div>
 
                 <div class="col-md-12">
                     <div class="row">

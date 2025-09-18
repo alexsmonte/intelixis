@@ -23,13 +23,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Clientes', 'url'=>['controller' => 'Cl
             
             <?= $this->Form->create($cliente) ?>
             <div class="row">
-                <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('estabelecimento_id', [
-                        'label' => 'Selecione o Estabelecimento',
-                        'class' => 'form-control',
-                        'options' => $estabelecimentos
-                    ]); ?>
-                </div>
+                
                 <div class="col-md-3 mb-3">
                     <?= $this->Form->control('nome',['label' => 'Nome Completo','class' => 'form-control']); ?>
                 </div>
@@ -53,11 +47,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Clientes', 'url'=>['controller' => 'Cl
                     <?= $this->Form->control('endereco',['label' => 'Endereço','class' => 'form-control']); ?>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('cidade',['label' => 'Cidade','class' => 'form-control']); ?>
-                </div>
-                <div class="col-md-3 mb-3">
                     <?= $this->Form->control('bairro',['label' => 'Bairro','class' => 'form-control']); ?>
                 </div>
+                <div class="col-md-3 mb-3">
+                    <?= $this->Form->control('cidade',['label' => 'Cidade','class' => 'form-control']); ?>
+                </div>
+                
             </div>
     <div class="col-md-12">
     <div class="row">

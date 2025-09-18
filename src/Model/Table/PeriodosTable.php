@@ -42,8 +42,13 @@ class PeriodosTable extends Table
      * @return void
      */
     public function initialize(array $config): void
+    
     {
         parent::initialize($config);
+
+
+        $this->getSchema()->setColumnType('data_hora_inicio', 'datetime');
+        $this->getSchema()->setColumnType('data_hora_fim', 'datetime');
 
         $this->setTable('periodos');
         $this->setDisplayField('id');

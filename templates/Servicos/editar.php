@@ -1,12 +1,14 @@
 <?php
-/**
- * @var \App\View\AppView $this
- * @var \App\Model\Entity\Servico $servico
- * @var string[]|\Cake\Collection\CollectionInterface $estabelecimentos
- * @var string[]|\Cake\Collection\CollectionInterface $convenios
- * @var string[]|\Cake\Collection\CollectionInterface $profissionais
- * @var string[]|\Cake\Collection\CollectionInterface $periodos
- */
+use Cake\Collection\Collection;
+
+
+$collection = new Collection($servico->periodos);
+
+$agrupados      = $collection->groupBy('cadeia_id')->toArray();
+$semanal        = $agrupados['semanal'] ?? [];
+$disponiveis    = $agrupados['disponivel'] ?? [];
+$indisponiveis  = $agrupados['indisponivel'] ?? [];
+
 $this->BreadcrumbsPlus->add([
     ['title' => 'Serviços', 'url' => ['controller' => 'Servicos', 'action' => 'index']],
     ['title' => 'Editar']
@@ -39,6 +41,13 @@ $this->BreadcrumbsPlus->add([
                 <div class="col-md-6 mb-3">
                     <?= $this->Form->control('nome', [
                         'label' => 'Nome do Serviço',
+                        'class' => 'form-control',
+                    ]); ?>
+                </div>
+
+                <div class="col-md-2 mb-3">
+                    <?= $this->Form->control('valor', [
+                        'label' => 'Valor',
                         'class' => 'form-control',
                     ]); ?>
                 </div>
@@ -91,19 +100,27 @@ $this->BreadcrumbsPlus->add([
             </div>
 
             <!-- Programação semanal Vue -->
-            <div data-vue="programacao-semanal" 
-                 data-programacao-inicial='<?= json_encode($servico->periodos ?? []) ?>'>
-                <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
-            </div>
+            <div data-vue="programacao-semanal"
+                                 data-programacao-inicial='<?= json_encode($semanal ?? []) ?>'
+                                 data-programacao-inicial='<?= json_encode($semanal ?? []) ?>'
+                                 data-habilitar-inicial="<?= $servico->habilitar_programacao ? 'true' : 'false' ?>">
+                                <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
+	                            </div>
 
-            <div data-vue="programacao-personalizada" 
-                data-programacao-inicial='<?= json_encode($servico->periodos ?? []) ?>'>
-                 <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
-            </div>
+                                <div data-vue="programacao-personalizada"
+                                        data-programacao-inicial='<?= htmlspecialchars(json_encode($disponiveis ?? []), ENT_QUOTES, 'UTF-8') ?>'
+                                        data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
+                                        data-base-url="<?= $this->Url->build(['controller'=>'Periodos', 'action' =>'delete'], ['fullBase' => true]) ?>"
+                                >
+                                        <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
+                                </div>
 
-            <div data-vue="dias-indisponiveis" 
-                data-periodos-iniciais='<?= json_encode($servico->periodos ?? []) ?>'>
-            </div>
+                                <div data-vue="dias-indisponiveis"
+                                        data-periodos-iniciais='<?= json_encode($indisponiveis ?? []) ?>'
+                                         data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
+                                         data-base-url="<?= $this->Url->build(['controller'=>'Periodos', 'action' =>'delete'], ['fullBase' => true]) ?>"
+                                >
+                                </div>
 
 
             <div class="row mt-3">

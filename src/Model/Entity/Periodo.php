@@ -41,6 +41,8 @@ class Periodo extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
+        '*' => true,
+        'id' => false,
         'estabelecimento_id' => true,
         'profissional_id' => true,
         'servico_id' => true,

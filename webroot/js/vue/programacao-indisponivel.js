@@ -28,14 +28,15 @@
             const todos = [];
 
             (dadosIniciais || []).forEach(p => {
-                const inicio = p.data_hora_inicio ? new Date(p.data_hora_inicio) : null;
+            const inicio = p.data_hora_inicio ? new Date(p.data_hora_inicio) : null;
             const fim = p.data_hora_fim ? new Date(p.data_hora_fim) : null;
+            const tipo = (inicio.getDate() === fim.getDate()) ? 'unico' : 'intervalo';
 
             if (!inicio || !fim) return;
 
             todos.push({
                 id: p.id,
-                tipo: "unico",
+                tipo: tipo,
                 profissional_id: p.profissional_id ?? null,
                 servico_id: p.servico_id ?? null,
                 local_id: p.local_id ?? null,
@@ -44,7 +45,7 @@
                 hora_inicio: inicio.toISOString().slice(11, 16),
                 data_fim: fim.toISOString().slice(0, 10),
                 hora_fim: fim.toISOString().slice(11, 16),
-                cadeia_id: p.cadeia_id || "disponivel",
+                cadeia_id: p.cadeia_id || "indisponivel",
                 status: p.status ? "1" : "0",
                 programacao_personalizada: 1,
             });
@@ -287,7 +288,7 @@
 			<input type="hidden" :name="'periodos[31'+key+'][data_hora_inicio]'" :value="p.data_hora_inicio">
 			<input type="hidden" :name="'periodos[31'+key+'][data_hora_fim]'" :value="p.data_hora_fim">
 			<input type="hidden" :name="'periodos[31'+key+'][data_personalizada]'" :value="p.data_personalizada">
-			<input type="hidden" :name="'periodos[31'+key+'][cadeia_id]'" :value="indisponivel">
+			<input type="hidden" :name="'periodos[31'+key+'][cadeia_id]'" value="indisponivel">
 			<input type="hidden" :name="'periodos[31'+key+'][status]'" value="1">
 			<input type="hidden" :name="'periodos[31'+key+'][programacao_personalizada]'" value="1">
         </div>

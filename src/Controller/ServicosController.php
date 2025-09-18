@@ -110,7 +110,16 @@ class ServicosController extends AppController
 
         if ($this->request->is('post')) {
             $data = $this->request->getData();
+            $data["estabelecimento_id"] = $this->getRequest()->getSession()->read('Auth.Estabelecimento.id');
 
+            if (!empty($data['periodos'])) {
+                $data['periodos'] = array_map(
+                    fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+                    $data['periodos']);
+            }
+
+
+           /** 
             // --------- NORMALIZA M2M (_ids) ----------
             $normalizaIds = function ($entrada, $chave) {
                 $ids = [];
@@ -186,12 +195,14 @@ class ServicosController extends AppController
 
             }
 
+            ***/
+
             // ---------- PATCH ENTITY ----------
             $servico = $this->Servicos->patchEntity($servico, $data, [
                 'associated' => ['Periodos', 'Profissionais', 'Convenios']
             ]);
 
-            $servico["estabelecimento_id"] = $this->getRequest()->getSession()->read('Auth.Estabelecimento.id');
+            //$servico["estabelecimento_id"] = $this->getRequest()->getSession()->read('Auth.Estabelecimento.id');
 
 
             if ($this->Servicos->save($servico, ['associated' => ['Periodos', 'Profissionais', 'Convenios']])) {
@@ -239,7 +250,14 @@ class ServicosController extends AppController
             $data = $this->request->getData();
 
 
+            if (!empty($data['periodos'])) {
+                $data['periodos'] = array_map(
+                    fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+                    $data['periodos']);
+            }
 
+
+          /**   
             $servico = $this->Servicos->patchEntity($servico, $data, [
                 'associated' => ['Profissionais', 'Convenios']
             ]);
@@ -247,11 +265,11 @@ class ServicosController extends AppController
             $periodosTable = $this->Servicos->Periodos;
             $periodosParaSalvar = [];
 
-            /**
+            
              * ======================
              * PROGRAMACAO SEMANAL
              * ======================
-             */
+          
             $habilitar = !empty($data['habilitar_programacao']) && $data['habilitar_programacao'] == 1;
 
             if ($habilitar) {
@@ -289,12 +307,12 @@ class ServicosController extends AppController
                 ]);
             }
 
-            /**
+            
              * ==============================
              * PROGRAMACAO PERSONALIZADA + INDISPONIVEIS
              * ==============================
 
-             */
+             
             $cadeiasEnviadas = [];
 
             if (!empty($data['periodos'])) {
@@ -342,7 +360,13 @@ class ServicosController extends AppController
             if (!empty($periodosParaSalvar)) {
                 $servico->periodos = $periodosParaSalvar;
             }
+            
 
+            ***/ 
+
+            //debug($data);
+            //die;
+            $servico = $this->Servicos->patchEntity($servico, $data, ['associated' => ['Periodos', 'Profissionais', 'Convenios']]);
             // Salva serviço e associações
             if ($this->Servicos->save($servico, ['associated' => ['Periodos', 'Profissionais', 'Convenios']])) {
                 $this->Flash->success(__('Serviço atualizado com sucesso.'));

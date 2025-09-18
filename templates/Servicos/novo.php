@@ -47,6 +47,9 @@ $this->BreadcrumbsPlus->add([['title' => 'Serviços', 'url' => ['controller' => 
                     <?= $this->Form->control('nome', ['label' => 'Nome do Serviço', 'class' => 'form-control',]); ?>
                 </div>
                 <div class="col-md-2 mb-3">
+                    <?= $this->Form->control('valor', ['label' => 'Valor', 'class' => 'form-control',]); ?>
+                </div>
+                <div class="col-md-2 mb-3">
                     <div class="position-relative">
                         <?= $this->Form->control('duracao', [
                             'type' => 'number',
@@ -100,7 +103,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Serviços', 'url' => ['controller' => 
                 </div>
                 <div class="row">
                     <div class="col-md-12 mb-3">
-                        <div data-vue="programacao-semanal" data-estabelecimento-id="<?= h($estabelecimento_id) ?>">
+                        <div data-vue="programacao-semanal" >
                         </div>
                     </div>
                 </div>
@@ -121,5 +124,4 @@ $this->BreadcrumbsPlus->add([['title' => 'Serviços', 'url' => ['controller' => 
 <!-- vue  -->
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <!-- Vue e componentes programacao.js -->
-<script src="/js/vue/programacao-semanal.js"></script>
 <?= $this->Html->script('vue/programacao-semanal.js') ?>

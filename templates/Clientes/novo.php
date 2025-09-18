@@ -45,11 +45,12 @@ $this->BreadcrumbsPlus->add([
                     <?= $this->Form->control('endereco',['label' => 'Endereço','class' => 'form-control']); ?>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('cidade',['label' => 'Cidade','class' => 'form-control']); ?>
-                </div>
-                <div class="col-md-3 mb-3">
                     <?= $this->Form->control('bairro',['label' => 'Bairro','class' => 'form-control']); ?>
                 </div>
+                <div class="col-md-3 mb-3">
+                    <?= $this->Form->control('cidade',['label' => 'Cidade','class' => 'form-control']); ?>
+                </div>
+                
             </div>
 
             <div class="col-md-12">

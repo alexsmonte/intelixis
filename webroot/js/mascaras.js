@@ -19,7 +19,17 @@ function aplicarMascaras(configs) {
       { id: 'telefone',  mask: '(00) 0000-0000' },
       { id: 'celular',   mask: '(00) 00000-0000' },
       { id: 'cep',       mask: '00000-000' },
-     
+      {
+        id: 'valor',
+        mask: Number,
+        thousandsSeparator: '.',
+        radix: ',',
+        scale: 2,
+        normalizeZeros: true,
+        padFractionalZeros: true,
+        lazy: false,
+        prefix: 'R$ '
+      },
     ]);
   });
   

@@ -46,6 +46,7 @@ class Convenio extends Entity
         'email' => true,
         'site' => true,
         'ativar' => true,
+        'habilitar_programacao' => true,
         'created' => true,
         'modified' => true,
         'estabelecimento' => true,

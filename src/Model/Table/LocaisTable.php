@@ -7,6 +7,7 @@ use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\Event\Event;
 
 /**
  * Locais Model
@@ -109,5 +110,20 @@ class LocaisTable extends Table
         $rules->add($rules->existsIn(['estabelecimento_id'], 'Estabelecimentos'), ['errorField' => 'estabelecimento_id']);
 
         return $rules;
+    }
+
+    public function beforeMarshal(Event $event, \ArrayObject $data, \ArrayObject $options)
+    {
+
+        $caracterInvalido   =   [" ",".","-","/",")","(",","];
+
+        if(isset($data['cnpj']))
+            $data['cnpj']      =   str_replace($caracterInvalido, "", $data['cnpj']);
+
+        if(isset($data['telefone']))
+            $data['telefone']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['telefone']));
+
+       
+
     }
 }

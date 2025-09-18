@@ -43,6 +43,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais', 'url' => ['controller'
                                         <?= $this->Form->control('nome', ['label' => 'Nome Completo', 'class' => 'form-control',]); ?>
                                 </div>
                                 <div class="col-md-3 mb-3">
+                                        <?= $this->Form->control('data_nascimento', ['label' => 'Data de Nascimento', 'class' => 'form-control',]); ?>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                        <?= $this->Form->control('conselho', ['label' => 'Conselho', 'class' => 'form-control',]); ?>
+                                </div>
+                                <div class="col-md-3 mb-3">
                                         <?= $this->Form->control('email', ['label' => 'Email', 'class' => 'form-control',]); ?>
                                 </div>
                                 <div class="col-md-3 mb-3">
@@ -103,12 +109,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais', 'url' => ['controller'
 
                         <div class="row">
                                 <div class="col-md-12 mb-3">
-                                    <div data-vue="programacao-semanal"
-                                         data-programacao-inicial='<?= json_encode([]) ?>'
-                                         data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
-                                         data-base-url="<?= $this->Url->build(['controller'=>'Periodos', 'action' =>'delete'], ['fullBase' => false]) ?>">
-                                        <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
-                                    </div>
+                                        <div data-vue="programacao-semanal"
+                                                data-programacao-inicial='<?= json_encode([]) ?>'
+                                                data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
+                                                data-base-url="<?= $this->Url->build(['controller' => 'Periodos', 'action' => 'delete'], ['fullBase' => false]) ?>">
+                                                <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
+                                        </div>
                                 </div>
 
                         </div>

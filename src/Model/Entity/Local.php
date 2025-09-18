@@ -37,6 +37,7 @@ class Local extends Entity
         'nome' => true,
         'endereco' => true,
         'ativar' => true,
+        'habilitar_programacao' => true,
         'created' => true,
         'modified' => true,
         'estabelecimento' => true,
