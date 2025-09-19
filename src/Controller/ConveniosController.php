@@ -131,16 +131,35 @@ class ConveniosController extends AppController
 
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
-
-            if (!empty($data['periodos'])) {
-                $data['periodos'] = array_map(
-                    fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
-                    $data['periodos']
-                );
-            }
-
             //debug($data);
             //die;
+
+            // 1. Defina a condição para exclusão
+            $shouldDelete = 
+            (isset($data['habilitar_programacao']) && $data['habilitar_programacao'] == 0) || 
+            (isset($data['habilitar_programacao']) && $data['habilitar_programacao'] == 1 && empty($data['periodos']));
+
+            // 2. Execute a exclusão se a condição for verdadeira
+            if ($shouldDelete) {
+                $this->Convenios->Periodos->deleteAll([
+                    'convenio_id' => $convenio->id,
+                    'cadeia_id' => 'semanal'
+                ]);
+
+                unset($data['periodos']);
+            } else {
+                // Se a programação estiver habilitada, anexa o estabelecimento_id aos periodos
+                if (!empty($data['periodos'])) {
+                    $data['periodos'] = array_map(
+                        fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+                        $data['periodos']
+                    );
+                }
+            }
+
+
+
+
             $convenio = $this->Convenios->patchEntity($convenio, $data, ['associated' => ['Periodos', 'Servicos', 'Profissionais']]);
             //debug($convenio);
             //die;

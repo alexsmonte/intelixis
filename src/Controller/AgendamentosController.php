@@ -112,4 +112,45 @@ class AgendamentosController extends AppController
 
         return $this->redirect(['action' => 'index']);
     }
+
+    
+ 
+    
+   
+    
+    
+    
+        // Endpoint JSON para o FullCalendar
+       
+        
+        
+            // JSON com slots
+          
+                public function verCalendario()
+                {
+                    $this->viewBuilder()->disableAutoLayout(); // mantém sem layout
+                }
+            
+                public function calendario()
+                {
+                    $this->request->allowMethod(['get']);
+                    $this->viewBuilder()->disableAutoLayout();
+                    $this->autoRender = false;
+            
+                    $slots = [
+                        ['start'=>'2025-09-18T08:00:00','end'=>'2025-09-18T08:30:00','title'=>'Disponível','color'=>'#28a745'],
+                        ['start'=>'2025-09-18T08:30:00','end'=>'2025-09-18T09:00:00','title'=>'Indisponível','color'=>'#dc3545'],
+                        ['start'=>'2025-09-18T09:00:00','end'=>'2025-09-18T09:30:00','title'=>'Disponível','color'=>'#28a745']
+                    ];
+            
+                    return $this->response
+                                ->withType('application/json')
+                                ->withStringBody(json_encode($slots));
+                }
+            
+            
+    
+
+
+
 }

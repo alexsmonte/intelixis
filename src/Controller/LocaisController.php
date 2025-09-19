@@ -19,17 +19,17 @@ class LocaisController extends AppController
     public function index()
     {
 
-        
+
         $query = $this->Locais->find()
             ->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])
             ->contain(['Estabelecimentos']);
         $locais = $this->paginate($query);
         $title = "Locais";
-       
+
         $this->set(compact('locais', 'title'));
-       
+
     }
-    
+
     /**
      * View method
      *
@@ -119,11 +119,27 @@ class LocaisController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
 
-            if (!empty($data['periodos'])) {
-                $data['periodos'] = array_map(
-                    fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
-                    $data['periodos']
-                );
+            // 1. Defina a condição para exclusão
+            $shouldDelete =
+                (isset($data['habilitar_programacao']) && $data['habilitar_programacao'] == 0) ||
+                (isset($data['habilitar_programacao']) && $data['habilitar_programacao'] == 1 && empty($data['periodos']));
+
+            // 2. Execute a exclusão se a condição for verdadeira
+            if ($shouldDelete) {
+                $this->Locais->Periodos->deleteAll([
+                    'local_id' => $local->id,
+                    'cadeia_id' => 'semanal'
+                ]);
+
+                unset($data['periodos']);
+            } else {
+                // Se a programação estiver habilitada, anexa o estabelecimento_id aos periodos
+                if (!empty($data['periodos'])) {
+                    $data['periodos'] = array_map(
+                        fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+                        $data['periodos']
+                    );
+                }
             }
 
             //$data['data_nascimento'] = new FrozenDate($data['data_nascimento']);

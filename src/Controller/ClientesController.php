@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 use App\Controller\Traits\SearchableTrait;
+use Cake\I18n\FrozenDate;
 /**
  * Clientes Controller
  *
@@ -70,19 +71,14 @@ class ClientesController extends AppController
             // Pega os dados do formulário
             $data = $this->request->getData();
 
-
-            // Remove máscaras: CPF, telefone, celular e CEP
-            $fieldsToClean = ['documento', 'telefone', 'celular', 'cep'];
-            foreach ($fieldsToClean as $field) {
-                if (!empty($data[$field])) {
-                    $data[$field] = preg_replace('/\D/', '', $data[$field]);
-                }
-            }
-
+            //debug($data);
+            //die;
+            $data['data_nascimento'] = new FrozenDate($data['data_nascimento']);
             // Aplica os dados limpos na entidade
             $cliente = $this->Clientes->patchEntity($cliente, $data);
             $cliente["estabelecimento_id"] = $this->getRequest()->getSession()->read('Auth.Estabelecimento.id');
-
+            //debug($cliente);
+            //die;
             if ($this->Clientes->save($cliente)) {
                 $this->Flash->success(__('Cliente cadastrado com sucesso.'));
                 return $this->redirect(['action' => 'index']);
@@ -111,14 +107,13 @@ class ClientesController extends AppController
 
             
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $cliente = $this->Clientes->patchEntity($cliente, $this->request->getData());
-            // Remove máscaras: CPF, telefone, celular e CEP
-            $fieldsToClean = ['documento', 'telefone', 'celular', 'cep'];
-            foreach ($fieldsToClean as $field) {
-                if (!empty($cliente[$field])) {
-                    $cliente[$field] = preg_replace('/\D/', '', $cliente[$field]);
-                }
-            }
+            $data = $this->request->getData();
+
+
+            $data['data_nascimento'] = new FrozenDate($data['data_nascimento']);
+            //debug ($cliente);
+            //die;
+            $cliente = $this->Clientes->patchEntity($cliente, $data);
 
             if ($this->Clientes->save($cliente)) {
                 $this->Flash->success(__('Cliente atualizado com sucesso.'));

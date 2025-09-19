@@ -18,9 +18,9 @@ class ServicosController extends AppController
      *
      * @return \Cake\Http\Response|null|void Renders view
      */
-    
-    
-    
+
+
+
 
     public function index()
     {
@@ -40,7 +40,7 @@ class ServicosController extends AppController
         if (!empty($convenioId)) {
             $query->where(['Servicos.convenio_id' => $convenioId]);
         }
-   
+
         $servicos = $this->paginate($query);
 
 
@@ -99,8 +99,8 @@ class ServicosController extends AppController
      *
      * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
      */
-    
-    
+
+
 
     public function novo()
     {
@@ -115,7 +115,8 @@ class ServicosController extends AppController
             if (!empty($data['periodos'])) {
                 $data['periodos'] = array_map(
                     fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
-                    $data['periodos']);
+                    $data['periodos']
+                );
             }
 
 
@@ -160,7 +161,7 @@ class ServicosController extends AppController
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
 
-    
+
     public function editar($id = null)
     {
         $servico = $this->Servicos->get($id, [
@@ -172,14 +173,31 @@ class ServicosController extends AppController
             $data = $this->request->getData();
 
 
-            if (!empty($data['periodos'])) {
-                $data['periodos'] = array_map(
-                    fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
-                    $data['periodos']);
+            // 1. Defina a condição para exclusão
+            $shouldDelete =
+                (isset($data['habilitar_programacao']) && $data['habilitar_programacao'] == 0) ||
+                (isset($data['habilitar_programacao']) && $data['habilitar_programacao'] == 1 && empty($data['periodos']));
+
+            // 2. Execute a exclusão se a condição for verdadeira
+            if ($shouldDelete) {
+                $this->Servicos->Periodos->deleteAll([
+                    'convenio_id' => $servico->id,
+                    'cadeia_id' => 'semanal'
+                ]);
+
+                unset($data['periodos']);
+            } else {
+                // Se a programação estiver habilitada, anexa o estabelecimento_id aos periodos
+                if (!empty($data['periodos'])) {
+                    $data['periodos'] = array_map(
+                        fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+                        $data['periodos']
+                    );
+                }
             }
 
 
-         
+
             //debug($data);
             //die;
             $servico = $this->Servicos->patchEntity($servico, $data, ['associated' => ['Periodos', 'Profissionais', 'Convenios']]);
@@ -217,12 +235,14 @@ class ServicosController extends AppController
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
-        $servico = $this->Servicos->get($id,
-        [
-            'where' => [
-                'Servicos.estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')
+        $servico = $this->Servicos->get(
+            $id,
+            [
+                'where' => [
+                    'Servicos.estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')
+                ]
             ]
-        ]);
+        );
         if ($this->Servicos->delete($servico)) {
             $this->Flash->success(__('Serviço excluído com sucesso.'));
         } else {

@@ -161,6 +161,11 @@ class ProfissionaisTable extends Table
             ->scalar('cidade')
             ->maxLength('cidade', 120)
             ->allowEmptyString('cidade');
+        
+        $validator
+            ->scalar('uf')
+            ->maxLength('uf', 2)
+            ->allowEmptyString('uf');
 
         $validator
             ->boolean('ativar')

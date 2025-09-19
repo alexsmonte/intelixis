@@ -165,12 +165,27 @@ class ProfissionaisController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
 
+            $shouldDelete = 
+            (isset($data['habilitar_programacao']) && $data['habilitar_programacao'] == 0) || 
+            (isset($data['habilitar_programacao']) && $data['habilitar_programacao'] == 1 && empty($data['periodos']));
+
+            // 2. Execute a exclusão se a condição for verdadeira
+            if ($shouldDelete) {
+                $this->Profissionais->Periodos->deleteAll([
+                    'profissional_id' => $profissional->id,
+                    'cadeia_id' => 'semanal'
+                ]);
+
+                unset($data['periodos']);
+            } else {
+
             if (!empty($data['periodos'])) {
                 $data['periodos'] = array_map(
                     fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
                     $data['periodos']
                 );
             }
+        }
 
             
             $data['data_nascimento'] = new FrozenDate($data['data_nascimento']);

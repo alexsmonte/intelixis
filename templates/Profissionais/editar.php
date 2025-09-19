@@ -43,7 +43,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais', 'url' => ['controller'
                                 </div>
                         </div>
                         <div class="row">
-
+                                <div class="col-md-12">
+                                        <div class="row">
+                                                <div class="col-md-12 mb-3 mt-3">
+                                                        <h6 class="border-bottom pb-2">Dados Pessoais:</h6>
+                                                </div>
+                                        </div>
+                                </div>
                                 <div class="col-md-6 mb-3">
                                         <?= $this->Form->control('nome', ['label' => 'Nome Completo', 'class' => 'form-control',]); ?>
                                 </div>
@@ -62,10 +68,21 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais', 'url' => ['controller'
                                 <div class="col-md-3 mb-3">
                                         <?= $this->Form->control('celular', ['label' => 'Celular', 'class' => 'form-control',]); ?>
                                 </div>
-                                <div class="col-md-3 mb-3">
-                                        <?= $this->Form->control('cep', ['label' => 'CEP', 'class' => 'form-control',]); ?>
+                                <div class="col-md-12">
+                                        <div class="row">
+                                                <div class="col-md-12 mb-3 mt-3">
+                                                        <h6 class="border-bottom pb-2">Endereço:</h6>
+                                                </div>
+                                        </div>
+                                </div>
+                                <div class="row">
+                                        <div class="col-md-3" data-vue="cep-autocomplete"
+                                                data-cep="<?= h($profissional->cep ?? '') ?>">
+
+                                        </div>
                                 </div>
                                 <div class="col-md-3 mb-3">
+                                        
                                         <?= $this->Form->control('logradouro', ['label' => 'Logradouro', 'class' => 'form-control',]); ?>
                                 </div>
                                 <div class="col-md-3 mb-3">
@@ -80,6 +97,17 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais', 'url' => ['controller'
                                 <div class="col-md-3 mb-3">
                                         <?= $this->Form->control('cidade', ['label' => 'Cidade', 'class' => 'form-control',]); ?>
                                 </div>
+                                <div class="col-md-1 mb-3">
+                                        <?= $this->Form->control('uf', ['label' => 'UF', 'class' => 'form-control',]); ?>
+                                </div>
+
+                                <div class="col-md-12">
+                                        <div class="row">
+                                                <div class="col-md-12 mb-3 mt-3">
+                                                        <h5 class="border-bottom pb-2"></h5>
+                                                </div>
+                                        </div>
+                                </div>
 
                                 <!-- Convênios -->
                                 <div class="row">
@@ -91,6 +119,14 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais', 'url' => ['controller'
                                                         'options' => $convenios,
                                                         'label' => 'Convênios que cobrem este serviço'
                                                 ]); ?>
+                                        </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                        <div class="row">
+                                                <div class="col-md-12 mb-3 mt-3">
+                                                        <h5 class="border-bottom pb-2"></h5>
+                                                </div>
                                         </div>
                                 </div>
                                 <!-- Servicos -->
@@ -142,9 +178,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais', 'url' => ['controller'
         </div>
 </div>
 
+
+
 <!-- vue  -->
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <!-- Vue e componentes programacao.js -->
 <?= $this->Html->script('vue/programacao-semanal.js') ?>
 <?= $this->Html->script('vue/programacao-personalizada.js') ?>
 <?= $this->Html->script('vue/programacao-indisponivel.js') ?>
+<?= $this->Html->script('vue/cep-autocomplete.js') ?>

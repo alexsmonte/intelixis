@@ -7,6 +7,7 @@ use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\Event\Event;
 
 /**
  * Clientes Model
@@ -80,6 +81,11 @@ class ClientesTable extends Table
             ->requirePresence('nome', 'create')
             ->notEmptyString('nome', __('O nome é obrigatório.'));
 
+            $validator
+            ->date('data_nascimento',['dmy'],'Informe uma data válida')
+            ->requirePresence('data_nascimento', 'create')
+            ->allowEmptyDate('data_nascimento');
+
         $validator
             ->requirePresence('documento', 'create', __('O documento é obrigatório.'))
             ->notEmptyString('documento', __('O documento é obrigatório.'))
@@ -113,9 +119,14 @@ class ClientesTable extends Table
             ->allowEmptyString('cep');
 
         $validator
-            ->scalar('endereco')
-            ->maxLength('endereco', 255)
-            ->allowEmptyString('endereco');
+            ->scalar('logradouro')
+            ->maxLength('logradouro', 50)
+            ->allowEmptyString('logradouro');
+
+            $validator
+            ->scalar('numero')
+            ->maxLength('numero', 10)
+            ->allowEmptyString('numero');
 
         $validator
             ->scalar('cidade')
@@ -165,4 +176,24 @@ class ClientesTable extends Table
     // Precisa de pelo menos duas partes válidas
     return count($validParts) >= 2;
 }
+
+public function beforeMarshal(Event $event, \ArrayObject $data, \ArrayObject $options)
+{
+
+    $caracterInvalido   =   [" ",".","-","/",")","(",","];
+
+    if(isset($data['documento']))
+        $data['documento']      =   str_replace($caracterInvalido, "", $data['documento']);
+
+    if(isset($data['telefone']))
+        $data['telefone']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['telefone']));
+
+        if(isset($data['celular']))
+        $data['celular']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['celular']));
+
+        if(isset($data['cep']))
+        $data['cep']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['cep']));
+
+}
+
 }
