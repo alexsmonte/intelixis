@@ -52,6 +52,7 @@
             // Inicializa a programação caso venha do backend
             
              onMounted(() => {
+               
                  // 1. Verifique se existe alguma programação semanal
                
                 // const temProgramacaoSemanal = props.programacaoInicial.some(p => p.cadeia_id === 'semanal');
@@ -63,7 +64,10 @@
      
                  // Agora, itere sobre os dados para preencher os dias
                  props.programacaoInicial.forEach((p) => {
-                     if (p.cadeia_id === '1') {
+                   
+                     if (p.cadeia_id === 1) {
+                    
+                      
                      const dia = dias.value.find((d) => d.id === p.dia_semana);
                      if (dia) {
                          dia.ativo = p.status !== false;
@@ -114,7 +118,7 @@
                             dia_semana: d.id,
                             data_hora_inicio: `${hojeStr()} ${d.inicio}:00`,
                             data_hora_fim: `${hojeStr()} ${d.fim}:00`,
-                            cadeia_id: "1",
+                            cadeia_id: 1,
                             //status: "disponivel",
                         };
                     } else {
@@ -281,10 +285,12 @@
 
                 createApp(ProgramacaoSemanal, {
                     programacaoInicial, // agora realmente passa a programação inicial
+                   
                     habilitarInicial,
                     token,
                     baseUrl
                 }).mount(el);
+              
             });
         });
     }

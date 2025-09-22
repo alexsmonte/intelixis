@@ -190,7 +190,7 @@ class ServicosController extends AppController
                 if ($habilitarProgramacao === 0 || ($habilitarProgramacao === 1 && !$temPeriodos)) {
                     $this->Servicos->Periodos->deleteAll([
                         'profissional_id' => $servico->id,
-                        'cadeia_id' => '1'
+                        'cadeia_id' => 1
                     ]);
                 }
             

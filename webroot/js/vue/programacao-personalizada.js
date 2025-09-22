@@ -53,7 +53,7 @@
                 hora_inicio: horaInicio,
                 data_fim: fim ? fim.toISOString().slice(0, 10) : dataISO,
                 hora_fim: horaFim,
-                cadeia_id: p.cadeia_id || "2",
+                cadeia_id: p.cadeia_id || 2,
                 status: p.status ? "1" : "0",
                 programacao_personalizada: 1,
             });

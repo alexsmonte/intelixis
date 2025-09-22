@@ -45,7 +45,7 @@
                 hora_inicio: inicio.toISOString().slice(11, 16),
                 data_fim: fim.toISOString().slice(0, 10),
                 hora_fim: fim.toISOString().slice(11, 16),
-                cadeia_id: p.cadeia_id || "3",
+                cadeia_id: p.cadeia_id || 3,
                 status: p.status ? "1" : "0",
                 programacao_personalizada: 1,
             });

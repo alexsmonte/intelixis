@@ -136,7 +136,7 @@ class LocaisController extends AppController
                 if ($habilitarProgramacao === 0 || ($habilitarProgramacao === 1 && !$temPeriodos)) {
                     $this->Locais->Periodos->deleteAll([
                         'profissional_id' => $local->id,
-                        'cadeia_id' => '1'
+                        'cadeia_id' => 1
                     ]);
                 }
             

@@ -151,7 +151,7 @@ class ConveniosController extends AppController
                 if ($habilitarProgramacao === 0 || ($habilitarProgramacao === 1 && !$temPeriodos)) {
                     $this->Convenios->Periodos->deleteAll([
                         'profissional_id' => $convenio->id,
-                        'cadeia_id' => '1'
+                        'cadeia_id' => 1
                     ]);
                 }
             

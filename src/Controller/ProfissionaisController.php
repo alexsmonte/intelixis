@@ -182,7 +182,7 @@ class ProfissionaisController extends AppController
                 if ($habilitarProgramacao === 0 || ($habilitarProgramacao === 1 && !$temPeriodos)) {
                     $this->Profissionais->Periodos->deleteAll([
                         'profissional_id' => $profissional->id,
-                        'cadeia_id' => '1'
+                        'cadeia_id' => 1
                     ]);
                 }
             
