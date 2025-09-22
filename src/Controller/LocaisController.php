@@ -120,29 +120,45 @@ class LocaisController extends AppController
             $data = $this->request->getData();
 
             // 1. Defina a condição para exclusão
-            $shouldDelete =
-                (isset($data['habilitar_programacao']) && $data['habilitar_programacao'] == 0) ||
-                (isset($data['habilitar_programacao']) && $data['habilitar_programacao'] == 1 && empty($data['periodos']));
-
-            // 2. Execute a exclusão se a condição for verdadeira
-            if ($shouldDelete) {
-                $this->Locais->Periodos->deleteAll([
-                    'local_id' => $local->id,
-                    'cadeia_id' => 'semanal'
-                ]);
-
-                unset($data['periodos']);
-            } else {
-                // Se a programação estiver habilitada, anexa o estabelecimento_id aos periodos
-                if (!empty($data['periodos'])) {
+            try {
+                // 1. Extrair e validar dados
+                $habilitarProgramacao = (int)($data['habilitar_programacao'] ?? 0);
+                $periodos = $data['periodos'] ?? [];
+                
+                // 2. Validar se períodos é array
+                if (!is_array($periodos)) {
+                    throw new \InvalidArgumentException('Períodos deve ser um array');
+                }
+                
+                $temPeriodos = !empty($periodos);
+            
+                // 3. Lógica de deleção
+                if ($habilitarProgramacao === 0 || ($habilitarProgramacao === 1 && !$temPeriodos)) {
+                    $this->Locais->Periodos->deleteAll([
+                        'profissional_id' => $local->id,
+                        'cadeia_id' => '1'
+                    ]);
+                }
+            
+                // 4.  Atribui estabelecimento_id
+                if ($temPeriodos) {
+                   
+                    
                     $data['periodos'] = array_map(
                         fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
                         $data['periodos']
-                    );
+                    ); 
+                
                 }
+            
+            } catch (\InvalidArgumentException $e) {
+                // Logar erro ou tratar exceção
+                $this->log("Erro ao processar períodos: " . $e->getMessage());
+                throw $e; // Re-lançar se necessário
             }
 
-            //$data['data_nascimento'] = new FrozenDate($data['data_nascimento']);
+
+            
 
             //debug($data);
             //die;

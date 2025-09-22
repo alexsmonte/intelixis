@@ -9,6 +9,8 @@
     <php>
         <ini name="memory_limit" value="-1"/>
         <ini name="apc.enable_cli" value="1"/>
+
+        <env name="PHPUNIT_DISABLE_MIGRATIONS" value="true"/>
     </php>
 
     <!-- Add any additional test suites you want to run here -->

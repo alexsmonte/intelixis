@@ -53,7 +53,7 @@
                 hora_inicio: horaInicio,
                 data_fim: fim ? fim.toISOString().slice(0, 10) : dataISO,
                 hora_fim: horaFim,
-                cadeia_id: p.cadeia_id || "disponivel",
+                cadeia_id: p.cadeia_id || "2",
                 status: p.status ? "1" : "0",
                 programacao_personalizada: 1,
             });
@@ -271,7 +271,7 @@
             <input type="hidden" :name="'periodos[21'+key+'][data_hora_inicio]'" :value="p.data_hora_inicio">
             <input type="hidden" :name="'periodos[21'+key+'][data_hora_fim]'" :value="p.data_hora_fim">
             <input type="hidden" :name="'periodos[21'+key+'][data_personalizada]'" :value="p.data_personalizada">
-            <input type="hidden" :name="'periodos[21'+key+'][cadeia_id]'" value="disponivel">
+            <input type="hidden" :name="'periodos[21'+key+'][cadeia_id]'" value="2">
             <input type="hidden" :name="'periodos[21'+key+'][status]'" value="1">
             <input type="hidden" :name="'periodos[21'+key+'][programacao_personalizada]'" value="1">
           </div>

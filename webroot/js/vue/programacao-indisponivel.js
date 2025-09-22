@@ -45,7 +45,7 @@
                 hora_inicio: inicio.toISOString().slice(11, 16),
                 data_fim: fim.toISOString().slice(0, 10),
                 hora_fim: fim.toISOString().slice(11, 16),
-                cadeia_id: p.cadeia_id || "indisponivel",
+                cadeia_id: p.cadeia_id || "3",
                 status: p.status ? "1" : "0",
                 programacao_personalizada: 1,
             });
@@ -288,7 +288,7 @@
 			<input type="hidden" :name="'periodos[31'+key+'][data_hora_inicio]'" :value="p.data_hora_inicio">
 			<input type="hidden" :name="'periodos[31'+key+'][data_hora_fim]'" :value="p.data_hora_fim">
 			<input type="hidden" :name="'periodos[31'+key+'][data_personalizada]'" :value="p.data_personalizada">
-			<input type="hidden" :name="'periodos[31'+key+'][cadeia_id]'" value="indisponivel">
+			<input type="hidden" :name="'periodos[31'+key+'][cadeia_id]'" value="3">
 			<input type="hidden" :name="'periodos[31'+key+'][status]'" value="1">
 			<input type="hidden" :name="'periodos[31'+key+'][programacao_personalizada]'" value="1">
         </div>

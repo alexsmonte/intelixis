@@ -44,10 +44,25 @@ $this->BreadcrumbsPlus->add([['title' => 'Serviços', 'url' => ['controller' => 
             <div class="row">
 
                 <div class="col-md-6 mb-3">
-                    <?= $this->Form->control('nome', ['label' => 'Nome do Serviço', 'class' => 'form-control',]); ?>
+                    <?= $this->Form->control('nome', [
+                        'label' => 'Nome do Serviço',
+                        'class' => 'form-control',
+                        'templates' => ['inputContainer' => '{{content}}'],
+                        'title' => 'Digite o nome do serviço',
+                        'data-bs-toggle' => 'tooltip',
+                        'data-bs-placement' => 'top'
+                    ]); ?>
                 </div>
                 <div class="col-md-2 mb-3">
-                    <?= $this->Form->control('valor', ['label' => 'Valor', 'class' => 'form-control',]); ?>
+                    <?= $this->Form->control('valor', [
+                        'label' => 'Valor',
+                        'type' => 'text',
+                        'class' => 'form-control',
+                        'templates' => ['inputContainer' => '{{content}}'],
+                        'title' => 'Digite o valor em R$',
+                        'data-bs-toggle' => 'tooltip',
+                        'data-bs-placement' => 'top'
+                    ]); ?>
                 </div>
                 <div class="col-md-2 mb-3">
                     <div class="position-relative">
@@ -103,7 +118,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Serviços', 'url' => ['controller' => 
                 </div>
                 <div class="row">
                     <div class="col-md-12 mb-3">
-                        <div data-vue="programacao-semanal" >
+                        <div data-vue="programacao-semanal">
                         </div>
                     </div>
                 </div>

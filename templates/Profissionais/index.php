@@ -27,29 +27,43 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais']]);
     <div class="px-4 py-3 border-bottom">
         <div class="card-body p-4">
 
-            <div class="d-flex mb-3 align-items-center">
-                <h4 class="card-title mb-0"><?= __('Profissionais') ?></h4>
-                <div class="ms-auto flex-shrink-0">
-                    <button class="btn bg-primary-subtle text-primary " data-bs-toggle="dropdown" aria-haspopup="true"
-                        aria-expanded="false">
-                        <i class="fa fa-bars" aria-hidden="true"></i>
-                    </button>
-                    <ul class="dropdown-menu animated flipInX">
-                        <li><?= $this->Html->link('<i class="fa fa-plus" aria-hidden="true"></i> Novo Profissional', ['action' => 'novo'], ['class' => 'dropdown-item', 'escape' => false]) ?>
-                        </li>
-                    </ul>
+            
+
+
+
+            <div class="row mb-3 align-items-center">
+                <!-- Coluna da busca -->
+                <div class="col-md-6">
+                    <form @submit.prevent="onSearch" class="mb-0">
+                        <div class="input-group mb-3">
+                            <input v-model="query" type="text" class="form-control form-control-lg placeholdert"
+                                placeholder="Buscar profissionais por nome ou email">
+                            <button class="btn border border-primary-subtle btn-primary search-btn" type="submit"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Pesquisar">
+                                <i class="ti ti-search fs-5"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Coluna do botão Novo -->
+                <div class="col-md-6 d-flex justify-content-end">
+                    <?= $this->Html->link(
+                        '<i class="ti ti-user-plus"></i><span class="btn-text ms-2">Novo</span>',
+                        ['action' => 'novo'],
+                        [
+                            'class' => 'btn btn-rounded btn-primary d-flex align-items-center',
+                            'escape' => false
+                        ]
+                    ) ?>
                 </div>
             </div>
 
 
-            <!-- BUSCA -->
-            <div class="row mb-3">
-                <div class="col-md-6 d-flex">
-                    <input v-model="query" type="text" class="form-control"
-                        placeholder="Buscar profissionais por nome ou email">
-                    <button class="btn btn-primary ms-2" @click="onSearch">Pesquisar</button>
-                </div>
-            </div>
+
+
+
+
 
             <!-- TABELA -->
             <div class="table-responsive mb-4 border rounded-1">
@@ -76,33 +90,33 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais']]);
                             </td>
 
                             <td>
-                                <div class="btn-group">
-                                    <button class="btn btn-warning dropdown-toggle" type="button"
-                                        data-bs-toggle="dropdown">Opções</button>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <button class="dropdown-item btn btn-primary btn-md"
-                                                @click="viewProfissional(profissional.id)">Visualizar</button>
+                                <div class="d-flex gap-3">
+                                    <!-- Visualizar -->
+                                    <a href="javascript:void(0);" @click="viewProfissional(profissional.id)"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Visualizar">
+                                        <i class="ti ti-eye fs-5 text-info"></i>
+                                    </a>
 
-                                        </li>
-                                        <li><a class="dropdown-item"
-                                                :href="`<?= $this->Url->build(['controller' => 'Profissionais', 'action' => 'editar']); ?>/${profissional.id}`">Editar</a>
-                                        </li>
+                                    <!-- Editar -->
+                                    <a :href="`<?= $this->Url->build(['controller' => 'Profissionais', 'action' => 'editar']); ?>/${profissional.id}`"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Editar">
+                                        <i class="ti ti-edit fs-5 text-warning"></i>
+                                    </a>
 
-                                        <li>
-                                            <form
-                                                :action="'<?= $this->Url->build(['controller' => 'Profissionais', 'action' => 'delete']); ?>/' + profissional.id"
-                                                method="post" @submit.prevent="confirmarExclusao($event)">
-                                                <input type="hidden" name="_method" value="DELETE">
-                                                <input type="hidden" name="_csrfToken" :value="csrfToken">
-                                                <button type="submit"
-                                                    class="dropdown-item btn btn-primary btn-md">Excluir</button>
-                                            </form>
-                                        </li>
-
-
-                                    </ul>
+                                    <!-- Excluir -->
+                                    <form
+                                        :action="'<?= $this->Url->build(['controller' => 'Profissionais', 'action' => 'delete']); ?>/' + profissional.id"
+                                        method="post" @submit.prevent="confirmarExclusao($event)"
+                                        style="display:inline;">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <input type="hidden" name="_csrfToken" :value="csrfToken">
+                                        <button type="submit" class="bg-transparent border-0 p-0"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Excluir">
+                                            <i class="ti ti-trash fs-5 text-danger"></i>
+                                        </button>
+                                    </form>
                                 </div>
+
                             </td>
                         </tr>
                         <tr v-if="profissionais.length === 0">

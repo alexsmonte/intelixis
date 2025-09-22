@@ -59,6 +59,10 @@ return function (RouteBuilder $routes): void {
         $builder->connect('meu-perfil', ['controller' => 'Usuarios', 'action' => 'meuPerfil']);
         $builder->connect('/dashboard', ['controller' => 'Pages', 'action' => 'index']);
 
+
+
+        
+
         /*
          * ...and connect the rest of 'Pages' controller's URLs.
          */

@@ -63,7 +63,7 @@
      
                  // Agora, itere sobre os dados para preencher os dias
                  props.programacaoInicial.forEach((p) => {
-                     if (p.cadeia_id === 'semanal') {
+                     if (p.cadeia_id === '1') {
                      const dia = dias.value.find((d) => d.id === p.dia_semana);
                      if (dia) {
                          dia.ativo = p.status !== false;
@@ -114,7 +114,7 @@
                             dia_semana: d.id,
                             data_hora_inicio: `${hojeStr()} ${d.inicio}:00`,
                             data_hora_fim: `${hojeStr()} ${d.fim}:00`,
-                            cadeia_id: "semanal",
+                            cadeia_id: "1",
                             //status: "disponivel",
                         };
                     } else {

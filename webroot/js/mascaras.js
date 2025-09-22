@@ -77,9 +77,20 @@
         onAccept: function(value, maskRef) {
           maskRef.el.value = value.toUpperCase();
         }
-      }
+      },
   
       // VALOR: monetário fixo 2 casas decimais
+      {
+        id: 'valor',
+        mask: Number,
+        thousandsSeparator: '.',
+        radix: ',',
+        scale: 2,
+        normalizeZeros: true,
+        padFractionalZeros: true,
+        lazy: false,
+        prefix: 'R$ '
+      }
       
     ]);
   });

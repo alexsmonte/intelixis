@@ -109,7 +109,7 @@ $this->BreadcrumbsPlus->add([
                                 <div data-vue="programacao-personalizada"
                                         data-programacao-inicial='<?= htmlspecialchars(json_encode($disponiveis ?? []), ENT_QUOTES, 'UTF-8') ?>'
                                         data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
-                                        data-base-url="<?= $this->Url->build(['controller'=>'Periodos', 'action' =>'delete'], ['fullBase' => true]) ?>"
+                                        data-base-url="<?= $this->Url->build(['controller'=>'Periodos', 'action' =>'delete'], ['fullBase' => false]) ?>"
                                 >
                                         <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
                                 </div>
@@ -117,7 +117,7 @@ $this->BreadcrumbsPlus->add([
                                 <div data-vue="dias-indisponiveis"
                                         data-periodos-iniciais='<?= json_encode($indisponiveis ?? []) ?>'
                                          data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
-                                         data-base-url="<?= $this->Url->build(['controller'=>'Periodos', 'action' =>'delete'], ['fullBase' => true]) ?>"
+                                         data-base-url="<?= $this->Url->build(['controller'=>'Periodos', 'action' =>'delete'], ['fullBase' => false]) ?>"
                                 >
                                 </div>
 

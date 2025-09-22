@@ -10,7 +10,31 @@ use Cake\Core\Configure;
 
 
 <head>
+<style>
 
+/* Cor de fundo do tooltip */
+.tooltip .tooltip-inner {
+    background-color: #E7F2FB; /* cor de fundo personalizada */
+    color: #2271BA;           /* cor do texto */
+    font-size: 0.875rem;       /* tamanho da fonte */
+    padding: 6px 10px;         /* espaçamento interno */
+    border-radius: 6px;        /* borda arredondada */
+    max-width: 250px;           /* largura máxima */
+    text-align: center;
+}
+
+/* Cor da seta */
+.tooltip .tooltip-arrow::before {
+    border-color: #E7F2FB !important;
+}
+
+/* Opcional: animação ao aparecer */
+.tooltip.show {
+    opacity: 1 !important;
+    transition: opacity 0.3s ease-in-out;
+}
+
+</style>   
 
 
 

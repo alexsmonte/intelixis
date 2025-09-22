@@ -109,6 +109,7 @@ class PeriodosTable extends Table
             ->notEmptyDateTime('data_hora_fim');
 
         $validator
+             ->integer('dia_semana')
             ->requirePresence('dia_semana', 'create')
             ->notEmptyString('dia_semana');
 
@@ -117,7 +118,7 @@ class PeriodosTable extends Table
             ->allowEmptyDateTime('data_personalizada');
 
         $validator
-            ->scalar('cadeia_id')
+            ->integer('cadeia_id')
             ->maxLength('cadeia_id', 20)
             ->allowEmptyString('cadeia_id');
 
