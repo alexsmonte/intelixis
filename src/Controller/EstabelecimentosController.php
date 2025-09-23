@@ -143,7 +143,7 @@ class EstabelecimentosController extends AppController
             $dadosEstabelecimento["usuarios"]["_ids"]   =   [$this->request->getAttribute('identity')->id];
 
 
-            $estabelecimento = $this->Estabelecimentos->patchEntity($estabelecimento, $dadosEstabelecimento,['associated' => ['Periodos']]);
+            $estabelecimento = $this->Estabelecimentos->patchEntity($estabelecimento, $dadosEstabelecimento,['associated' => ['Periodos','Usuarios' ]]);
 
             if ($this->Estabelecimentos->save($estabelecimento)) {
                 $this->Flash->success(__('Os dados foram salvos com sucesso.'));

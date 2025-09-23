@@ -1,10 +1,7 @@
 <?php
 use Cake\I18n\Number;
 use Cake\Collection\Collection;
-//if(!empty($estabelecimento->periodos))
 $collection = new Collection($estabelecimento->periodos);
-debug ($this->getRequest()->getSession()->read('Auth.Estabelecimento.id'));
-debug($estabelecimento->periodos);
 $agrupados = $collection->groupBy('cadeia_id')->toArray();
 $semanal = $agrupados['1'] ?? [];
 $disponiveis = $agrupados['2'] ?? [];
