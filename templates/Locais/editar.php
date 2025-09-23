@@ -5,9 +5,9 @@ use Cake\Collection\Collection;
 
 $collection = new Collection($local->periodos);
 $agrupados      = $collection->groupBy('cadeia_id')->toArray();
-$semanal        = $agrupados['semanal'] ?? [];
-$disponiveis    = $agrupados['disponivel'] ?? [];
-$indisponiveis  = $agrupados['indisponivel'] ?? [];
+$semanal        = $agrupados['1'] ?? [];
+$disponiveis    = $agrupados['2'] ?? [];
+$indisponiveis  = $agrupados['3'] ?? [];
 
 $this->BreadcrumbsPlus->add([
     ['title' => 'Locais', 'url' => ['controller' => 'Locais', 'action' => 'index']],

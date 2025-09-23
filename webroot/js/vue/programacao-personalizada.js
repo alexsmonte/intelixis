@@ -38,7 +38,7 @@
             const horaInicio = inicio.toISOString().slice(11, 16);
             const horaFim = fim.toISOString().slice(11, 16);
             
-
+            
             todos.push({
                 id: p.id,
                 tipo: tipo,

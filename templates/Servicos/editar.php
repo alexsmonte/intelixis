@@ -2,12 +2,15 @@
 use Cake\Collection\Collection;
 
 
+
 $collection = new Collection($servico->periodos);
 
+if(!empty($estabelecimento->periodos))
+$collection = new Collection($servico->periodos);
 $agrupados      = $collection->groupBy('cadeia_id')->toArray();
-$semanal        = $agrupados['semanal'] ?? [];
-$disponiveis    = $agrupados['disponivel'] ?? [];
-$indisponiveis  = $agrupados['indisponivel'] ?? [];
+$semanal        = $agrupados['1'] ?? [];
+$disponiveis    = $agrupados['2'] ?? [];
+$indisponiveis  = $agrupados['3'] ?? [];
 
 $this->BreadcrumbsPlus->add([
     ['title' => 'Serviços', 'url' => ['controller' => 'Servicos', 'action' => 'index']],

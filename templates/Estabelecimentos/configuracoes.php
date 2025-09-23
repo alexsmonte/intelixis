@@ -1,6 +1,14 @@
 <?php
 use Cake\I18n\Number;
-
+use Cake\Collection\Collection;
+//if(!empty($estabelecimento->periodos))
+$collection = new Collection($estabelecimento->periodos);
+debug ($this->getRequest()->getSession()->read('Auth.Estabelecimento.id'));
+debug($estabelecimento->periodos);
+$agrupados = $collection->groupBy('cadeia_id')->toArray();
+$semanal = $agrupados['1'] ?? [];
+$disponiveis = $agrupados['2'] ?? [];
+$indisponiveis = $agrupados['3'] ?? [];
 $this->BreadcrumbsPlus->add([['title' => 'Estabelecimento']]);
 ?>
 <?= $this->element('barra-titulo',['title' => $title]); ?>
@@ -158,16 +166,31 @@ $this->BreadcrumbsPlus->add([['title' => 'Estabelecimento']]);
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
                         <div class="card border shadow-none p-4">
-                            <div data-vue="programacao-semanal"
-                                 data-programacao-inicial='<?= json_encode($estabelecimento->periodos ?? []) ?>'
-								 data-habilitar-inicial="true"
-                                 data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
-                                 data-base-url="<?= $this->Url->build(['controller'=>'Periodos', 'action' =>'delete'], ['fullBase' => false]) ?>">
-                                <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
-                            </div>
+                        <div data-vue="programacao-semanal"
+                                        data-programacao-inicial='<?= json_encode($semanal ?? []) ?>'
+                                        data-habilitar-inicial="<?= $estabelecimento->habilitar_programacao ? 'true' : 'false' ?>"
+                                        data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
+                                        data-base-url="<?= $this->Url->build(['controller' => 'Periodos', 'action' => 'delete'], ['fullBase' => false]) ?>">
+                                        <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
+                                </div>
 
                         </div>
                     </div>
+                    
+                    </div>
+                    <div data-vue="programacao-personalizada"
+                                        data-programacao-inicial='<?= htmlspecialchars(json_encode($disponiveis ?? []), ENT_QUOTES, 'UTF-8') ?>'
+                                        data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
+                                        data-base-url="<?= $this->Url->build(['controller' => 'Periodos', 'action' => 'delete'], ['fullBase' => false]) ?>">
+                                        <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
+                                </div>
+
+                                <div data-vue="dias-indisponiveis"
+                                        data-periodos-iniciais='<?= json_encode($indisponiveis ?? []) ?>'
+                                        data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
+                                        data-base-url="<?= $this->Url->build(['controller' => 'Periodos', 'action' => 'delete'], ['fullBase' => false]) ?>">
+                                </div>
+
                     <div class="col-lg-9">
                         <div class="card border shadow-none">
                             <div class="card-body p-4">
@@ -408,4 +431,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Estabelecimento']]);
     </div>
 </div>
 <?= $this->Form->end() ?>
+<!-- Vue e componentes programacao.js -->
 <?= $this->Html->script('vue/programacao-semanal.js') ?>
+<?= $this->Html->script('vue/programacao-personalizada.js') ?>
+<?= $this->Html->script('vue/programacao-indisponivel.js') ?>
+<?= $this->Html->script('vue/cep-autocomplete.js') ?>
