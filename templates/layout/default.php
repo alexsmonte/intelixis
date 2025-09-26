@@ -58,6 +58,14 @@ use Cake\Core\Configure;
     <?= $this->fetch('css') ?>
     <?= $this->fetch('script') ?>
 
+    <!-- CSS do Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- jQuery (necessário para Select2) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- JS do Select2 -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <?= $this->Html->script('forms/select2.init.js') ?>
+
     <!-- Import Js Files -->
     <?= $this->Html->script(['/libs/bootstrap/dist/js/bootstrap.bundle.min.js', '/libs/simplebar/dist/simplebar.min.js', '/js/theme/rmhorizontal.init.js', '/js/theme/theme.js','/js/theme/app.min.js','/js/theme/sidebarmenu.js','/js/theme/feather.min.js', '/js/highlights/highlight.min.js']) ?>
 
@@ -207,13 +215,6 @@ use Cake\Core\Configure;
     });
   });
 </script>
-<!-- CSS do Select2 -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<!-- jQuery (necessário para Select2) -->
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<!-- JS do Select2 -->
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<?= $this->Html->script('forms/select2.init.js') ?>
 
 </body>
 </html>
