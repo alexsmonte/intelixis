@@ -71,8 +71,7 @@ class ClientesController extends AppController
             // Pega os dados do formulário
             $data = $this->request->getData();
 
-            //debug($data);
-            //die;
+            
             $data['data_nascimento'] = new FrozenDate($data['data_nascimento']);
             // Aplica os dados limpos na entidade
             $cliente = $this->Clientes->patchEntity($cliente, $data);
@@ -80,8 +79,19 @@ class ClientesController extends AppController
             //debug($cliente);
             //die;
             if ($this->Clientes->save($cliente)) {
+                if ($this->request->is('ajax')) {
+                    return $this->response
+                        ->withType('application/json')
+                        ->withStringBody(json_encode([
+                            'success' => true,
+                            'message' => 'Cliente cadastrado com sucesso!',
+                            'data' => $cliente
+                        ]));
+                }else{
                 $this->Flash->success(__('Cliente cadastrado com sucesso.'));
+               
                 return $this->redirect(['action' => 'index']);
+            }
             }
             $this->Flash->error(__('O cliente não pôde ser salvo, verifique os campos destacados e tente novamente.'));
         }

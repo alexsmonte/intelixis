@@ -65,8 +65,11 @@
 
         template: `
         <div class="mb-3">
-            <label for="cep-input" class="form-label">CEP</label>
+            
+           <label for="cep-input" class="form-label spike-label">CEP</label>
+
             <div class="input-group">
+               
                 <input
                     id="cep"
                     name="cep" 
@@ -78,7 +81,8 @@
                     placeholder="00000-000"
                     maxlength="9"
                 />
-                <button type="button" @click="buscarCep" class="btn btn-secondary" :disabled="carregando">
+                <button type="button" @click="buscarCep" class="btn border border-primary-subtle btn-primary search-btn" 
+                data-bs-toggle="tooltip" data-bs-placement="top" title="Consultar Cep" :disabled="carregando">
                     <span v-if="carregando" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                     <span v-else><i class="ti ti-search"></i></span>
                 </button>

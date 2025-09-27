@@ -177,11 +177,10 @@ class LocaisController extends AppController
 
 
 
-        $periodos = $this->Locais->Periodos->find('list')->all();
-        $estabelecimentos = $this->Locais->Estabelecimentos->find('list')->all();
+    
 
         $title = 'Editar Local';
-        $this->set(compact('local', 'estabelecimentos', 'periodos', 'title'));
+        $this->set(compact('local',  'title'));
     }
     /**
      * Delete method

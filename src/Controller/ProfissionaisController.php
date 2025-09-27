@@ -228,11 +228,9 @@ class ProfissionaisController extends AppController
             ->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])
             ->all();
 
-        $periodos = $this->Profissionais->Periodos->find('list')->all();
-        $estabelecimentos = $this->Profissionais->Estabelecimentos->find('list')->all();
-
+        
         $title = 'Editar Serviço';
-        $this->set(compact('profissional', 'convenios', 'estabelecimentos', 'servicos', 'periodos', 'title'));
+        $this->set(compact('profissional', 'convenios', 'servicos', 'title'));
     }
 
     /**
