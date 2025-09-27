@@ -4,13 +4,15 @@
  * @var \App\Model\Entity\Cliente $cliente
  * @var \Cake\Collection\CollectionInterface|string[] $estabelecimentos
  */
-$this->BreadcrumbsPlus->add([
-    ['title' => 'Clientes', 'url' => ['controller' => 'Clientes', 'action' => 'index']],
-    ['title' => 'Novo']
-]);
+
+ ?>
+<?php
+
+$this->BreadcrumbsPlus->add([['title' => 'Clientes', 'url'=>['controller' => 'Clientes', 'action' => 'index']],['title'=> 'Novo']]);
+
 ?>
 
-<?= $this->element('barra-titulo', ['title' => $title]); ?>
+<?= $this->element('barra-titulo',['title' => $title]); ?>
 
 <div class="card w-100 position-relative overflow-hidden">
     <div class="px-4 py-3 border-bottom">
@@ -24,7 +26,7 @@ $this->BreadcrumbsPlus->add([
                 <div class="col-md-12">
                     <div class="row">
                         <div class="col-md-12 mb-3 mt-3">
-                            <h5 class="border-bottom pb-2">Dados pessoais:</h5>
+                            <h6 class="border-bottom pb-2">Dados pessoais:</h6>
                         </div>
                     </div>
                 </div>
@@ -51,11 +53,12 @@ $this->BreadcrumbsPlus->add([
                 <div class="col-md-12">
                     <div class="row">
                         <div class="col-md-12 mb-3 mt-3">
-                            <h5 class="border-bottom pb-2">Endereço:</h5>
+                            <h6 class="border-bottom pb-2">Endereço:</h6>
                         </div>
                     </div>
                 </div>
                 <div class="row">
+              
                     <div class="col-md-3" data-vue="cep-autocomplete">
                     </div>
                 </div>

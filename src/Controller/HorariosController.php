@@ -330,14 +330,7 @@ while (($slotStartTs + $slotStepSec) <= $fimFinal) {
 
 
 
-    public function initialize(): void
-{
-    parent::initialize();
-    
-    // Verifique os nomes exatos dos seus models
-    // Os nomes devem estar no plural e em PascalCase
    
-}
 
     /**
      
@@ -856,9 +849,54 @@ while (($slotStartTs + $slotStepSec) <= $fimFinal) {
 
 
 
-public function agendamentos()
+
+
+public function getDisponiveis()
 {
-   
+    $this->autoRender = false;
+    $this->viewBuilder()->disableAutoLayout();
+    $this->response = $this->response->withType('application/json');
+
+    try {
+        $data = $this->request->getData();
+        $estabelecimentoId = $this->getRequest()->getSession()->read('Auth.Estabelecimento.id');
+        if (!$estabelecimentoId) throw new \Exception('Estabelecimento não encontrado.');
+
+        $conn = ConnectionManager::get('default');
+        $sql = "SELECT * FROM public.fn_horarios_disponiveis(
+            :estabelecimento_id,
+            :profissional_id,
+            :servico_id,
+            :local_id,
+            :convenio_id,
+            :data_inicio,
+            :data_fim
+        )";
+
+        $horarios = $conn->execute($sql, [
+            'estabelecimento_id' => $estabelecimentoId,
+            'profissional_id' => !empty($data['profissional_id']) ? (int)$data['profissional_id'] : null,
+            'servico_id' => !empty($data['servico_id']) ? (int)$data['servico_id'] : null,
+            'local_id' => !empty($data['local_id']) ? (int)$data['local_id'] : null,
+            'convenio_id' => !empty($data['convenio_id']) ? (int)$data['convenio_id'] : null,
+            'data_inicio' => $data['data_inicio'] ?? date('Y-m-d'),
+            'data_fim' => $data['data_fim'] ?? date('Y-m-d', strtotime('+7 days'))
+        ])->fetchAll('assoc');
+
+        // Retorna JSON puro
+        echo json_encode(['success' => true, 'horarios' => $horarios]);
+    } catch (\Throwable $e) {
+        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    }
+
+    exit;
+}
+
+
+
+
+    public function agendamentos()
+{
     // ---------- OUTRAS LISTAS PARA VIEW ----------
     $estabelecimentoId = $this->getRequest()->getSession()->read('Auth.Estabelecimento.id');
 
@@ -878,17 +916,28 @@ public function agendamentos()
         ->where(['estabelecimento_id' => $estabelecimentoId])
         ->all();
 
-    $agendamentos = $this->fetchTable('Agendamentos')->find()
-        ->where([
-            'estabelecimento_id' => $estabelecimentoId,
-            'data_hora_inicio >=' => date('Y-m-d H:i:s')
+        $agendamentos = $this->fetchTable('Agendamentos')->find()
+        ->contain([
+            'Clientes' => [
+                'fields' => ['nome']
+            ]
         ])
-        ->select(['data_hora_inicio', 'data_hora_fim'])
+        ->where([
+            'Agendamentos.estabelecimento_id' => $estabelecimentoId,
+            'Agendamentos.data_hora_inicio >=' => date('Y-m-d H:i:s')
+        ])
+        ->select([
+            'Agendamentos.profissional_id',
+            'Agendamentos.data_hora_inicio',
+            'Agendamentos.data_hora_fim'
+        ])
         ->all()
         ->map(function ($ag) {
             return [
+                'profissional_id' => $ag->profissional_id,
                 'data_hora_inicio' => $ag->data_hora_inicio->format('Y-m-d H:i:s'),
-                'data_hora_fim' => $ag->data_hora_fim->format('Y-m-d H:i:s')
+                'data_hora_fim' => $ag->data_hora_fim->format('Y-m-d H:i:s'),
+                'cliente_nome' => $ag->cliente->nome
             ];
         })
         ->toArray();
@@ -896,56 +945,4 @@ public function agendamentos()
     $this->set(compact('profissionais', 'convenios', 'servicos', 'locais', 'agendamentos'));
 }
 
-public function getDisponiveis()
-{
-    
-    ob_clean(); // limpa qualquer output anterior
-    $this->autoRender = false; // não renderiza view
-    $this->viewBuilder()->disableAutoLayout(); // não inclui layout
-
-    $this->response = $this->response->withType('application/json');
-   
-
-    try {
-      
-    
-        $data = $this->request->getData();
-        $estabelecimentoId = $this->getRequest()->getSession()->read('Auth.Estabelecimento.id');
-        if (!$estabelecimentoId) throw new \Exception('Estabelecimento não encontrado.');
-    
-        $conn = ConnectionManager::get('default');
-        $sql = "SELECT * FROM public.fn_horarios_disponiveis3(
-            :estabelecimento_id,
-            :profissional_id,
-            :servico_id,
-            :local_id,
-            :convenio_id,
-            :duracao_servico,
-            :data_inicio,
-            :data_fim
-        )";
-    
-        $horarios = $conn->execute($sql, [
-            'estabelecimento_id' => $estabelecimentoId,
-            'profissional_id' => $data['profissional_id'] ?? null,
-            'servico_id' => $data['servico_id'] ?? null,
-            'local_id' => $data['local_id'] ?? null,
-            'convenio_id' => $data['convenio_id'] ?? null,
-            'duracao_servico' => $data['duracao_servico'] ?? 45,
-            'data_inicio' => $data['data_inicio'] ?? date('Y-m-d'),
-            'data_fim' => $data['data_fim'] ?? date('Y-m-d', strtotime('+7 days'))
-        ])->fetchAll('assoc');
-        debug(json_encode(['success' => true, 'horarios' => $horarios]));
-        die;
-        echo json_encode(['success' => true, 'horarios' => $horarios]);
-    
-    } catch (\Throwable $e) {
-        echo json_encode(['error' => $e->getMessage()]);
-    }
-    exit; // força fim do script para não gerar HTML extra
-    
-
 }
-
-
-}   

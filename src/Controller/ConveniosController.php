@@ -193,11 +193,10 @@ class ConveniosController extends AppController
             ->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])
             ->all();
 
-        $periodos = $this->Convenios->Periodos->find('list')->all();
-        $estabelecimentos = $this->Convenios->Estabelecimentos->find('list')->all();
+       
 
         $title = 'Editar Convênio';
-        $this->set(compact('convenio', 'profissionais', 'estabelecimentos', 'servicos', 'periodos', 'title'));
+        $this->set(compact('convenio', 'profissionais',  'servicos', 'title'));
     }
 
 

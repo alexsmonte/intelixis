@@ -80,27 +80,6 @@ use Cake\Core\Configure;
 
 <body class="link-sidebar">
 
-<!-- Modal Excluir -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-sm">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 id="deleteModalLabel" class="modal-title text-danger"></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-      </div>
-      <div class="modal-body text-start">
-        <p id="deleteModalMessage"></p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-danger btn-sm" id="confirmDeleteBtn">Excluir</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
 <!-- Preloader -->
 <div class="preloader">
     <img src="img/logos/favicon.png" alt="carregando" class="lds-ripple img-fluid" />

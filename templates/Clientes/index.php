@@ -2,6 +2,31 @@
 $this->BreadcrumbsPlus->add([['title' => 'Clientes']]);
 ?>
 <?= $this->element('barra-titulo',['title' => $title]); ?>
+<meta name="csrfToken" content="<?= $this->request->getAttribute('csrfToken') ?>">
+
+
+<button id="btnAbrirModal" class="btn btn-primary">+ Cadastrar</button>
+
+<div data-vue="generic-modal"
+     data-title="Cadastrar Cliente"
+     data-submit-url="<?= $this->Url->build(['controller' => 'Clientes', 'action' => 'novo']) ?>"
+     data-trigger-btn="#btnAbrirModal"
+     data-modal-size="modal-xl"
+     data-fields='[
+        {"name":"nome","label":"Nome Completo","type":"text","id":"nome","col":6,"placeholder":"Digite o nome"},
+        {"name":"data_nascimento","label":"Nascimento","type":"date","id":"data_nascimento","col":3},
+        {"name":"documento","label":"CPF","type":"text","id":"documento","col":3},
+        {"name":"email","label":"Email","type":"email","id":"email","col":6},
+        {"name":"telefone","label":"Telefone","type":"text","id":"telefone","col":3},
+        {"name":"celular","label":"Celular","type":"text","id":"celular","col":3},
+        {"name":"cep","label":"CEP","vueComponent":"cep-autocomplete","id":"cep","col":3},
+        {"name":"logradouro","label":"Logradouro","type":"text","id":"logradouro","col":7,"autocompleteField":true},
+        {"name":"numero","label":"Número","type":"text","id":"numero", "col":2},
+         {"name":"bairro","label":"Bairro","type":"text","id":"bairro","col":5,"autocompleteField":true},
+        {"name":"cidade","label":"Cidade","type":"text","id":"cidade","col":5,"autocompleteField":true},
+        {"name":"uf","label":"UF","type":"text","id":"uf","col":2,"autocompleteField":true}
+     ]'>
+</div>
 
 <!-- Modal Visualizar Cliente -->
 <div class="modal fade" id="view-modal" tabindex="-1" aria-hidden="true">
@@ -141,6 +166,9 @@ $this->BreadcrumbsPlus->add([['title' => 'Clientes']]);
 
 <!-- vue -->
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<?= $this->Html->script('vue/generic-modal.js') ?>
+<?= $this->Html->script('vue/form-cadastrar.js') ?>
+<?= $this->Html->script('vue/cep-autocomplete.js') ?>
 <script>
 const clientesInit = <?= json_encode($clientes->toArray()) ?>;
 

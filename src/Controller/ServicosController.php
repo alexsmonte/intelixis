@@ -231,11 +231,10 @@ class ServicosController extends AppController
             ->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])
             ->all();
 
-        $periodos = $this->Servicos->Periodos->find('list', ['limit' => 200])->all();
-        $estabelecimentos = $this->Servicos->Estabelecimentos->find('list', ['limit' => 200])->all();
+        
 
         $title = 'Editar Serviço';
-        $this->set(compact('servico', 'convenios', 'estabelecimentos', 'profissionais', 'periodos', 'title'));
+        $this->set(compact('servico', 'convenios', 'profissionais', 'title'));
     }
 
     /**
