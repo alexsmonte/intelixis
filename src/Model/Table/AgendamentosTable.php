@@ -59,11 +59,9 @@ class AgendamentosTable extends Table
         ]);
         $this->belongsTo('Clientes', [
             'foreignKey' => 'cliente_id',
-            'joinType' => 'INNER',
         ]);
         $this->belongsTo('Servicos', [
             'foreignKey' => 'servico_id',
-            'joinType' => 'INNER',
         ]);
         $this->belongsTo('Status', [
             'foreignKey' => 'statu_id',
@@ -80,6 +78,53 @@ class AgendamentosTable extends Table
         ]);
     }
 
+    public function validationAgendar(Validator $validator): Validator
+    {
+        $validator
+            ->notEmptyString('estabelecimento_id');
+
+        $validator
+            ->notEmptyString('titulo','Informe um cliente');
+
+        $validator
+            ->allowEmptyString('cliente_id');
+
+        $validator
+            ->notEmptyString('servico_id');
+
+        $validator
+            ->notEmptyString('statu_id');
+
+        $validator
+            ->allowEmptyString('profissional_id');
+
+        $validator
+            ->allowEmptyString('local_id');
+
+        $validator
+            ->integer('convenio_id')
+            ->allowEmptyString('convenio_id');
+
+        $validator
+            ->date('data_inicio',['ymd'],'Informe uma data válida')
+            ->requirePresence('data_inicio')
+            ->notEmptyDateTime('data_inicio','Informe uma data válida');
+
+        $validator
+            ->requirePresence('hora_inicio')
+            ->notEmptyString('hora_inicio', 'Informe a hora')
+            ->add('hora_inicio', 'formato', [
+                'rule' => ['custom', '/^(?:[01]\d|2[0-3]):[0-5]\d$/'],
+                'message' => 'Hora inválida',
+            ]);
+
+        $validator
+            ->scalar('descricao')
+            ->allowEmptyString('descricao');
+
+        return $validator;
+
+    }
     /**
      * Default validation rules.
      *
@@ -111,12 +156,12 @@ class AgendamentosTable extends Table
             ->allowEmptyString('convenio_id');
 
         $validator
-            ->dateTime('data_hora_inicio')
+            ->dateTime('data_hora_inicio',['dmy'],'Informe uma data válida')
             ->requirePresence('data_hora_inicio', 'create')
             ->notEmptyDateTime('data_hora_inicio');
 
         $validator
-            ->dateTime('data_hora_fim')
+            ->dateTime('data_hora_fim',['dmy'],'Informe uma data válida')
             ->requirePresence('data_hora_fim', 'create')
             ->notEmptyDateTime('data_hora_fim');
 
