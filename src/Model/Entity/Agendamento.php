@@ -48,6 +48,7 @@ class Agendamento extends Entity
         'statu_id' => true,
         'profissional_id' => true,
         'local_id' => true,
+        'titulo' => true,
         'convenio_id' => true,
         'data_hora_inicio' => true,
         'data_hora_fim' => true,
