@@ -178,5 +178,49 @@ class ClientesController extends AppController
     }
 
 
+    public function localizar()
+    {
+        $this->request->allowMethod(['get']);
+
+        $termo = $this->request->getQuery('termo');
+
+        $query = $this->Clientes->find();
+
+        if (!empty($termo)) {
+            $query->where([
+                'Clientes.estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id'),
+                'OR' => [
+                    "Clientes.nome LIKE" => "%$termo%",
+                    "Clientes.documento LIKE " => "%$termo%",
+                    "Clientes.email LIKE " => "%$termo%",
+                    "Clientes.telefone LIKE" => "%$termo%",
+                    "Clientes.celular LIKE" => "%$termo%",
+                ]
+            ]);
+        }
+
+        $clientes = $query->orderBy('Clientes.nome ASC')->limit(5)->all()->toArray(); // toArray() obrigatório
+
+        $paciente     =   [];
+        foreach ($clientes as $dadosPaciente){
+
+            $aniversario = false;
+            /***
+            if(!empty($dadosPaciente->data_nascimento)){
+                $time = new Time($dadosPaciente->data_nascimento);
+                $time->year =   date("Y");
+                $aniversario    =   $time->isToday();
+            }
+             ***/
+            $paciente[] = ['id' => $dadosPaciente->id, 'label' => trim($dadosPaciente->nome),  'aniversario' => $aniversario];
+        }
+
+
+        $this->autoRender = false;
+        $this->response = $this->response
+            ->withType('application/json')
+            ->withStringBody(json_encode($paciente));
+
+    }
 
 }
