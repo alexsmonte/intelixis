@@ -56,6 +56,7 @@ class Profissional extends Entity
         'cidade' => true,
         'uf' => true,
         'ativar' => true,
+        'cor' => true,
         'habilitar_programacao' => true,
         'data_nascimento' => true,
         'conselho' => true,
