@@ -137,10 +137,10 @@ class AgendamentosTable extends Table
             ->notEmptyString('estabelecimento_id');
 
         $validator
-            ->notEmptyString('cliente_id');
+            ->allowEmptyString('cliente_id');
 
         $validator
-            ->notEmptyString('servico_id');
+            ->allowEmptyString('servico_id');
 
         $validator
             ->notEmptyString('statu_id');
