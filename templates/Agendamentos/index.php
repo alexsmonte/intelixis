@@ -653,13 +653,17 @@ $segundos = ($estabelecimento->intervalo_atendimento ?? 30) * 60;
     }
 
     .fc-time-grid-event.fc-short .fc-title{
-        font-size: 13px;
+        font-size: 12px;
     }
     .fc-time-grid-event .fc-time{
-        font-size: 13px;
+        font-size: 12px;
     }
-    .fc-event{
-        font-size: 13px;
+    .fc .fc-event{
+        font-size: 12px;
+        border-left: 5px solid;
+        border-top: none;
+        border-right: none;
+        border-bottom: none;
     }
 
     .fc .fc-event{
