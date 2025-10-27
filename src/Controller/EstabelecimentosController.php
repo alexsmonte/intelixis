@@ -21,6 +21,9 @@ class EstabelecimentosController extends AppController
             ->contain(['Contas', 'Assinaturas']);
         $estabelecimentos = $this->paginate($query);
 
+
+        
+
         $this->set(compact('estabelecimentos'));
     }
 
@@ -136,6 +139,8 @@ class EstabelecimentosController extends AppController
 
         if ($this->request->is(['patch', 'post', 'put'])) {
             $dadosEstabelecimento   =   $this->request->getData();
+
+
             $dadosEstabelecimento["assinatura_id"]  =   $this->request->getSession()->read('Auth.Assinatura.id');
             $dadosEstabelecimento["conta_id"]       =   $this->request->getAttribute('identity')->conta_id;
 
