@@ -8,6 +8,8 @@ use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 use Cake\Event\Event;
+use Cake\Event\EventInterface;
+use Cake\Datasource\EntityInterface;
 /**
  * Profissionais Model
  *
@@ -230,5 +232,102 @@ class ProfissionaisTable extends Table
         if(isset($data['celular']))
             $data['celular']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['celular']));
 
+    }
+
+
+    public function beforeSave(EventInterface $event, EntityInterface $entity, \ArrayObject $options)
+    {
+        if ($entity->isNew() && empty($entity->cor)) {
+            $entity->cor = $this->gerarCorUnica($entity->estabelecimento_id);
+        }
+    }
+
+    private function gerarCorUnica(int $estabelecimentoId): string
+    {
+        $tabela = $this;
+
+        // Cores proibidas — não usar nem próximas delas
+        $coresProibidas = [
+            '#ADB5BD', '#FAED96', '#A5D4ED', '#A4E082',
+            '#FF0000', '#FF7F7F', '#0000FF', '#A020F0'
+        ];
+
+        // 🎨 Paleta fixa e bonita (cores fortes e equilibradas)
+        $paleta = [
+            '#1ABC9C', '#16A085', '#2ECC71', '#27AE60', '#3498DB', '#2980B9',
+            '#9B59B6', '#8E44AD', '#34495E', '#2C3E50', '#F39C12', '#E67E22',
+            '#D35400', '#E74C3C', '#C0392B', '#7F8C8D', '#95A5A6'
+        ];
+
+        // Tenta primeiro pegar uma cor livre da paleta
+        $coresUsadas = $tabela->find()
+            ->select('cor')
+            ->where(['estabelecimento_id' => $estabelecimentoId])
+            ->enableHydration(false)
+            ->toArray();
+
+        $usadas = array_map('strtoupper', array_column($coresUsadas, 'cor'));
+
+        $disponiveis = array_diff($paleta, $usadas);
+
+        if (!empty($disponiveis)) {
+            $cor = array_rand(array_flip($disponiveis));
+            return strtoupper($cor);
+        }
+
+        // Se esgotar a paleta, gera aleatória visível e única
+        do {
+            $cor = $this->gerarCorVisivel();
+
+            // Verifica se já existe dentro do mesmo estabelecimento
+            $existe = $tabela->exists([
+                'cor' => $cor,
+                'estabelecimento_id' => $estabelecimentoId
+            ]);
+
+            // Calcula distância de cor com as proibidas (evita tons próximos)
+            $proximaDeProibida = false;
+            foreach ($coresProibidas as $bloqueada) {
+                if ($this->coresSaoParecidas($cor, $bloqueada, 80)) {
+                    $proximaDeProibida = true;
+                    break;
+                }
+            }
+
+        } while ($existe || $proximaDeProibida);
+
+        return strtoupper($cor);
+    }
+
+    private function gerarCorVisivel(): string
+    {
+        // Gera uma cor aleatória saturada e contrastante
+        do {
+            $r = mt_rand(0, 200);
+            $g = mt_rand(0, 200);
+            $b = mt_rand(0, 200);
+            $lum = $this->calcularLuminosidade($r, $g, $b);
+        } while ($lum > 180 || $lum < 50); // evita muito clara ou muito escura
+
+        return sprintf("#%02X%02X%02X", $r, $g, $b);
+    }
+
+    private function calcularLuminosidade(int $r, int $g, int $b): float
+    {
+        return 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
+    }
+
+    private function coresSaoParecidas(string $cor1, string $cor2, int $limite = 60): bool
+    {
+        [$r1, $g1, $b1] = sscanf($cor1, "#%02x%02x%02x");
+        [$r2, $g2, $b2] = sscanf($cor2, "#%02x%02x%02x");
+
+        $distancia = sqrt(
+            pow($r1 - $r2, 2) +
+            pow($g1 - $g2, 2) +
+            pow($b1 - $b2, 2)
+        );
+
+        return $distancia < $limite;
     }
 }
