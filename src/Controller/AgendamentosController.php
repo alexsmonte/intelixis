@@ -119,6 +119,8 @@ class AgendamentosController extends AppController
 
         $agenda  =   [];
 
+
+
         foreach ($agendamentos as $chave => $agendamento) {
 
             $agenda[$chave]["id"]           = $agendamento->id;
@@ -144,6 +146,10 @@ class AgendamentosController extends AppController
                 $agenda[$chave]["statu_id"]     =   $agendamento->status->id;
                 $agenda[$chave]["color"]        =   $agendamento->status->cor;
                 $agenda[$chave]["status_nome"]        =   $agendamento->status->nome;
+            }
+
+            if(!empty($agendamento->profissional_id)){
+                $agenda[$chave]["borderColor"]  =   $agendamento->profissional->cor;
             }
 
             if (!empty($agendamento->data_hora_fim))
