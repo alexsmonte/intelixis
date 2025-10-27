@@ -1,12 +1,15 @@
 <?php
 use Cake\I18n\Number;
 use Cake\Collection\Collection;
+
 $collection = new Collection($estabelecimento->periodos);
 $agrupados = $collection->groupBy('cadeia_id')->toArray();
+
 $semanal = $agrupados['1'] ?? [];
 $disponiveis = $agrupados['2'] ?? [];
 $indisponiveis = $agrupados['3'] ?? [];
 $this->BreadcrumbsPlus->add([['title' => 'Estabelecimento']]);
+
 ?>
 <?= $this->element('barra-titulo',['title' => $title]); ?>
 <?= $this->Form->create($estabelecimento) ?>
