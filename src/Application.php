@@ -35,6 +35,7 @@ use Authentication\Middleware\AuthenticationMiddleware;
 use Authorization\Middleware\AuthorizationMiddleware;
 use Cake\Routing\Router;
 use Psr\Http\Message\ServerRequestInterface;
+use Cake\Http\ServerRequest;
 
 /**
  * Application setup class.
@@ -57,6 +58,7 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
         parent::bootstrap();
 
 
+        Router::fullBaseUrl('https://' . env('HTTP_HOST'));
 
         if (PHP_SAPI !== 'cli') {
             // The bake plugin requires fallback table classes to work properly
@@ -72,6 +74,15 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
      */
     public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
     {
+        ServerRequest::addDetector('ssl', function ($request) {
+            $scheme = $request->getUri()->getScheme();
+            if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+                $scheme = $_SERVER['HTTP_X_FORWARDED_PROTO'];
+            }
+            return $scheme === 'https';
+        });
+
+
         $middlewareQueue
             // Catch any exceptions in the lower layers,
             // and make an error page/response
@@ -102,7 +113,17 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             ->add(new RoutingMiddleware($this))
             ->add(new BodyParserMiddleware())
 //        // Add the AuthenticationMiddleware. It should be after routing and body parser.
-            ->add(new AuthenticationMiddleware($this));
+            ->add(new AuthenticationMiddleware($this))
+            ->add(function ($request, $handler) {
+                if (!$request->is('ssl')) {
+                    $url = 'https://' . $request->getUri()->getHost() . $request->getUri()->getPath();
+                    if ($request->getUri()->getQuery()) {
+                        $url .= '?' . $request->getUri()->getQuery();
+                    }
+                    return new \Cake\Http\Response(['location' => $url, 'status' => 301]);
+                }
+                return $handler->handle($request);
+            });
 
         return $middlewareQueue;
     }
