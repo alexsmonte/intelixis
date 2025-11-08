@@ -1232,7 +1232,11 @@
                             <a class="nav-link position-relative ms-6" href="javascript:void(0)" id="drop1" aria-expanded="false">
                                 <div class="d-flex align-items-center flex-shrink-0">
                                     <div class="user-profile me-sm-3 me-2">
-                                        <?= $this->Html->image('profile/usuario-padrao.png',['width'=>'40', 'class'=>'rounded-circle']); ?>
+                                        <?php if (empty($this->getRequest()->getSession()->read('Auth.foto'))) { ?>
+                                            <?= $this->Html->image('profile/usuario-padrao.png',['width'=>'40', 'class'=>'rounded-circle']); ?>
+                                        <?php } else { ?>
+                                            <?= $this->Html->image($this->getRequest()->getSession()->read('Auth.foto'),['width'=>'40', 'class'=>'rounded-circle']); ?>
+                                        <?php } ?>
                                     </div>
                                     <span class="d-sm-none d-block"><iconify-icon icon="solar:alt-arrow-down-line-duotone"></iconify-icon></span>
 
@@ -1253,7 +1257,11 @@
                                     </div>
 
                                     <div class="d-flex align-items-center mx-7 py-9 border-bottom">
+                                        <?php if (empty($this->getRequest()->getSession()->read('Auth.foto'))) { ?>
                                         <?= $this->Html->image('profile/usuario-padrao.png',['width'=>'90', 'class'=>'rounded-circle']); ?>
+                                        <?php } else { ?>
+                                        <?= $this->Html->image($this->getRequest()->getSession()->read('Auth.foto'),['width'=>'90', 'class'=>'rounded-circle']); ?>
+                                        <?php } ?>
                                         <div class="ms-4">
                                             <h4 class="mb-0 fs-5 fw-normal"><?= $this->request->getAttribute('identity')->nome; ?></h4>
                                             <span class="text-muted">super admin</span>
