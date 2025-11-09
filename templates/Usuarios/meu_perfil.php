@@ -21,13 +21,41 @@ $usuario->password  =   '';
                         <div class="card-body p-4">
                             <h4 class="card-title">Minha foto</h4>
                             <p class="card-subtitle mb-4">Altere sua foto de perfil aqui</p>
+
                             <div class="text-center">
-                                <?= $this->Html->image('profile/usuario-padrao.png', ['fullBase'=>true,'alt'=>'Escolha uma foto', 'class' => 'img-fluid', 'width'=>'120'])?>
+                                <?php if (empty($usuario->foto)) { ?>
+                                    <?= $this->Html->image(
+                                        'profile/usuario-padrao.png',
+                                        ['fullBase' => true, 'alt' => 'Escolha uma foto', 'class' => 'img-fluid', 'width' => '120']
+                                    ) ?>
+                                <?php } else { ?>
+                                    <?= $this->Html->image(
+                                        '/img/' . $usuario->foto,
+                                        ['fullBase' => true, 'alt' => $usuario->nome, 'class' => 'rounded-circle', 'width' => '120']
+                                    ) ?>
+                                <?php } ?>
+
                                 <div class="d-flex align-items-center justify-content-center my-4 gap-6">
-                                    <a title="Escolher foto" alt="Escolher foto" class="btn btn-primary file-wrapper" tabindex="-1" href="#download"><i class="fa fa-upload"></i> Escolher foto<?= $this->Form->control('foto', ['label' => false,'templates' => ['inputContainer' => '{{content}}'],'type' => 'file', 'required'=>false]);?></a>
-                                    <button class="btn bg-danger-subtle text-danger">Remover</button>
+                                    <a title="Escolher foto" alt="Escolher foto" class="btn btn-primary file-wrapper" tabindex="-1" href="#upload">
+                                        <i class="fa fa-upload"></i> Escolher foto
+                                        <?= $this->Form->control('foto', [
+                                            'label' => false,
+                                            'templates' => ['inputContainer' => '{{content}}'],
+                                            'type' => 'file',
+                                            'required' => false
+                                        ]) ?>
+                                    </a>
+
+                                    <!-- Botão remover -->
+                                    <button type="button" id="btn-remover-foto" class="btn bg-danger-subtle text-danger">
+                                        <i class="fa fa-trash"></i>&nbsp;Remover
+                                    </button>
                                 </div>
-                                <p class="mb-0">Allowed JPG ou PNG. Max size of 800K</p>
+
+                                <!-- Campo oculto para sinalizar remoção -->
+                                <?= $this->Form->hidden('remover_foto', ['value' => 0, 'id' => 'remover-foto-input']) ?>
+
+                                <p class="mb-0">Somente fotos em JPG ou PNG. Máximo de 800Kb</p>
                             </div>
                         </div>
                     </div>
@@ -77,3 +105,16 @@ $usuario->password  =   '';
     .file-wrapper { cursor: pointer; display: inline-block; overflow: hidden; position: relative; }
     .file-wrapper input { cursor: pointer; font-size: 100px; height: 100%; filter: alpha(opacity=1); -moz-opacity: 0.01; opacity: 0.01; position: absolute; right: 0; top: 0; } .file-wrapper .button { background: #79130e; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; color: #fff; cursor: pointer; display: inline-block; font-size: 11px; font-weight: bold; margin-right: 5px; padding: 4px 18px; text-transform: uppercase; }
 </style>
+
+<script>
+    document.getElementById('btn-remover-foto').addEventListener('click', function() {
+        if (confirm('Tem certeza que deseja remover sua foto de perfil?')) {
+            document.getElementById('remover-foto-input').value = 1;
+            // Limpa a seleção do input file, se houver
+            const fileInput = document.querySelector('input[type=file][name=foto]');
+            if (fileInput) fileInput.value = '';
+            // Submete o formulário automaticamente
+            this.closest('form').submit();
+        }
+    });
+</script>
