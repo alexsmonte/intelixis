@@ -25,27 +25,73 @@ class UsuariosController extends AppController
 
     public function meuPerfil()
     {
-        $usuario = $this->Usuarios->get($this->request->getAttribute('identity')->id,['conditions' => ['Usuarios.conta_id' => $this->request->getAttribute('identity')->conta_id]]);
+        $usuario = $this->Usuarios->get(
+            $this->request->getAttribute('identity')->id,
+            ['conditions' => [
+                'Usuarios.conta_id' => $this->request->getAttribute('identity')->conta_id
+            ]]
+        );
 
         if ($this->request->is(['patch', 'post', 'put'])) {
 
-            $dadosUsuarios              =   $this->request->getData();
+            $dadosUsuarios = $this->request->getData();
+            $dadosUsuarios["conta_id"] = $this->request->getAttribute('identity')->conta_id;
 
-            $dadosUsuarios["conta_id"]  =   $this->request->getAttribute('identity')->conta_id;
+            // ⚙️ Se o usuário marcou "remover foto"
+            if (!empty($dadosUsuarios['remover_foto'])) {
+                if (!empty($usuario->foto)) {
+                    $oldFilePath = WWW_ROOT . 'img' . DS . $usuario->foto;
+                    if (file_exists($oldFilePath)) {
+                        @unlink($oldFilePath);
+                    }
+                }
+                // Define como null no banco
+                $dadosUsuarios['foto'] = null;
+            } else {
+                // Caso contrário, trata upload normalmente
+                $uploadedFile = $dadosUsuarios['foto'] ?? null;
 
-            $usuarioEntity = $this->Usuarios->patchEntity($usuario, $dadosUsuarios, ['validate' => 'editarUsuario']);
+                if ($uploadedFile && $uploadedFile->getError() === UPLOAD_ERR_OK) {
+                    $filename = time() . '_' . preg_replace('/\s+/', '_', $uploadedFile->getClientFilename());
+                    $uploadPath = WWW_ROOT . 'img' . DS . 'profile' . DS;
+
+                    if (!is_dir($uploadPath)) {
+                        if (!mkdir($uploadPath, 0775, true) && !is_dir($uploadPath))
+                            throw new \RuntimeException(sprintf('Não foi possível criar o diretório: %s', $uploadPath));
+                    }
+
+                    // Remove a foto antiga
+                    if (!empty($usuario->foto)) {
+                        $oldFilePath = $uploadPath . $usuario->foto;
+                        if (file_exists($oldFilePath))
+                            @unlink($oldFilePath);
+                    }
+
+                    $uploadedFile->moveTo($uploadPath . $filename);
+                    $dadosUsuarios['foto'] = 'profile/' . $filename;
+                } else {
+                    // Não marcou remover e não enviou nova foto → mantém antiga
+                    unset($dadosUsuarios['foto']);
+                }
+            }
+
+            $usuarioEntity = $this->Usuarios->patchEntity($usuario, $dadosUsuarios, [
+                'validate' => 'editarUsuario'
+            ]);
 
             if ($this->Usuarios->save($usuarioEntity)) {
                 $this->Flash->success(__('Dados do usuário salvo com sucesso.'));
-
                 return $this->redirect(['action' => 'meuPerfil']);
             }
+
             $this->Flash->error(__('Ocorreu um erro na tentativa de atualizar os dados do usuário. Por favor, tente novamente.'));
         }
 
-        $title  =   'Meu perfil';
-        $this->set(compact('title','usuario'));
+        $title = 'Meu perfil';
+        $this->set(compact('title', 'usuario'));
     }
+
+
 
     /**
      * Index method
@@ -213,6 +259,8 @@ class UsuariosController extends AppController
                 $this->getRequest()->getSession()->write('Auth.Estabelecimento.id',$estabelecimentos[0]->id);
                 $this->getRequest()->getSession()->write('Auth.Estabelecimento.nome_fantasia',$estabelecimentos[0]->nome_fantasia);
                 $this->getRequest()->getSession()->write('Auth.Assinatura.id',$estabelecimentos[0]->assinatura_id);
+
+
 
             } elseif (count($estabelecimentos) > 1){
                 // Redireciona para escolher o estabelecimento
