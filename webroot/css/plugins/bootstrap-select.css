@@ -1,0 +1,89 @@
+/* bootstrap-select-bs5.css */
+/* Estilo adaptado para o Bootstrap 5, sem jQuery */
+
+.bootstrap-select {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.bootstrap-select .btn {
+    width: 100%;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bootstrap-select .btn .btn-text {
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.bootstrap-select .dropdown-menu {
+    width: 100%;
+    max-height: 250px;
+    overflow-y: auto;
+    border-radius: 0.5rem;
+}
+
+.bootstrap-select .dropdown-item.active,
+.bootstrap-select .dropdown-item:active {
+    background-color: var(--bs-primary);
+    color: #fff;
+}
+
+.bootstrap-select .dropdown-header {
+    font-size: 0.875rem;
+    color: var(--bs-secondary-color);
+    opacity: 0.8;
+}
+
+.bootstrap-select .form-control {
+    width: 100%;
+}
+
+.bootstrap-select .checkmark svg {
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.bootstrap-select .text-muted {
+    text-align: center;
+}
+
+.bootstrap-select.show .dropdown-toggle::after {
+    transform: rotate(180deg);
+    transition: transform 0.2s;
+}
+
+.bootstrap-select .dropdown-toggle::after {
+    transition: transform 0.2s;
+}
+
+.bootstrap-select .dropdown-item.hidden {
+    display: none !important;
+}
+/* Corrige alinhamento do texto no botão do select */
+.bootstrap-select .form-select.dropdown-toggle {
+    display: flex !important;
+    justify-content: flex-start !important; /* texto à esquerda */
+    align-items: center;
+    text-align: left !important;
+    padding-right: 2rem; /* espaço para a seta */
+    position: relative;
+}
+
+/* Garante que o texto use todo o espaço disponível */
+.bootstrap-select .btn-text {
+    flex-grow: 1;
+    text-align: left;
+}
+
+/* Reposiciona a seta padrão do Bootstrap 5 */
+.bootstrap-select .form-select.dropdown-toggle::after {
+
+    content: normal;
+}
