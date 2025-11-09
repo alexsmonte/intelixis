@@ -72,23 +72,23 @@ class AgendamentosController extends AppController
 
 // Filtros opcionais
         if (!empty($dataFullCalendar['status'])) {
-            $conditions['Agendamentos.status_id'] = $dataFullCalendar['status'];
+            $conditions['Agendamentos.status_id IN '] = explode(',', $dataFullCalendar['status']);
         }
 
         if (!empty($dataFullCalendar['profissional'])) {
-            $conditions['Agendamentos.profissional_id'] = $dataFullCalendar['profissional'];
+            $conditions['Agendamentos.profissional_id IN '] = explode(',', $dataFullCalendar['profissional']);
         }
 
         if (!empty($dataFullCalendar['local'])) {
-            $conditions['Agendamentos.local_id'] = $dataFullCalendar['local'];
+            $conditions['Agendamentos.local_id IN ']  = explode(',', $dataFullCalendar['local']);
         }
 
         if (!empty($dataFullCalendar['convenio'])) {
-            $conditions['Agendamentos.convenio_id'] = $dataFullCalendar['convenio'];
+            $conditions['Agendamentos.convenio_id IN '] = explode(',', $dataFullCalendar['convenio']);
         }
 
         if (!empty($dataFullCalendar['servico'])) {
-            $conditions['Agendamentos.servico_id'] = $dataFullCalendar['servico'];
+            $conditions['Agendamentos.servico_id IN '] = explode(',', $dataFullCalendar['servico']);
         }
 
 
