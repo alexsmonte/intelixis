@@ -248,15 +248,12 @@ class ProfissionaisTable extends Table
 
         // Cores proibidas — não usar nem próximas delas
         $coresProibidas = [
-            '#ADB5BD', '#FAED96', '#A5D4ED', '#A4E082',
-            '#FF0000', '#FF7F7F', '#0000FF', '#A020F0'
+            '#ADB5BD', '#FAED96', '#A5D4ED', '#A4E082','#FF0000', '#FF7F7F', '#0000FF', '#A020F0'
         ];
 
-        // 🎨 Paleta fixa e bonita (cores fortes e equilibradas)
+        // Paleta fixa e bonita (cores fortes e equilibradas)
         $paleta = [
-            '#1ABC9C', '#16A085', '#2ECC71', '#27AE60', '#3498DB', '#2980B9',
-            '#9B59B6', '#8E44AD', '#34495E', '#2C3E50', '#F39C12', '#E67E22',
-            '#D35400', '#E74C3C', '#C0392B', '#7F8C8D', '#95A5A6'
+            '#018a6f', '#022a52','#75910f', '#2980B9','#F39C12', '#C0392B','#633262','#154f4f','#224f15','#636209','#7a180b'
         ];
 
         // Tenta primeiro pegar uma cor livre da paleta
