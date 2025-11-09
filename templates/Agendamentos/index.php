@@ -49,16 +49,16 @@ $segundos = ($estabelecimento->intervalo_atendimento ?? 30) * 60;
                         <?= $this->Form->control('buscar_titulo', ['label' => 'Buscar por nome do cliente, cpf, telefone', 'class' =>'form-control']);?>
                     </div>
                     <div class="col-md-12 mb-1">
-                        <?= $this->Form->control('buscar_profissional', ['label' => 'Buscar por profissional', 'class' =>'form-select', 'options' =>$profissionais, 'empty'=>true]);?>
+                        <?= $this->Form->control('buscar_profissional', ['label' => 'Buscar por profissional', 'class' =>'selectpicker', 'multiple','data-live-search'=>true,'data-none-selected-text'=>'Meus profissionais','options' =>$profissionais, 'empty'=>true]);?>
                     </div>
                     <div class="col-md-12 mb-1">
-                        <?= $this->Form->control('buscar_servicos', ['label' => 'Buscar por serviços', 'class' =>'form-select', 'options' =>$servicos, 'empty'=>true]);?>
+                        <?= $this->Form->control('buscar_servicos', ['label' => 'Buscar por serviços', 'class' =>'selectpicker', 'multiple','data-live-search'=>true,'data-none-selected-text'=>'Meus serviços', 'options' =>$servicos, 'empty'=>true]);?>
                     </div>
                     <div class="col-md-12 mb-1">
-                        <?= $this->Form->control('buscar_convenios', ['label' => 'Buscar por convénios', 'class' =>'form-select', 'options' =>$convenios, 'empty'=>true]);?>
+                        <?= $this->Form->control('buscar_convenios', ['label' => 'Buscar por convénios', 'class' =>'selectpicker', 'multiple','data-live-search'=>true,'data-none-selected-text'=>'Meus convénios', 'options' =>$convenios, 'empty'=>true]);?>
                     </div>
                     <div class="col-md-12 mb-1">
-                        <?= $this->Form->control('buscar_local', ['label' => 'Buscar por local', 'class' =>'form-select', 'options' =>$locais, 'empty'=>true]);?>
+                        <?= $this->Form->control('buscar_local', ['label' => 'Buscar por local', 'class' =>'selectpicker', 'multiple','data-live-search'=>true,'data-none-selected-text'=>'Meus locais', 'options' =>$locais, 'empty'=>true]);?>
                     </div>
                 </div>
 
@@ -117,7 +117,7 @@ $segundos = ($estabelecimento->intervalo_atendimento ?? 30) * 60;
                         </div>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <?= $this->Form->control('profissional_id', ['label' => 'Profissional','class' => 'form-select form-control-lg','options' => $profissionais, 'empty' => true]); ?>
+                        <?= $this->Form->control('profissional_id', ['label' => 'Profissional','data-live-search'=>'1','data-none-selected-text' => 'Meus profissionais','class' => 'form-select form-control-lg','options' => $profissionais, 'empty' => true]); ?>
                     </div>
                     <div class="col-md-4">
                         <?= $this->Form->control('servico_id', ['label' => 'Serviço','class' => 'form-select','options' => $servicos]); ?>
@@ -182,9 +182,11 @@ $segundos = ($estabelecimento->intervalo_atendimento ?? 30) * 60;
 <?= $this->Html->script(['https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js',
     'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js',
     'https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.19/locales-all.global.min.js',
-    'https://code.jquery.com/ui/1.14.1/jquery-ui.min.js','jquery.form.min.js','ui.datepicker-pt-BR.js']); ?>
+    'https://code.jquery.com/ui/1.14.1/jquery-ui.min.js','jquery.form.min.js','ui.datepicker-pt-BR.js',
+    'plugins/bootstrap-select.js'
+]); ?>
 
-<?= $this->Html->css(['https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.14.1/themes/base/jquery-ui.min.css']);?>
+<?= $this->Html->css(['https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.14.1/themes/base/jquery-ui.min.css', 'plugins/bootstrap-select.css']);?>
 
 <script>
 
@@ -455,12 +457,12 @@ $segundos = ($estabelecimento->intervalo_atendimento ?? 30) * 60;
 
         function limpar()
         {
-            $('#buscar-titulo').val('');
-            $('#buscar-profissional').val('');
-            $('#buscar-servicos').val('');
-            $('#buscar-convenios').val('');
-            $('#buscar-local').val('');
-
+            selectBuscarProfissional._bsSelect.clear();
+            selectBuscarProfissional._bsSelect.clear();
+            selectBuscarServicos._bsSelect.clear();
+            selectBuscarConvenios._bsSelect.clear();
+            selectBuscarLocais._bsSelect.clear();
+            buscarTitulo.value = '';
         }
 
         /*=====================
@@ -549,6 +551,16 @@ $segundos = ($estabelecimento->intervalo_atendimento ?? 30) * 60;
             const monthEl = document.getElementById("calendar-month");
             if (monthEl) monthEl.textContent = mes;
         })();
+
+        const selectBuscarProfissional = document.querySelector('#buscar-profissional');
+        const selectBuscarServicos  = document.querySelector('#buscar-servicos');
+        const selectBuscarConvenios = document.querySelector('#buscar-convenios');
+        const selectBuscarLocais    = document.querySelector('#buscar-local');
+
+
+
+        const buscarTitulo = document.querySelector('#buscar-titulo');
+
     });
 
 
