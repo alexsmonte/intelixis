@@ -434,6 +434,7 @@ $segundos = ($estabelecimento->intervalo_atendimento ?? 30) * 60;
 
         $('#buscar').click(function(){
             calendar.refetchEvents();
+            mdlBusca.hide();
         });
 
         $('#limpar').click(function(){
