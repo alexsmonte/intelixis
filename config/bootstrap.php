@@ -249,4 +249,39 @@ ServerRequest::addDetector('tablet', function ($request) {
             ->setLocaleFormat('dd/MM/yyyy HH:mm:ss');
     TypeFactory::build('decimal')->useLocaleParser();
     TypeFactory::build('float')->useLocaleParser();
+
+
+$timezones = [
+    'AC' => 'America/Rio_branco',      // UTC-5
+    'RO' => 'America/Porto_Velho',     // UTC-4
+    'RR' => 'America/Boa_Vista',       // UTC-4
+    'AM' => 'America/Manaus',          // UTC-4
+    'MT' => 'America/Cuiaba',          // UTC-4
+    'MS' => 'America/Campo_Grande',    // UTC-4
+    'DF' => 'America/Sao_Paulo',       // UTC-3
+    'GO' => 'America/Sao_Paulo',       // UTC-3
+    'TO' => 'America/Sao_Paulo',       // UTC-3
+    'BA' => 'America/Bahia',           // UTC-3
+    'SE' => 'America/Bahia',           // UTC-3
+    'AL' => 'America/Maceio',          // UTC-3
+    'PE' => 'America/Recife',          // UTC-3
+    'PB' => 'America/Fortaleza',       // UTC-3
+    'RN' => 'America/Fortaleza',       // UTC-3
+    'CE' => 'America/Fortaleza',       // UTC-3
+    'PI' => 'America/Fortaleza',       // UTC-3
+    'MA' => 'America/Fortaleza',       // UTC-3
+    'PA' => 'America/Belem',           // UTC-3
+    'AP' => 'America/Belem',           // UTC-3
+    'SP' => 'America/Sao_Paulo',       // UTC-3
+    'RJ' => 'America/Sao_Paulo',       // UTC-3
+    'ES' => 'America/Sao_Paulo',       // UTC-3
+    'MG' => 'America/Sao_Paulo',       // UTC-3
+    'PR' => 'America/Sao_Paulo',       // UTC-3
+    'SC' => 'America/Sao_Paulo',       // UTC-3
+    'RS' => 'America/Sao_Paulo',       // UTC-3
+    'FN' => 'America/Noronha',         // UTC-2 (Fernando de Noronha)
+];
+
+
+
 require  __DIR__ . '/inflector.php';
