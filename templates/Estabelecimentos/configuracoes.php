@@ -163,189 +163,52 @@ $this->BreadcrumbsPlus->add([['title' => 'Estabelecimento']]);
                 </div>
             </div>
             <div class="tab-pane fade" id="pills-notifications" role="tabpanel" aria-labelledby="pills-notifications-tab" tabindex="0">
-                <div class="row justify-content-center">
-                    <div class="col-lg-10">
-                        <div class="card border shadow-none p-4">
-                        <div data-vue="programacao-semanal"
+                    <div class="row justify-content-center">
+                        <div class="col-lg-12">
+                            <div class="card border p-4">
+                                <div data-vue="programacao-semanal"
                                         data-programacao-inicial='<?= json_encode($semanal ?? []) ?>'
                                         data-habilitar-inicial="<?= $estabelecimento->habilitar_programacao ? 'true' : 'false' ?>"
                                         data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
                                         data-base-url="<?= $this->Url->build(['controller' => 'Periodos', 'action' => 'delete'], ['fullBase' => false]) ?>">
                                         <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
                                 </div>
-
+                            </div>
                         </div>
                     </div>
-                    
-                    </div>
-                    <div data-vue="programacao-personalizada"
+                    <div class="row justify-content-center">
+                        <div class="col-lg-12">
+                            <div class="card border p-4">
+                                <div data-vue="programacao-personalizada"
                                         data-programacao-inicial='<?= htmlspecialchars(json_encode($disponiveis ?? []), ENT_QUOTES, 'UTF-8') ?>'
                                         data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
                                         data-base-url="<?= $this->Url->build(['controller' => 'Periodos', 'action' => 'delete'], ['fullBase' => false]) ?>">
                                         <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
                                 </div>
-
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="col-lg-12">
+                            <div class="card border p-4">
                                 <div data-vue="dias-indisponiveis"
                                         data-periodos-iniciais='<?= json_encode($indisponiveis ?? []) ?>'
                                         data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
                                         data-base-url="<?= $this->Url->build(['controller' => 'Periodos', 'action' => 'delete'], ['fullBase' => false]) ?>">
                                 </div>
-
-                    <div class="col-lg-9">
-                        <div class="card border shadow-none">
-                            <div class="card-body p-4">
-                                <h4 class="card-title">Date &amp; Time</h4>
-                                <p class="card-subtitle">Time zones and calendar display settings.</p>
-                                <div class="d-flex align-items-center justify-content-between mt-7">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                            <i class="ti ti-clock-hour-4 text-dark d-block fs-7" width="22" height="22"></i>
-                                        </div>
-                                        <div>
-                                            <p class="mb-0">Time zone</p>
-                                            <h5 class="fs-4 fw-semibold">(UTC + 02:00) Athens, Bucharet</h5>
-                                        </div>
-                                    </div>
-                                    <a class="text-dark fs-6 d-flex align-items-center justify-content-center bg-transparent p-2 fs-4 rounded-circle" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Download">
-                                        <i class="ti ti-download"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-9">
-                        <div class="card border shadow-none">
-                            <div class="card-body p-4">
-                                <h4 class="card-title">Ignore Tracking</h4>
-                                <div class="d-flex align-items-center justify-content-between mt-7">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                            <i class="ti ti-player-pause text-dark d-block fs-7" width="22" height="22"></i>
-                                        </div>
-                                        <div>
-                                            <h5 class="fs-4 fw-semibold">Ignore Browser Tracking</h5>
-                                            <p class="mb-0">Browser Cookie</p>
-                                        </div>
-                                    </div>
-                                    <div class="form-check form-switch mb-0">
-                                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked5">
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-12">
-                        <div class="d-flex align-items-center justify-content-end gap-6">
-                            <button class="btn btn-primary">Save</button>
-                            <button class="btn bg-danger-subtle text-danger">Cancel</button>
+                        <div class="d-flex align-items-center justify-content-end mt-4 gap-6">
+                            <button type="submit" class="btn btn-primary">Salvar</button>
                         </div>
                     </div>
                 </div>
-            </div>
+
             <div class="tab-pane fade" id="pills-bills" role="tabpanel" aria-labelledby="pills-bills-tab" tabindex="0">
                 <div class="row justify-content-center">
-                    <div class="col-lg-9">
-                        <div class="card border shadow-none">
-                            <div class="card-body p-4">
-                                <h4 class="card-title mb-3">Billing Information</h4>
-                                <form>
-                                    <div class="row">
-                                        <div class="col-lg-6">
-                                            <div class="mb-3">
-                                                <label for="exampleInputtext6" class="form-label">Business
-                                                    Name*</label>
-                                                <input type="text" class="form-control" id="exampleInputtext6" placeholder="Visitor Analytics">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="exampleInputtext7" class="form-label">Business
-                                                    Address*</label>
-                                                <input type="text" class="form-control" id="exampleInputtext7" placeholder="">
-                                            </div>
-                                            <div>
-                                                <label for="exampleInputtext8" class="form-label">First Name*</label>
-                                                <input type="text" class="form-control" id="exampleInputtext8" placeholder="">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <div class="mb-3">
-                                                <label for="exampleInputtext9" class="form-label">Business
-                                                    Sector*</label>
-                                                <input type="text" class="form-control" id="exampleInputtext9" placeholder="Arts, Media &amp; Entertainment">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="exampleInputtext10" class="form-label">Country*</label>
-                                                <input type="text" class="form-control" id="exampleInputtext10" placeholder="Romania">
-                                            </div>
-                                            <div>
-                                                <label for="exampleInputtext11" class="form-label">Last Name*</label>
-                                                <input type="text" class="form-control" id="exampleInputtext11" placeholder="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-9">
-                        <div class="card border shadow-none">
-                            <div class="card-body p-4">
-                                <h4 class="card-title">Current Plan : <span class="text-success">Executive</span>
-                                </h4>
-                                <p class="card-subtitle">Thanks for being a premium member and supporting our development.</p>
-                                <div class="d-flex align-items-center justify-content-between mt-7 mb-3">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                            <i class="ti ti-package text-dark d-block fs-7" width="22" height="22"></i>
-                                        </div>
-                                        <div>
-                                            <p class="mb-0">Current Plan</p>
-                                            <h5 class="fs-4 fw-semibold">750.000 Monthly Visits</h5>
-                                        </div>
-                                    </div>
-                                    <a class="text-dark fs-6 d-flex align-items-center justify-content-center bg-transparent p-2 fs-4 rounded-circle" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Add">
-                                        <i class="ti ti-circle-plus"></i>
-                                    </a>
-                                </div>
-                                <div class="d-flex align-items-center gap-3">
-                                    <button class="btn btn-primary">Change Plan</button>
-                                    <button class="btn bg-danger-subtle text-danger">Reset Plan</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-9">
-                        <div class="card border shadow-none">
-                            <div class="card-body p-4">
-                                <h4 class="card-title">Payment Method</h4>
-                                <p class="card-subtitle">On 26 December, 2024</p>
-                                <div class="d-flex align-items-center justify-content-between mt-7">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                            <i class="ti ti-credit-card text-dark d-block fs-7" width="22" height="22"></i>
-                                        </div>
-                                        <div>
-                                            <h5 class="fs-4 fw-semibold">Visa</h5>
-                                            <p class="mb-0 text-dark">*****2102</p>
-                                        </div>
-                                    </div>
-                                    <a class="text-dark fs-6 d-flex align-items-center justify-content-center bg-transparent p-2 fs-4 rounded-circle" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit">
-                                        <i class="ti ti-pencil-minus"></i>
-                                    </a>
-                                </div>
-                                <p class="my-2">If you updated your payment method, it will only be dislpayed here after your
-                                    next billing cycle.</p>
-                                <div class="d-flex align-items-center gap-3">
-                                    <button class="btn bg-danger-subtle text-danger">Cancel Subscription</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="d-flex align-items-center justify-content-end gap-6">
-                            <button class="btn btn-primary">Save</button>
-                            <button class="btn bg-danger-subtle text-danger">Cancel</button>
-                        </div>
-                    </div>
+-->
                 </div>
             </div>
             <div class="tab-pane fade" id="pills-security" role="tabpanel" aria-labelledby="pills-security-tab" tabindex="0">
