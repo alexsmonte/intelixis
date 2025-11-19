@@ -140,4 +140,9 @@ class ServicosTable extends Table
 
         return $rules;
     }
+
+    public function findAtivar(SelectQuery $query)
+    {
+        return $query->where(['Servicos.ativar' => 1]);
+    }
 }

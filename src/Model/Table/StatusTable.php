@@ -102,4 +102,9 @@ class StatusTable extends Table
     {
         return $query->orderBy(['Status.id' => 'ASC']);
     }
+
+    public function findAtivar(SelectQuery $query)
+    {
+        return $query->where(['Status.ativar' => 1]);
+    }
 }

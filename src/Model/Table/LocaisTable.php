@@ -122,8 +122,10 @@ class LocaisTable extends Table
 
         if(isset($data['telefone']))
             $data['telefone']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['telefone']));
+    }
 
-       
-
+    public function findAtivar(SelectQuery $query)
+    {
+        return $query->where(['Locais.ativar' => 1]);
     }
 }
