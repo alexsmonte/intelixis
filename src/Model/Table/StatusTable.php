@@ -97,4 +97,9 @@ class StatusTable extends Table
 
         return $rules;
     }
+
+    public function findOrdenar(SelectQuery $query)
+    {
+        return $query->orderBy(['Status.id' => 'ASC']);
+    }
 }

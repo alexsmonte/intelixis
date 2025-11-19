@@ -190,7 +190,10 @@ class ProfissionaisTable extends Table
         return $rules;
     }
 
-
+    public function findAtivar(SelectQuery $query)
+    {
+        return $query->where(['Profissionais.ativar' => 1]);
+    }
 
 
     public function isFullName($value, array $context): bool
