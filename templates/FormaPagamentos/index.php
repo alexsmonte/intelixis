@@ -1,0 +1,119 @@
+<?php
+
+$this->BreadcrumbsPlus->add([['title' => 'Forma Pagamentos']]);
+
+?>
+
+<?= $this->element('barra-titulo',['title' => $title]); ?>
+
+<div class="card w-100 position-relative overflow-hidden">
+    <div class="px-4 py-3 border-bottom">
+        <div class="card-body p-4">
+            <div class="d-flex mb-3 align-items-center">
+                <h4 class="card-title mb-0"><?= __('Forma Pagamentos') ?></h4>
+                <div class="ms-auto flex-shrink-0">
+                    <button class="btn bg-primary-subtle text-primary "  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-bars" aria-hidden="true"></i>
+                    </button>
+                    <ul class="dropdown-menu animated flipInX">
+                                                <li><?= $this->Html->link('<i class="fa fa-plus" aria-hidden="true"></i> Novo Forma Pagamento', ['action' => 'novo'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
+                                                <li><?= $this->Html->link('<i class="fa fa-print" aria-hidden="true"></i> Imprimir esta página', ['action' => 'imprimir'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
+                        <li><?= $this->Html->link('<i class="fa fa-print" aria-hidden="true"></i> Imprimir tudo', ['action' => 'imprimir'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
+                    </ul>
+                </div>
+            </div>
+                        <div class="row">
+
+                                <div class="col-md-3 mb-3">
+                                    <?= $this->Form->control('estabelecimento_id', ['label'=>'estabelecimento_id','options' => $estabelecimentos, 'empty' => true]); ?>
+                                </div>                            <div class="col-md-3 mb-3">
+                                <?= $this->Form->control('nome', ['label'=>'nome', 'class'=>'form-control']); ?>
+                            </div>                            <div class="col-md-3 mb-3">
+                                <?= $this->Form->control('tipo_taxa', ['label'=>'tipo_taxa', 'class'=>'form-control']); ?>
+                            </div>                            <div class="col-md-3 mb-3">
+                                <?= $this->Form->control('taxas', ['label'=>'taxas', 'class'=>'form-control']); ?>
+                            </div>                            <div class="col-md-3 mb-3">
+                                <?= $this->Form->control('taxa_antecipacao', ['label'=>'taxa_antecipacao', 'class'=>'form-control']); ?>
+                            </div>                            <div class="col-md-3 mb-3">
+                                <?= $this->Form->control('dias', ['label'=>'dias', 'class'=>'form-control']); ?>
+                            </div>                            <div class="col-md-3 mb-3">
+                                <?= $this->Form->control('ativar', ['label'=>'ativar', 'class'=>'form-control']); ?>
+                            </div>                <div class="col-md-12 mb-3">
+                    <div class="row">
+                        <div class="col-md-2 offset-md-10  mb-3">
+                            <button type="button" class="justify-content-center w-100 btn btn-primary d-flex align-items-center">Pesquisar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive mb-4 border rounded-1">
+                <table class="table table-striped text-nowrap mb-0 align-middle">
+                    <thead class="text-dark fs-4">
+                    <tr>
+                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('id') ?></h6></th>
+                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('estabelecimento_id') ?></h6></th>
+                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('nome') ?></h6></th>
+                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('tipo_taxa') ?></h6></th>
+                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('taxas') ?></h6></th>
+                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('taxa_antecipacao') ?></h6></th>
+                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('dias') ?></h6></th>
+                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('ativar') ?></h6></th>
+                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('created') ?></h6></th>
+                            <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('modified') ?></h6></th>
+                        <th><?= __('Opções') ?></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($formaPagamentos as $formaPagamento): ?>
+                    <tr>
+                                                                                                        <td><p class="mb-0 fw-normal fs-4"><?= $this->Number->format($formaPagamento->id) ?></p></td>
+                                                                                                <td><p class="mb-0 fw-normal fs-4"><?= $formaPagamento->hasValue('estabelecimento') ? $this->Html->link($formaPagamento->estabelecimento->razao_social, ['controller' => 'Estabelecimentos', 'action' => 'view', $formaPagamento->estabelecimento->id]) : '' ?></p></td>
+                                                                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= h($formaPagamento->nome) ?> </p></td>
+                                                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= $formaPagamento->tipo_taxa === null ? '' : $this->Number->format($formaPagamento->tipo_taxa) ?></p></td>
+                                                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= $formaPagamento->taxas === null ? '' : $this->Number->format($formaPagamento->taxas) ?></p></td>
+                                                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= $formaPagamento->taxa_antecipacao === null ? '' : $this->Number->format($formaPagamento->taxa_antecipacao) ?></p></td>
+                                                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= $formaPagamento->dias === null ? '' : $this->Number->format($formaPagamento->dias) ?></p></td>
+                                                                                                                    <td><?= $formaPagamento->ativar == 1 ? '<span class="badge bg-success-subtle text-success">Ativo</span>' : '<span class="badge bg-warning-subtle text-warning">Não</span>'; ?></td>
+                                                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= h($formaPagamento->created) ?> </p></td>
+                                                                                                                    <td><p class="mb-0 fw-normal fs-4"><?= h($formaPagamento->modified) ?> </p></td>
+                                    <td>
+                            <div class="btn-group">
+                                <button class="btn btn-warning dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Opções
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <li><?= $this->Html->link('Visualizar', ['action' => 'view', $formaPagamento->id],['class'=>'dropdown-item','escape'=>false]) ?></li>
+                                    <li><?= $this->Html->link('Editar', ['action' => 'edit', $formaPagamento->id],['class'=>'dropdown-item','escape'=>false]) ?> </li>
+                                    <li>
+                                        <?= $this->Form->postLink(
+                                        'Excluir',
+                                        ['action' => 'delete', $formaPagamento->id],
+                                        [
+                                        'class'=>'dropdown-item',
+                                        'escape'=>false,
+                                        'method' => 'delete',
+                                        'confirm' => __('Tem certeza que deseja excluir # {0}?', $formaPagamento->id),
+                                        ]
+                                        ) ?>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <div class="paginator mt-4">
+                    <ul class="pagination justify-content-center">
+                        <?= $this->Paginator->first('<< ') ?>
+                        <?= $this->Paginator->prev('< ') ?>
+                        <?= $this->Paginator->numbers() ?>
+                        <?= $this->Paginator->next(' >') ?>
+                        <?= $this->Paginator->last(' >>') ?>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
