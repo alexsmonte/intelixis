@@ -35,8 +35,15 @@ class ConveniosController extends AppController
      */
     public function visualizar($id = null)
     {
-        $convenio = $this->Convenios->get($id, contain: ['Estabelecimentos', 'Profissionais', 'Servicos', 'Agendamentos', 'Periodos']);
+        $convenio = $this->Convenios->get($id, [
+            'conditions' => ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+            'contain' => ['Estabelecimentos', 'Profissionais', 'Servicos']
+        ]);
         $this->set(compact('convenio'));
+        if ($this->request->is('ajax')) {
+            $this->viewBuilder()->disableAutoLayout();
+            $this->render('visualizar_modal'); // view com HTML puro
+        }
     }
 
     /**
