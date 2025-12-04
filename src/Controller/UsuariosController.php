@@ -259,6 +259,7 @@ class UsuariosController extends AppController
                 $this->getRequest()->getSession()->write('Auth.Estabelecimento.id',$estabelecimentos[0]->id);
                 $this->getRequest()->getSession()->write('Auth.Estabelecimento.nome_fantasia',$estabelecimentos[0]->nome_fantasia);
                 $this->getRequest()->getSession()->write('Auth.Assinatura.id',$estabelecimentos[0]->assinatura_id);
+                $this->getRequest()->getSession()->write('Auth.Estabelecimento.retorno_atendimento',$estabelecimentos[0]->retorno_atendimento);
 
 
 

@@ -44,16 +44,30 @@ function createEntityApp() {
                     });
                     const html = await res.text();
                     const modalEl = document.getElementById('view-modal');
-                    modalEl.querySelector('#modal-body-content').innerHTML = html;
-                    new bootstrap.Modal(modalEl).show();
-                } catch (err) {
-                    console.error(err);
+
+                    modalEl.querySelector('#modal-body-content').innerHTML = `
+                        <div>
+                            ${html} <!-- conteúdo da view visualizar_tabela.php -->
+                            <div class="modal-footer mt-3">
+                                <a href="${routes.edit}/${id}" class="btn btn-primary">Editar</a>
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
+                            </div>
+                        </div>
+                    `;
+
+                    // Abrir o modal usando Bootstrap 5
+                    const modal = new bootstrap.Modal(modalEl);
+                    modal.show();
+
+                } catch (error) {
+                    console.error('Erro ao carregar a view:', error);
                 }
-            },
+            }
+            ,
             confirmarExclusao(event, item) {
                 event.preventDefault();
                 const form = event.target;
-            
+
                 Swal.fire({
                     title: `Tem certeza que deseja excluir ${this.entityName}: <br> "${item.nome}"?`,
                     html: `<p style="font-size:0.95rem; color:#374151;">Esta ação não poderá ser desfeita.</p>`,
@@ -72,9 +86,9 @@ function createEntityApp() {
                     if (result.isConfirmed) form.submit();
                 });
             }
-            
-            
-            
+
+
+
         }
     });
 

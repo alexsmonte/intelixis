@@ -1,0 +1,29 @@
+
+/* Mobile < 768px */
+@media (max-width: 767.98px) {
+    /* Barra de busca menor */
+    #app .form-control {
+        font-size: 0.85rem;
+        padding: 0.375rem 0.5rem;
+    }
+
+    #app .input-group .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    /* Botão Novo Profissional só ícone transparente */
+    #app .btn-novo {
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        width: auto;
+        height: auto;
+        font-size: 1.25rem;
+    }
+
+    /* Tabela fonte menor */
+    #app table {
+        font-size: 0.85rem;
+    }
+}

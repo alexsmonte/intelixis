@@ -45,22 +45,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Clientes']]);
   </div>
 </div>
 
-<!-- Modal Visualizar Cliente -->
-<div class="modal fade" id="view-modal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-md">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="pb-1 mb-2 border-bottom w-100">
-          <h5>Excluir Registro?</h5>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-      </div>
-      <div class="modal-body text-start" id="modal-body-content">
-        <i class="fa fa-spinner fa-spin fa-2x"></i>
-      </div>
-    </div>
-  </div>
-</div>
+
 
 
 <div id="app" class="card w-100 position-relative overflow-hidden">

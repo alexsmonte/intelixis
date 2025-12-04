@@ -1,12 +1,10 @@
 <?php
-$this->BreadcrumbsPlus->add([['title' => 'Convenios']]);
+$this->BreadcrumbsPlus->add([['title' => 'Convênios']]);
 ?>
-<?= $this->element('barra-titulo',['title' => $title]); ?>
+<?= $this->element('barra-titulo', ['title' => $title]); ?>
+<?= $this->Html->css('index') ?>
 
-
-
-
-<!-- Modal Visualizar Servico -->
+<!-- Modal Visualizar convenio -->
 <div class="modal fade" id="view-modal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-md">
     <div class="modal-content">
@@ -23,194 +21,142 @@ $this->BreadcrumbsPlus->add([['title' => 'Convenios']]);
   </div>
 </div>
 
+<!-- Vue App Container -->
+<div id="app" data-entity='<?= json_encode($convenios->toArray(), JSON_HEX_APOS | JSON_HEX_QUOT) ?>'
+    data-csrf="<?= $this->request->getAttribute('csrfToken'); ?>" data-entity-name="o Convênio" data-routes='<?= json_encode([
+          'search' => $this->Url->build(['controller' => 'Convenios', 'action' => 'search']),
+          'view' => $this->Url->build(['controller' => 'Convenios', 'action' => 'visualizar']),
+          'edit' => $this->Url->build(['controller' => 'Convenios', 'action' => 'editar']),
+          'delete' => $this->Url->build(['controller' => 'Convenios', 'action' => 'delete'])
+      ], JSON_HEX_APOS | JSON_HEX_QUOT) ?>'>
 
-<div id="app" class="card w-100 position-relative overflow-hidden">
-    <div class="px-4 py-3 border-bottom">
-        <div class="card-body p-4">
-             
-        <div class="d-flex mb-3 align-items-center">
-                <h4 class="card-title mb-0"><?= __('Convênios') ?></h4>
-                <div class="ms-auto flex-shrink-0">
-                    <button class="btn bg-primary-subtle text-primary "  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-bars" aria-hidden="true"></i>
-                    </button>
-                    <ul class="dropdown-menu animated flipInX">
-                        <li><?= $this->Html->link('<i class="fa fa-plus" aria-hidden="true"></i> Novo Convênio', ['action' => 'novo'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
-                    </ul>
+    <div class="card w-100 position-relative overflow-hidden">
+        <div class="px-4 py-3 border-bottom">
+            <div class="card-body p-4">
+
+                <!-- Título e menu -->
+                <div class="d-flex mb-3 align-items-center">
+                    <h4 class="card-title mb-0"><?= __('Convênios') ?></h4>
+
                 </div>
-            </div>
 
-
-            <!-- BUSCA -->
-            <div class="row mb-3">
-                <div class="col-md-6 d-flex">
-                    <input v-model="query" type="text" class="form-control" placeholder="Buscar Serviços por nome">
-                    <button class="btn btn-primary ms-2" @click="onSearch">Pesquisar</button>
+                <!-- Busca -->
+                <!-- Busca -->
+                <div class="row mb-3 align-items-center">
+                    <div class="col-md-6">
+                        <form @submit.prevent="onSearch" class="mb-0">
+                            <div class="input-group">
+                                <input v-model="query" type="text" class="form-control form-control-lg placeholdert"
+                                    placeholder="Buscar por nome ou email">
+                                <button class="btn bg-primary-subtle text-primary border-primary" type="submit"
+                                    data-bs-toggle="tooltip" title="Pesquisar">
+                                    <i class="ti ti-search fs-5"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+ 
+                    <div class="col-md-6 d-flex justify-content-end">
+                        <button class="btn btn-novo bg-primary-subtle text-primary border-primary" data-bs-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-bars" aria-hidden="true"></i>
+                        </button>
+                        <ul class="dropdown-menu animated flipInX">
+                            <li><?= $this->Html->link('<i class="fa fa-plus" aria-hidden="true"></i> Novo Convenio', ['action' => 'novo'], ['class' => 'dropdown-item', 'escape' => false]) ?>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-
-            <!-- TABELA -->
-            <div class="table-responsive mb-4 border rounded-1">
-                <table class="table table-striped text-nowrap mb-0 align-middle">
-                    <thead>
-                        <tr>
-                            <th>Estabelecimento</th>
-                            <th>Nome</th>
-                            <th>Registro ANS</th>
-                            <th>CNPJ</th>
-                            <th>Telefone</th>
-                            <th>Email</th>
-                            <th>Status</th>
-                            <th>Opções</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="convenio in Convenios" :key="convenio.id">
-                            <td>{{ convenio.estabelecimento.razao_social || '' }}</td>
-                            <td>{{ convenio.nome }}</td>
-                            <td>{{ convenio.registro_ans }}</td>
-                            <td>{{ convenio.cnpj }}</td>
-                            <td>{{ convenio.telefone }}</td>
-                            <td>{{ convenio.email }}</td>
-                            <td><span v-if="convenio.ativar" class="badge bg-success-subtle text-success">Ativo</span>
-                                <span v-else class="badge bg-danger-subtle text-danger">Inativo</span>
-                            </td>
-                            
-                            
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown">Opções</button>
-                                    <ul class="dropdown-menu">
-                                     <li>
-                                        <button class="dropdown-item btn btn-primary btn-md" @click="viewServico(convenio.id)">Visualizar</button>
-           
-                                    </li>
-                                        <li><a class="dropdown-item" :href="`<?= $this->Url->build(['controller' => 'Convenios', 'action' => 'editar']);?>/${convenio.id}`">Editar</a></li>
-
-                                    <li>
-                                        <form :action="'<?= $this->Url->build(['controller' => 'Convenios', 'action' => 'delete']);?>/' + convenio.id" method="post" @submit.prevent="confirmarExclusao($event)">
-                                            <input type="hidden" name="_method" value="DELETE">
-                                            <input type="hidden" name="_csrfToken" :value="csrfToken">
-                                            <button type="submit" class="dropdown-item btn btn-primary btn-md">Excluir</button>
-                                        </form>
-                                    </li>
-
-
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr v-if="Convenios.length === 0">
-                            <td colspan="8" class="text-center">Nenhum convenio encontrado</td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                
+                <!-- Tabela -->
+                <div class="table-responsive-sm mb-4 border rounded-1">
+                    <table class="table table-striped text-nowrap mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Registro ANS</th>
+                                <th>CNPJ</th>
+                                <th>Telefone</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Opções</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="item in filteredItems" :key="item.id">
+                                <td style="width:40%;">{{ item.nome }}</td>
+                                <td>{{ item.registro_ans }}</td>
+                                <td>{{ item.cnpj }}</td>
+                                <td>{{ item.telefone }}</td>
+                                <td>{{ item.email }}</td>
+                                <td>
+                                    <span v-if="item.ativar"
+                                        class="badge bg-success-subtle border border-success text-success">
+                                        Ativo
+                                    </span>
+                                    <span v-else class="badge bg-danger-subtle border border-danger text-danger">
+                                        Inativo
+                                    </span>
+                                </td>
+                                <td style="width:8%;">
+                                    <div class="d-flex  align-items-center gap-2" style="min-width:120px;">
 
 
 
-                <div class="paginator mt-4">
-                    <ul class="pagination justify-content-center">
-                        <?= $this->Paginator->first('<< ') ?>
-                        <?= $this->Paginator->prev('< ') ?>
-                        <?= $this->Paginator->numbers() ?>
-                        <?= $this->Paginator->next(' >') ?>
-                        <?= $this->Paginator->last(' >>') ?>
-                    </ul>
+
+
+                                        <button
+                                            class="btn  bg-transparent text-primary  d-inline-flex align-items-center justify-content-center"
+                                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fs-5 fa fa-bars"></i>
+                                        </button>
+                                        <ul class="dropdown-menu animated flipInX">
+
+                                            <li>
+                                                <button class="dropdown-item btn btn-primary btn-md"
+                                                    @click="viewEntity(item.id)">Visualizar</button>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" :href="`${routes.edit}/${item.id}`">Editar</a>
+                                            </li>
+                                            <li>
+                                                <form :action="`${routes.delete}/${item.id}`" method="post"
+                                                    @submit.prevent="confirmarExclusao($event,item)">
+                                                    <input type="hidden" name="_method" value="DELETE">
+                                                    <input type="hidden" name="_csrfToken" :value="csrfToken">
+                                                    <button type="submit"
+                                                        class="dropdown-item btn btn-primary btn-md">Excluir</button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-if="items.length === 0">
+                                <td colspan="8" class="text-center text-muted">Nenhum convenio encontrado</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Paginador -->
+                    <div class="paginator mt-4">
+                        <ul class="pagination justify-content-center">
+                            <?= $this->Paginator->first('<< ') ?>
+                            <?= $this->Paginator->prev('< ') ?>
+                            <?= $this->Paginator->numbers() ?>
+                            <?= $this->Paginator->next(' >') ?>
+                            <?= $this->Paginator->last(' >>') ?>
+                        </ul>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
 </div>
 
 
+<!-- Vue 3  -->
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-<script>
-const conveniosInit = <?= json_encode($convenios->toArray()) ?>;
 
-Vue.createApp({
-    data() {
-        return {
-            query: '',
-            Convenios: conveniosInit,
-            convenioId: null,
-            csrfToken: "<?= $this->request->getAttribute('csrfToken'); ?>"
-        }
-    },
-    methods: {
-        async onSearch() {
-            try {
-                // URL relativa do endpoint
-                const url = "<?= $this->Url->build(['controller' => 'Convenios', 'action' => 'search']); ?>?q=" + encodeURIComponent(this.query);
-                const res = await fetch(url, {
-                    credentials: 'same-origin' // envia cookies de sessão
-                });
-
-                // lê JSON mesmo que haja redirect
-                const data = await res.json();
-                this.Convenios = data.data || [];
-            } catch(err) {
-                console.error(err);
-                alert('Erro ao buscar Convênios. Verifique console para detalhes.');
-            }
-        },
-
-        async viewServico(id) {
-            try {
-        const res = await fetch(`<?= $this->Url->build(['controller' => 'Convenios', 'action' => 'visualizar']);?>/${id}`, {
-            credentials: 'same-origin',
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        });
-
-        if (!res.ok) throw new Error('Erro ao carregar convênio');
-
-        const html = await res.text();
-
-        // Adiciona o conteúdo no modal e inclui botão Editar
-        const modalEl = document.getElementById('view-modal');
-        modalEl.querySelector('#modal-body-content').innerHTML = `
-            <div>
-                ${html} <!-- conteúdo da view visualizar_tabela.php -->
-                <div class="modal-footer mt-3">
-                    <a href="<?= $this->Url->build(['controller' => 'Convenios', 'action' => 'editar']);?>/${id}" class="btn btn-primary">Editar</a>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
-                </div>
-            </div>
-        `;
-
-        // Inicializa e abre o modal
-        const modal = new bootstrap.Modal(modalEl);
-        modal.show();
-
-    } catch (err) {
-        console.error(err);
-        alert('Erro ao carregar convênio.');
-    }
-
-    },
-
-        confirmarExclusao(event) {
-            event.preventDefault();
-            const form = event.target;
-
-            Swal.fire({
-                title: "Tem certeza que deseja excluir este Convênio?",
-                text: "Esta ação não pode ser desfeita.",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "Sim, excluir!"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit(); // só envia se confirmar
-                }
-            });
-  }
-
-    }
-
-}).mount('#app');
-</script>
-
+<!-- Import do JS genérico -->
+<?= $this->Html->script('vue/app') ?>

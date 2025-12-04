@@ -1,216 +1,159 @@
 <?php
-$this->BreadcrumbsPlus->add([['title' => 'Servicos']]);
-
-
+$this->BreadcrumbsPlus->add([['title' => 'Serviços']]);
 ?>
-<?= $this->element('barra-titulo',['title' => $title]); ?>
+<?= $this->element('barra-titulo', ['title' => $title]); ?>
+<?= $this->Html->css('index') ?>
 
 
 
 
-<!-- Modal Visualizar Servico -->
+<!-- Modal Visualizar Profissional -->
 <div class="modal fade" id="view-modal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-md">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="pb-1 mb-2 border-bottom w-100">
-          <h5>Detalhes do Servico</h5>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-      </div>
-      <div class="modal-body text-start" id="modal-body-content">
-        <i class="fa fa-spinner fa-spin fa-2x"></i>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<div id="app" class="card w-100 position-relative overflow-hidden">
-    <div class="px-4 py-3 border-bottom">
-        <div class="card-body p-4">
-             
-        <div class="d-flex mb-3 align-items-center">
-                <h4 class="card-title mb-0"><?= __('Servicos') ?></h4>
-                <div class="ms-auto flex-shrink-0">
-                    <button class="btn bg-primary-subtle text-primary "  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-bars" aria-hidden="true"></i>
-                    </button>
-                    <ul class="dropdown-menu animated flipInX">
-                        <li><?= $this->Html->link('<i class="fa fa-plus" aria-hidden="true"></i> Novo Servico', ['action' => 'novo'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
-                    </ul>
-                </div>
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5>Detalhes do Serviço</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
-
-
-            <!-- BUSCA -->
-            <div class="row mb-3">
-                <div class="col-md-6 d-flex">
-                    <input v-model="query" type="text" class="form-control" placeholder="Buscar Serviços por nome">
-                    <button class="btn btn-primary ms-2" @click="onSearch">Pesquisar</button>
-                </div>
-            </div>
-
-            <!-- TABELA -->
-            <div class="table-responsive mb-4 border rounded-1">
-                <table class="table table-striped text-nowrap mb-0 align-middle">
-                    <thead>
-                        <tr>
-                            <th>Estabelecimento</th>
-                            <th>Nome</th>
-                            <th>Descrição</th>
-                            <th>Duração</th>
-                            <th>Status</th>
-                            <th>Opções</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="servico in Servicos" :key="servico.id">
-                            <td>{{ servico.estabelecimento.razao_social || '' }}</td>
-                            <td>{{ servico.nome }}</td>
-                            <td>{{ servico.descricao }}</td>
-                            <td>{{ servico.duracao }}</td>
-                            <td><span v-if="servico.ativar" class="badge bg-success-subtle text-success">Ativo</span>
-                                <span v-else class="badge bg-danger-subtle text-danger">Inativo</span>
-                            </td>
-                            
-                            
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown">Opções</button>
-                                    <ul class="dropdown-menu">
-                                     <li>
-                                        <button class="dropdown-item btn btn-primary btn-md" @click="viewServico(servico.id)">Visualizar</button>
-           
-                                    </li>
-                                        <li><a class="dropdown-item" :href="`<?= $this->Url->build(['controller' => 'Servicos', 'action' => 'editar']);?>/${servico.id}`">Editar</a></li>
-
-                                    <li>
-                                        <form :action="'<?= $this->Url->build(['controller' => 'Servicos', 'action' => 'delete']);?>/' + servico.id" method="post" @submit.prevent="confirmarExclusao($event)">
-                                            <input type="hidden" name="_method" value="DELETE">
-                                            <input type="hidden" name="_csrfToken" :value="csrfToken">
-                                            <button type="submit" class="dropdown-item btn btn-primary btn-md">Excluir</button>
-                                        </form>
-                                    </li>
-
-
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr v-if="Servicos.length === 0">
-                            <td colspan="8" class="text-center">Nenhum servico encontrado</td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                
-
-
-
-                <div class="paginator mt-4">
-                    <ul class="pagination justify-content-center">
-                        <?= $this->Paginator->first('<< ') ?>
-                        <?= $this->Paginator->prev('< ') ?>
-                        <?= $this->Paginator->numbers() ?>
-                        <?= $this->Paginator->next(' >') ?>
-                        <?= $this->Paginator->last(' >>') ?>
-                    </ul>
-                </div>
+            <div class="modal-body text-start" id="modal-body-content">
+                <i class="fa fa-spinner fa-spin fa-2x"></i>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Vue App Container -->
+<div id="app" data-entity='<?= json_encode($servicos->toArray(), JSON_HEX_APOS | JSON_HEX_QUOT) ?>'
+    data-csrf="<?= $this->request->getAttribute('csrfToken'); ?>" data-entity-name="o serviço" data-routes='<?= json_encode([
+          'search' => $this->Url->build(['controller' => 'Servicos', 'action' => 'search']),
+          'view' => $this->Url->build(['controller' => 'Servicos', 'action' => 'visualizar']),
+          'edit' => $this->Url->build(['controller' => 'Servicos', 'action' => 'editar']),
+          'delete' => $this->Url->build(['controller' => 'Servicos', 'action' => 'delete'])
+      ], JSON_HEX_APOS | JSON_HEX_QUOT) ?>'>
+
+    <div class="card w-100 position-relative overflow-hidden">
+        <div class="px-4 py-3 border-bottom">
+            <div class="card-body p-4">
+
+                <!-- Título e menu -->
+                <div class="d-flex mb-3 align-items-center">
+                    <h4 class="card-title mb-0"><?= __('Serviços') ?></h4>
+
+                </div>
+
+                <!-- Busca -->
+                <!-- Busca -->
+                <div class="row mb-3 align-items-center">
+                    <div class="col-md-6">
+                        <form @submit.prevent="onSearch" class="mb-0">
+                            <div class="input-group">
+                                <input v-model="query" type="text" class="form-control form-control-lg placeholdert"
+                                    placeholder="Buscar por nome ou email">
+                                <button class="btn bg-primary-subtle text-primary border-primary" type="submit"
+                                    data-bs-toggle="tooltip" title="Pesquisar">
+                                    <i class="ti ti-search fs-5"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <br>
+                    <div class="col-md-6 d-flex justify-content-end">
+                        <button class="btn btn-novo bg-primary-subtle text-primary border-primary" data-bs-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-bars" aria-hidden="true"></i>
+                        </button>
+                        <ul class="dropdown-menu animated flipInX">
+                            <li><?= $this->Html->link('<i class="fa fa-plus" aria-hidden="true"></i> Novo Serviço', ['action' => 'novo'], ['class' => 'dropdown-item', 'escape' => false]) ?>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Tabela -->
+                <div class="table-responsive-sm mb-4 border rounded-1">
+                    <table class="table table-striped text-nowrap mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Descrição</th>
+                                <th>Duração</th>
+                                <th>Status</th>
+                                <th>Opções</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="item in filteredItems" :key="item.id">
+                                <td style="width:40%;">{{ item.nome }}</td>
+                                <td>{{ item.descricao }}</td>
+                                <td>{{ item.duracao }}</td>
+                                <td>
+                                    <span v-if="item.ativar"
+                                        class="badge bg-success-subtle border border-success text-success">
+                                        Ativo
+                                    </span>
+                                    <span v-else class="badge bg-danger-subtle border border-danger text-danger">
+                                        Inativo
+                                    </span>
+                                </td>
+                                <td style="width:8%;">
+                                    <div class="d-flex  align-items-center gap-2" style="min-width:120px;">
 
 
-<!-- vue  -->
+
+
+
+                                        <button
+                                            class="btn  bg-transparent text-primary  d-inline-flex align-items-center justify-content-center"
+                                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fs-5 fa fa-bars"></i>
+                                        </button>
+                                        <ul class="dropdown-menu animated flipInX">
+
+                                            <li>
+                                                <button class="dropdown-item btn btn-primary btn-md"
+                                                    @click="viewEntity(item.id)">Visualizar</button>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" :href="`${routes.edit}/${item.id}`">Editar</a>
+                                            </li>
+                                            <li>
+                                                <form :action="`${routes.delete}/${item.id}`" method="post"
+                                                    @submit.prevent="confirmarExclusao($event,item)">
+                                                    <input type="hidden" name="_method" value="DELETE">
+                                                    <input type="hidden" name="_csrfToken" :value="csrfToken">
+                                                    <button type="submit"
+                                                        class="dropdown-item btn btn-primary btn-md">Excluir</button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-if="items.length === 0">
+                                <td colspan="8" class="text-center text-muted">Nenhum serviço encontrado</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Paginador -->
+                    <div class="paginator mt-4">
+                        <ul class="pagination justify-content-center">
+                            <?= $this->Paginator->first('<< ') ?>
+                            <?= $this->Paginator->prev('< ') ?>
+                            <?= $this->Paginator->numbers() ?>
+                            <?= $this->Paginator->next(' >') ?>
+                            <?= $this->Paginator->last(' >>') ?>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Vue 3  -->
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-<script>
-const servicosInit = <?= json_encode($servicos->toArray()) ?>;
 
-Vue.createApp({
-    data() {
-        return {
-            query: '',
-            Servicos: servicosInit,
-            servicoId: null,
-            csrfToken: "<?= $this->request->getAttribute('csrfToken'); ?>"
-        }
-    },
-    methods: {
-        async onSearch() {
-            try {
-                // URL relativa do endpoint
-                const url = "<?= $this->Url->build(['controller' => 'Servicos', 'action' => 'search']); ?>?q=" + encodeURIComponent(this.query);
-                const res = await fetch(url, {
-                    credentials: 'same-origin', // envia cookies de sessão
-                });
-
-                // lê JSON mesmo que haja redirect
-                const data = await res.json();
-                this.Servicos = data.data || [];
-            } catch(err) {
-                console.error(err);
-                alert('Erro ao buscar serviços. Verifique console para detalhes.');
-            }
-        },
-
-        async viewServico(id) {
-            try {
-        const res = await fetch(`<?= $this->Url->build(['controller' => 'Servicos', 'action' => 'visualizar']);?>/${id}`, {
-            credentials: 'same-origin',
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        });
-
-        if (!res.ok) throw new Error('Erro ao carregar servico');
-
-        const html = await res.text();
-
-        // Adiciona o conteúdo no modal e inclui botão Editar
-        const modalEl = document.getElementById('view-modal');
-        modalEl.querySelector('#modal-body-content').innerHTML = `
-            <div>
-                ${html} <!-- conteúdo da view visualizar_tabela.php -->
-                <div class="modal-footer mt-3">
-                    <a href="<?= $this->Url->build(['controller' => 'Servicos', 'action' => 'editar']);?>/${id}" class="btn btn-primary">Editar</a>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
-                </div>
-            </div>
-        `;
-
-        // Inicializa e abre o modal
-        const modal = new bootstrap.Modal(modalEl);
-        modal.show();
-
-    } catch (err) {
-        console.error(err);
-        alert('Erro ao carregar servico.');
-    }
-
-    },
-
-        confirmarExclusao(event) {
-            event.preventDefault();
-            const form = event.target;
-
-            Swal.fire({
-                title: "Tem certeza que deseja excluir este Servico?",
-                text: "Esta ação não pode ser desfeita.",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "Sim, excluir!"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit(); // só envia se confirmar
-                }
-            });
-  }
-
-    }
-
-}).mount('#app');
-</script>
-
+<!-- Import do JS genérico -->
+<?= $this->Html->script('vue/app') ?>
