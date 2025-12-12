@@ -58,7 +58,7 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
         parent::bootstrap();
 
 
-        Router::fullBaseUrl('https://' . env('HTTP_HOST'));
+        //Router::fullBaseUrl('https://' . env('HTTP_HOST'));
 
         if (PHP_SAPI !== 'cli') {
             // The bake plugin requires fallback table classes to work properly
@@ -110,10 +110,10 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
                 'httponly' => true,
             ]))
 //
-            ->add(new RoutingMiddleware($this))
-            ->add(new BodyParserMiddleware())
+
 //        // Add the AuthenticationMiddleware. It should be after routing and body parser.
-            ->add(new AuthenticationMiddleware($this))
+            ->add(new AuthenticationMiddleware($this));
+/**
             ->add(function ($request, $handler) {
                 if (!$request->is('ssl')) {
                     $url = 'https://' . $request->getUri()->getHost() . $request->getUri()->getPath();
@@ -124,7 +124,7 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
                 }
                 return $handler->handle($request);
             });
-
+***/
         return $middlewareQueue;
     }
 
