@@ -69,6 +69,14 @@ class ProcedimentosTable extends Table
         $this->hasMany('Anotacoes', [
             'foreignKey' => 'procedimento_id',
         ]);
+
+        $this->hasMany('Anexos', [
+            'foreignKey' => 'entidade_id',
+            'conditions' => [
+                'Anexos.entidade' => 'Procedimentos'
+            ]
+        ]);
+
     }
 
     /**
