@@ -10,8 +10,8 @@ use Cake\ORM\Entity;
  *
  * @property int $id
  * @property int $procedimento_id
+ * @property int $usuario_id
  * @property string|null $texto
- * @property string|null $data_registro
  * @property \Cake\I18n\DateTime|null $created
  * @property \Cake\I18n\DateTime|null $modified
  *
@@ -30,8 +30,8 @@ class Anotacao extends Entity
      */
     protected array $_accessible = [
         'procedimento_id' => true,
+        'usuario_id' => true,
         'texto' => true,
-        'data_registro' => true,
         'created' => true,
         'modified' => true,
         'procedimento' => true,

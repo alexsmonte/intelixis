@@ -51,6 +51,10 @@ class AnotacoesTable extends Table
             'foreignKey' => 'procedimento_id',
             'joinType' => 'INNER',
         ]);
+        $this->belongsTo('Usuarios', [
+            'foreignKey' => 'usuario_id',
+            'joinType' => 'INNER',
+        ]);
     }
 
     /**
@@ -66,13 +70,12 @@ class AnotacoesTable extends Table
             ->notEmptyString('procedimento_id');
 
         $validator
-            ->scalar('texto')
-            ->allowEmptyString('texto');
+            ->integer('usuario_id')
+            ->notEmptyString('usuario_id');
 
         $validator
-            ->scalar('data_registro')
-            ->maxLength('data_registro', 45)
-            ->allowEmptyString('data_registro');
+            ->scalar('texto')
+            ->allowEmptyString('texto');
 
         return $validator;
     }
@@ -87,6 +90,7 @@ class AnotacoesTable extends Table
     public function buildRules(RulesChecker $rules): RulesChecker
     {
         $rules->add($rules->existsIn(['procedimento_id'], 'Procedimentos'), ['errorField' => 'procedimento_id']);
+        $rules->add($rules->existsIn(['usuario_id'], 'Usuarios'), ['errorField' => 'usuario_id']);
 
         return $rules;
     }
