@@ -10,9 +10,10 @@ use Cake\ORM\Entity;
  *
  * @property int $id
  * @property int $procedimento_id
+ * @property int $usuario_id
  * @property string|null $texto
- * @property \Cake\I18n\Date|null $data_registro
  * @property string|null $audio_transcricao
+ * @property string|null $audio_path
  * @property \Cake\I18n\DateTime|null $created
  * @property \Cake\I18n\DateTime|null $modified
  *
@@ -31,9 +32,10 @@ class Anamnes extends Entity
      */
     protected array $_accessible = [
         'procedimento_id' => true,
+        'usuario_id' => true,
         'texto' => true,
-        'data_registro' => true,
         'audio_transcricao' => true,
+        'audio_path' => true,
         'created' => true,
         'modified' => true,
         'procedimento' => true,

@@ -51,6 +51,10 @@ class AnamnesesTable extends Table
             'foreignKey' => 'procedimento_id',
             'joinType' => 'INNER',
         ]);
+        $this->belongsTo('Usuarios', [
+            'foreignKey' => 'usuario_id',
+            'joinType' => 'INNER',
+        ]);
     }
 
     /**
@@ -66,16 +70,21 @@ class AnamnesesTable extends Table
             ->notEmptyString('procedimento_id');
 
         $validator
+            ->integer('usuario_id')
+            ->notEmptyString('usuario_id');
+
+        $validator
             ->scalar('texto')
             ->allowEmptyString('texto');
 
         $validator
-            ->date('data_registro')
-            ->allowEmptyDate('data_registro');
-
-        $validator
             ->scalar('audio_transcricao')
             ->allowEmptyString('audio_transcricao');
+
+        $validator
+            ->scalar('audio_path')
+            ->maxLength('audio_path', 255)
+            ->allowEmptyString('audio_path');
 
         return $validator;
     }
@@ -90,6 +99,7 @@ class AnamnesesTable extends Table
     public function buildRules(RulesChecker $rules): RulesChecker
     {
         $rules->add($rules->existsIn(['procedimento_id'], 'Procedimentos'), ['errorField' => 'procedimento_id']);
+        $rules->add($rules->existsIn(['usuario_id'], 'Usuarios'), ['errorField' => 'usuario_id']);
 
         return $rules;
     }
