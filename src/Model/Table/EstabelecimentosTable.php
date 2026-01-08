@@ -209,7 +209,7 @@ class EstabelecimentosTable extends Table
 
         if(isset($data['cpf_cnpj']))
             $data['cpf_cnpj']      =   str_replace($caracterInvalido, "", $data['cpf_cnpj']);
-
+/**
         if(isset($data['cep']))
             $data['cep']           =   str_replace($caracterInvalido, "", $data['cep']);
 
@@ -218,6 +218,6 @@ class EstabelecimentosTable extends Table
 
         if(isset($data['celular']))
             $data['celular']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['celular']));
-
+**/
     }
 }
