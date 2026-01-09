@@ -37,7 +37,7 @@ class UsuariosController extends AppController
             $dadosUsuarios = $this->request->getData();
             $dadosUsuarios["conta_id"] = $this->request->getAttribute('identity')->conta_id;
 
-            // ⚙️ Se o usuário marcou "remover foto"
+            // Se o usuário marcou "remover foto"
             if (!empty($dadosUsuarios['remover_foto'])) {
                 if (!empty($usuario->foto)) {
                     $oldFilePath = WWW_ROOT . 'img' . DS . $usuario->foto;
