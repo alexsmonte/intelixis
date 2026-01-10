@@ -12,7 +12,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Estabelecimento']]);
 
 ?>
 <?= $this->element('barra-titulo',['title' => $title]); ?>
-<?= $this->Form->create($estabelecimento) ?>
+<?= $this->Form->create($estabelecimento,['type' => 'file']) ?>
 <div class="card">
     <ul class="nav nav-pills user-profile-tab" id="pills-tab" role="tablist">
         <li class="nav-item" role="presentation">
@@ -48,13 +48,36 @@ $this->BreadcrumbsPlus->add([['title' => 'Estabelecimento']]);
                         <div class="card w-100 border position-relative overflow-hidden">
                             <div class="card-body p-4">
                                 <h4 class="card-title">Logomarca</h4>
-                                <p class="card-subtitle mb-4">Altere a logo da sua empresa</p>
+                                <p class="card-subtitle mb-4">Altere a logomarca da sua empresa</p>
                                 <div class="text-center">
-                                    <?= $this->Html->image('profile/user-1.jpg', ['alt'=>'Logo', 'class' => 'img-fluid', 'width'=>'120'])?>
+                                    <?php if (empty($estabelecimento->logo)) { ?>
+                                        <?= $this->Html->image(
+                                            'profile/usuario-padrao.png',
+                                            ['fullBase' => true, 'alt' => 'Escolha a sua logomarca', 'class' => 'img-fluid', 'width' => '220']
+                                        ) ?>
+                                    <?php } else { ?>
+                                        <?= $this->Html->image(
+                                            '/img/' . $estabelecimento->logo,
+                                            ['fullBase' => true, 'alt' => $estabelecimento->nome_fantasia, 'width' => '220']
+                                        ) ?>
+                                    <?php } ?>
                                     <div class="d-flex align-items-center justify-content-center my-4 gap-6">
-                                        <button class="btn btn-primary">Escolher foto</button>
-                                        <button class="btn bg-danger-subtle text-danger">Reset</button>
+                                        <a title="Escolher foto" alt="Escolher sua logomarca" class="btn btn-primary file-wrapper" tabindex="-1" href="#upload">
+                                            <i class="fa fa-upload"></i> Escolher sua logomarca
+                                            <?= $this->Form->control('logo', [
+                                                'label' => false,
+                                                'templates' => ['inputContainer' => '{{content}}'],
+                                                'type' => 'file',
+                                                'required' => false
+                                            ]) ?>
+                                        </a>
+                                        <!-- Botão remover -->
+                                        <button type="button" id="btn-remover-foto" class="btn bg-danger-subtle text-danger">
+                                            <i class="fa fa-trash"></i>&nbsp;Remover
+                                        </button>
                                     </div>
+
+                                    <?= $this->Form->hidden('remover_foto', ['value' => 0, 'id' => 'remover-foto-input']) ?>
                                     <p class="mb-0">Envie no formato JPG ou PNG. Maximo de 800K</p>
                                 </div>
                             </div>
@@ -113,12 +136,11 @@ $this->BreadcrumbsPlus->add([['title' => 'Estabelecimento']]);
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-lg-2">
-                                            <div class="mb-3">
-                                                <?= $this->Form->control('cep',['label' => 'CEP','class' => 'form-control',]); ?>
-                                            </div>
+                                        <div class="col-lg-3">
+                                            <div data-vue="cep-autocomplete" data-cep="<?= $estabelecimento->cep; ?>"></div>
                                         </div>
-                                        <div class="col-lg-5">
+
+                                        <div class="col-lg-4">
                                             <div class="mb-3">
                                                 <?= $this->Form->control('logradouro',['label' => 'Logradouro','class' => 'form-control',]); ?>
                                             </div>
@@ -131,6 +153,21 @@ $this->BreadcrumbsPlus->add([['title' => 'Estabelecimento']]);
                                         <div class="col-lg-3">
                                             <div class="mb-3">
                                                 <?= $this->Form->control('complemento',['label' => 'Complemento','class' => 'form-control',]); ?>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="mb-3">
+                                                <?= $this->Form->control('bairro',['label' => 'Bairro','class' => 'form-control',]); ?>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="mb-3">
+                                                <?= $this->Form->control('cidade',['label' => 'Cidade','class' => 'form-control',]); ?>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="mb-3">
+                                                <?= $this->Form->control('uf',['label' => 'UF','class' => 'form-control',]); ?>
                                             </div>
                                         </div>
                                     </div>
@@ -152,7 +189,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Estabelecimento']]);
                                         </div>
                                         <div class="col-12">
                                             <div class="d-flex align-items-center justify-content-end mt-4 gap-6">
-                                                <button type="submit" class="btn btn-primary">Salvar</button>
+                                                <button type="submit" class="btn btn-success">Salvar</button>
                                             </div>
                                         </div>
                                     </div>
@@ -294,6 +331,44 @@ $this->BreadcrumbsPlus->add([['title' => 'Estabelecimento']]);
     </div>
 </div>
 <?= $this->Form->end() ?>
+
+<style type="text/css">
+    .file-wrapper { cursor: pointer; display: inline-block; overflow: hidden; position: relative; }
+    .file-wrapper input { cursor: pointer; font-size: 100px; height: 100%; filter: alpha(opacity=1); -moz-opacity: 0.01; opacity: 0.01; position: absolute; right: 0; top: 0; } .file-wrapper .button { background: #79130e; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; color: #fff; cursor: pointer; display: inline-block; font-size: 11px; font-weight: bold; margin-right: 5px; padding: 4px 18px; text-transform: uppercase; }
+</style>
+
+<script>
+    document.getElementById('btn-remover-foto').addEventListener('click', function (e) {
+        e.preventDefault();
+
+        Swal.fire({
+            title: 'Tem certeza?',
+            text: 'A logomarca da sua empresa será removida.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sim, remover',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+            document.getElementById('remover-foto-input').value = 1;
+
+            // Limpa o input file
+            const fileInput = document.querySelector('input[type=file][name=logo]');
+            if (fileInput) fileInput.value = '';
+
+            // Submete o formulário
+            document.getElementById('btn-remover-foto')
+                .closest('form')
+                .submit();
+        }
+    });
+    });
+</script>
+
+
 <!-- Vue e componentes programacao.js -->
 <?= $this->Html->script('vue/programacao-semanal.js') ?>
 <?= $this->Html->script('vue/programacao-personalizada.js') ?>

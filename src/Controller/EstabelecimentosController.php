@@ -148,6 +148,45 @@ class EstabelecimentosController extends AppController
             $dadosEstabelecimento["usuarios"]["_ids"]   =   [$this->request->getAttribute('identity')->id];
 
 
+
+            // Se o usuário marcou "remover foto"
+            if (!empty($dadosEstabelecimento['remover_foto'])) {
+                if (!empty($estabelecimento->logo)) {
+                    $oldFilePath = WWW_ROOT . 'img' . DS . $estabelecimento->logo;
+                    if (file_exists($oldFilePath)) {
+                        @unlink($oldFilePath);
+                    }
+                }
+                // Define como null no banco
+                $dadosEstabelecimento['logo'] = null;
+            } else {
+                // Caso contrário, trata upload normalmente
+                $uploadedFile = $dadosEstabelecimento['logo'] ?? null;
+
+                if ($uploadedFile && $uploadedFile->getError() === UPLOAD_ERR_OK) {
+                    $filename = time() . '_' . preg_replace('/\s+/', '_', $uploadedFile->getClientFilename());
+                    $uploadPath = WWW_ROOT . 'img' . DS . 'logo' . DS;
+
+                    if (!is_dir($uploadPath)) {
+                        if (!mkdir($uploadPath, 0775, true) && !is_dir($uploadPath))
+                            throw new \RuntimeException(sprintf('Não foi possível criar o diretório: %s', $uploadPath));
+                    }
+
+                    // Remove a foto antiga
+                    if (!empty($estabelecimento->logo)) {
+                        $oldFilePath = $uploadPath . $estabelecimento->logo;
+                        if (file_exists($oldFilePath))
+                            @unlink($oldFilePath);
+                    }
+
+                    $uploadedFile->moveTo($uploadPath . $filename);
+                    $dadosEstabelecimento['logo'] = 'logo/' . $filename;
+                } else {
+                    // Não marcou remover e não enviou nova foto → mantém antiga
+                    unset($dadosEstabelecimento['logo']);
+                }
+            }
+
             $estabelecimento = $this->Estabelecimentos->patchEntity($estabelecimento, $dadosEstabelecimento,['associated' => ['Periodos','Usuarios' ]]);
 
             if ($this->Estabelecimentos->save($estabelecimento)) {
