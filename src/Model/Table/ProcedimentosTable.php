@@ -65,16 +65,23 @@ class ProcedimentosTable extends Table
         ]);
         $this->hasMany('Anamneses', [
             'foreignKey' => 'procedimento_id',
+            'dependent' => true,
+            'cascadeCallbacks' => true,
         ]);
         $this->hasMany('Anotacoes', [
             'foreignKey' => 'procedimento_id',
+            'sort' => ['Anotacoes.created' => 'DESC'],
+            'dependent' => true,
+            'cascadeCallbacks' => true,
         ]);
 
         $this->hasMany('Anexos', [
             'foreignKey' => 'entidade_id',
             'conditions' => [
                 'Anexos.entidade' => 'Procedimentos'
-            ]
+            ],
+            'dependent' => true,
+            'cascadeCallbacks' => true,
         ]);
 
     }
