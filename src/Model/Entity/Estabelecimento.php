@@ -11,18 +11,27 @@ use Cake\ORM\Entity;
  * @property int $id
  * @property int $conta_id
  * @property int $assinatura_id
+ * @property string|null $logo
  * @property string $razao_social
  * @property string $nome_fantasia
  * @property string $cpf_cnpj
+ * @property string|null $cep
  * @property string|null $logradouro
+ * @property string|null $bairro
  * @property string|null $numero
  * @property string|null $complemento
  * @property string $email
  * @property string|null $telefone
+ * @property string|null $telefone_opcional
  * @property string|null $celular
  * @property bool|null $ativar
  * @property \Cake\I18n\DateTime|null $created
  * @property \Cake\I18n\DateTime|null $modified
+ * @property int|null $habilitar_programacao
+ * @property int|null $intervalo_atendimento
+ * @property int|null $retorno_atendimento
+ * @property string|null $cidade
+ * @property string|null $uf
  *
  * @property \App\Model\Entity\Conta $conta
  * @property \App\Model\Entity\Assinatura $assinatura
@@ -53,14 +62,12 @@ class Estabelecimento extends Entity
     protected array $_accessible = [
         'conta_id' => true,
         'assinatura_id' => true,
-        'razao_social' => true,
         'logo' => true,
+        'razao_social' => true,
         'nome_fantasia' => true,
         'cpf_cnpj' => true,
         'cep' => true,
         'logradouro' => true,
-        'cidade' => true,
-        'uf' => true,
         'bairro' => true,
         'numero' => true,
         'complemento' => true,
@@ -69,11 +76,13 @@ class Estabelecimento extends Entity
         'telefone_opcional' => true,
         'celular' => true,
         'ativar' => true,
-        'habilitar_programacao' => true,
-        'intervalo_atendimento'=> true,
-        'retorno_atendimento'=> true,
         'created' => true,
         'modified' => true,
+        'habilitar_programacao' => true,
+        'intervalo_atendimento' => true,
+        'retorno_atendimento' => true,
+        'cidade' => true,
+        'uf' => true,
         'conta' => true,
         'assinatura' => true,
         'agendamentos' => true,
