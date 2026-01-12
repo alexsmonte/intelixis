@@ -72,13 +72,33 @@ class EstabelecimentosTable extends Table
         $this->hasMany('Agendamentos', [
             'foreignKey' => 'estabelecimento_id',
         ]);
+
+        $this->hasMany('Anexos', [
+            'foreignKey' => 'estabelecimento_id',
+        ]);
+
         $this->hasMany('Bloqueios', [
+            'foreignKey' => 'estabelecimento_id',
+        ]);
+        $this->hasMany('Caixas', [
+            'foreignKey' => 'estabelecimento_id',
+        ]);
+        $this->hasMany('Ccustos', [
             'foreignKey' => 'estabelecimento_id',
         ]);
         $this->hasMany('Clientes', [
             'foreignKey' => 'estabelecimento_id',
         ]);
+        $this->hasMany('Consultas', [
+            'foreignKey' => 'estabelecimento_id',
+        ]);
         $this->hasMany('Convenios', [
+            'foreignKey' => 'estabelecimento_id',
+        ]);
+        $this->hasMany('Financas', [
+            'foreignKey' => 'estabelecimento_id',
+        ]);
+        $this->hasMany('FormaPagamentos', [
             'foreignKey' => 'estabelecimento_id',
         ]);
         $this->hasMany('Locais', [
@@ -88,6 +108,9 @@ class EstabelecimentosTable extends Table
             'foreignKey' => 'estabelecimento_id',
         ]);
         $this->hasMany('Profissionais', [
+            'foreignKey' => 'estabelecimento_id',
+        ]);
+        $this->hasMany('Receituarios', [
             'foreignKey' => 'estabelecimento_id',
         ]);
         $this->hasMany('Servicos', [
@@ -128,6 +151,11 @@ class EstabelecimentosTable extends Table
             ->notEmptyString('assinatura_id');
 
         $validator
+            ->scalar('logo')
+            ->maxLength('logo', 255)
+            ->allowEmptyString('logo');
+
+        $validator
             ->scalar('razao_social')
             ->maxLength('razao_social', 255)
             ->requirePresence('razao_social', 'create')
@@ -143,17 +171,22 @@ class EstabelecimentosTable extends Table
             ->scalar('cpf_cnpj')
             ->maxLength('cpf_cnpj', 21)
             ->requirePresence('cpf_cnpj', 'create')
-            ->notEmptyString('cpf_cnpj','Você precis informa o CPF/CNPJ');
+            ->notEmptyString('cpf_cnpj','Você precisa informa o CPF/CNPJ');
 
         $validator
             ->scalar('cep')
             ->maxLength('cep', 9)
-            ->allowEmptyString('logradouro');
+            ->allowEmptyString('cep');
 
         $validator
             ->scalar('logradouro')
             ->maxLength('logradouro', 255)
             ->allowEmptyString('logradouro');
+
+        $validator
+            ->scalar('bairro')
+            ->maxLength('bairro', 100)
+            ->allowEmptyString('bairro');
 
         $validator
             ->scalar('numero')
@@ -176,6 +209,11 @@ class EstabelecimentosTable extends Table
             ->allowEmptyString('telefone');
 
         $validator
+            ->scalar('telefone_opcional')
+            ->maxLength('telefone_opcional', 30)
+            ->allowEmptyString('telefone_opcional');
+
+        $validator
             ->scalar('celular')
             ->maxLength('celular', 20)
             ->allowEmptyString('celular');
@@ -183,6 +221,28 @@ class EstabelecimentosTable extends Table
         $validator
             ->boolean('ativar')
             ->allowEmptyString('ativar');
+
+        $validator
+            ->integer('habilitar_programacao')
+            ->allowEmptyString('habilitar_programacao');
+
+        $validator
+            ->integer('intervalo_atendimento')
+            ->allowEmptyString('intervalo_atendimento');
+
+        $validator
+            ->integer('retorno_atendimento')
+            ->allowEmptyString('retorno_atendimento');
+
+        $validator
+            ->scalar('cidade')
+            ->maxLength('cidade', 80)
+            ->allowEmptyString('cidade');
+
+        $validator
+            ->scalar('uf')
+            ->maxLength('uf', 2)
+            ->allowEmptyString('uf');
 
         return $validator;
     }
@@ -202,6 +262,7 @@ class EstabelecimentosTable extends Table
         return $rules;
     }
 
+
     public function beforeMarshal(Event $event, \ArrayObject $data, \ArrayObject $options)
     {
 
@@ -209,15 +270,15 @@ class EstabelecimentosTable extends Table
 
         if(isset($data['cpf_cnpj']))
             $data['cpf_cnpj']      =   str_replace($caracterInvalido, "", $data['cpf_cnpj']);
-/**
+        /**
         if(isset($data['cep']))
-            $data['cep']           =   str_replace($caracterInvalido, "", $data['cep']);
+        $data['cep']           =   str_replace($caracterInvalido, "", $data['cep']);
 
         if(isset($data['telefone']))
-            $data['telefone']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['telefone']));
+        $data['telefone']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['telefone']));
 
         if(isset($data['celular']))
-            $data['celular']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['celular']));
-**/
+        $data['celular']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['celular']));
+         **/
     }
 }
