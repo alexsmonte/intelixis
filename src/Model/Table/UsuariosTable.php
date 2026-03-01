@@ -225,7 +225,10 @@ class UsuariosTable extends Table
     {
         $rules->add($rules->isUnique(['email'],'E-Mail já esta em uso'), ['errorField' => 'email']);
         $rules->add($rules->existsIn(['conta_id'], 'Contas','Verifique o ID da conta.'), ['errorField' => 'conta_id']);
-
+        $rules->add($rules->existsIn('profissional_id', 'Profissionais'), [
+            'errorField' => 'profissional_id',
+            'message' => 'Profissional não encontrado'
+        ]);
         return $rules;
     }
 
