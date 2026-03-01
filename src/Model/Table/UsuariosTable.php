@@ -55,6 +55,12 @@ class UsuariosTable extends Table
             'foreignKey' => 'conta_id',
             'joinType' => 'INNER',
         ]);
+
+        $this->belongsTo('Profissionais', [
+            'foreignKey' => 'profissional_id',
+            'joinType' => 'LEFT',
+        ]);
+
         $this->belongsToMany('Estabelecimentos', [
             'foreignKey' => 'usuario_id',
             'targetForeignKey' => 'estabelecimento_id',
