@@ -241,6 +241,6 @@ class UsuariosTable extends Table
 
     public function findAtivos(Query $query, array $options)
     {
-        return $query->where(['ativar' => true]);
+        return $query->where(['Usuarios.ativar' => true]);
     }
 }
