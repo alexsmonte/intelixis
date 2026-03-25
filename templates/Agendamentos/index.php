@@ -1171,7 +1171,7 @@ $retornoAtendimento = $this->request->getSession()
              * 2) CHAMADA AJAX NORMAL
              * ------------------------------ */
             $.ajax({
-                url: '/painel/agendamentos/sugestoes',
+              url: '<?= $this->Url->build(['controller' => 'Agendamentos', 'action' => 'sugestoes']) ?>',
                 method: 'GET',
                 data: params,
 

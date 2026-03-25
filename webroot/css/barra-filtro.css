@@ -1,0 +1,142 @@
+[v-cloak] {
+    display: none;
+}
+
+/* ── Grupo de datas ── */
+.grupo-datas {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 50rem;
+    overflow: hidden;
+    height: 48px;
+}
+
+.grupo-datas .data-input {
+    flex: 1;
+    min-width: 0;
+}
+
+.grupo-datas input[type="date"] {
+    border: none;
+    background: transparent;
+    font-size: 0.875rem;
+    color: #495057;
+    height: 100%;
+    width: 100%;
+    padding: 0 0.85rem;
+    outline: none;
+    box-shadow: none;
+}
+
+.grupo-datas input[type="date"]:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.separador-ate {
+    padding: 0 0.5rem;
+    color: #6c757d;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    border-left: 1px solid #ced4da;
+    border-right: 1px solid #ced4da;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+}
+
+
+/* ── Select genérico ── */
+.select-situacao,
+.select-filtro {
+    height: 48px;
+    border-radius: 50rem !important;
+    font-size: 0.875rem;
+    border-color: #ced4da;
+    padding: 0 1.25rem;
+}
+
+.select-situacao:focus,
+.select-filtro:focus {
+    box-shadow: none;
+    border-color: #86b7fe;
+}
+
+/* ── Input genérico ── */
+.input-filtro,
+.input-date-filtro {
+    height: 48px;
+    border-radius: 50rem !important;
+    font-size: 0.875rem;
+    border-color: #ced4da;
+    padding: 0 1.25rem;
+}
+
+.input-filtro:focus,
+.input-date-filtro:focus {
+    box-shadow: none;
+    border-color: #86b7fe;
+}
+
+/* ── Label do filtro ── */
+.filtro-label {
+    font-size: 0.78rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+    padding-left: 0.5rem;
+}
+
+/* ── Filtros ativos ── */
+.filtro-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background-color: #f1f3f5;
+    border: 1px solid #dee2e6;
+    border-radius: 50rem;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.8rem;
+    color: #495057;
+    font-weight: 500;
+}
+
+.filtro-badge .btn-remover {
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: 0.15rem;
+    line-height: 1;
+    color: #868e96;
+    cursor: pointer;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+.filtro-badge .btn-remover:hover {
+    color: #343a40;
+}
+
+/* ── Botão limpar todos ── */
+.btn-limpar-todos {
+    border: 1px solid #fa5252;
+    color: #fa5252;
+    background: transparent;
+    border-radius: 50rem;
+    padding: 0.35rem 1.1rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.btn-limpar-todos:hover {
+    background: #fa5252;
+    color: #fff;
+}

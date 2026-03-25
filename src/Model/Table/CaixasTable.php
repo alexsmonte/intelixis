@@ -57,6 +57,14 @@ class CaixasTable extends Table
             'foreignKey' => 'usuario_id',
             'joinType' => 'INNER',
         ]);
+        $this->belongsTo('Conferentes', [
+            'className' => 'Usuarios',
+            'foreignKey' => 'usuario_conferiu',
+            'joinType' => 'LEFT',
+        ]);
+        $this->hasMany('Pagamentos', [
+            'foreignKey' => 'caixa_id',
+        ]);
         $this->hasMany('Movimentacoes', [
             'foreignKey' => 'caixa_id',
         ]);

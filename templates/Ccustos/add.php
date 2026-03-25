@@ -23,14 +23,17 @@ $this->BreadcrumbsPlus->add([['title' => 'Ccustos', 'url'=>['controller' => 'Ccu
 
             <?= $this->Form->create($ccusto) ?>
             <div class="row">
-                <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('estabelecimento_id', ['label' => 'estabelecimento_id','class' => 'form-control','options' => $estabelecimentos, 'empty' => true]); ?>
-                </div>
+                
             <div class="col-md-3 mb-3">
                     <?= $this->Form->control('name',['label' => 'name','class' => 'form-control',]); ?>
             </div>
                 <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('parent_id', ['label' => 'parent_id','class' => 'form-control','options' => $parentCcustos, 'empty' => true]); ?>
+                <?= $this->Form->control('parent_id', [
+    'label' => 'Nível Superior',
+    'class' => 'form-control',
+    'options' => $parentCcustos,
+    'empty' => '-- Nível Principal --'
+]) ?>
                 </div>
     <div class="col-md-12">
     <div class="row">
