@@ -34,7 +34,7 @@ class ProcedimentosController extends AppController
      */
     public function view($id = null)
     {
-        $procedimento = $this->Procedimentos->get($id, contain: ['Consultas', 'Servicos', 'Profissionais', 'Anamneses', 'Anotacoes']);
+        $procedimento = $this->Procedimentos->get($id, contain: ['Consultas', 'Servicos', 'Profissionais', 'Documentos']);
         $this->set(compact('procedimento'));
     }
 
@@ -57,7 +57,7 @@ class ProcedimentosController extends AppController
             else
                 $procedimento = $this->Procedimentos->get($dadosProcedimento["id"]);
 
-            $procedimento = $this->Procedimentos->patchEntity($procedimento, $dadosProcedimento,['associated'=>['Anamneses'=> ['accessibleFields' => ['id' => true]],'Anotacoes' => ['accessibleFields' => ['id' => true]]]]);
+            $procedimento = $this->Procedimentos->patchEntity($procedimento, $dadosProcedimento,['associated'=>['Documentos'=> ['accessibleFields' => ['id' => true]]]]);
 
 
             if ($this->Procedimentos->save($procedimento)) {
@@ -79,31 +79,6 @@ class ProcedimentosController extends AppController
             ]));
     }
 
-
-    /**
-     * Edit method
-     *
-     * @param string|null $id Procedimento id.
-     * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function edit($id = null)
-    {
-        $procedimento = $this->Procedimentos->get($id, contain: []);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $procedimento = $this->Procedimentos->patchEntity($procedimento, $this->request->getData());
-            if ($this->Procedimentos->save($procedimento)) {
-                $this->Flash->success(__('The procedimento has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The procedimento could not be saved. Please, try again.'));
-        }
-        $consultas = $this->Procedimentos->Consultas->find('list', limit: 200)->all();
-        $servicos = $this->Procedimentos->Servicos->find('list', limit: 200)->all();
-        $profissionais = $this->Procedimentos->Profissionais->find('list', limit: 200)->all();
-        $this->set(compact('procedimento', 'consultas', 'servicos', 'profissionais'));
-    }
 
     /**
      * Delete method
