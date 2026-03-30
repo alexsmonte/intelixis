@@ -37,7 +37,7 @@ class UsuariosController extends AppController
             $dadosUsuarios = $this->request->getData();
             $dadosUsuarios["conta_id"] = $this->request->getAttribute('identity')->conta_id;
 
-            // ⚙️ Se o usuário marcou "remover foto"
+            // Se o usuário marcou "remover foto"
             if (!empty($dadosUsuarios['remover_foto'])) {
                 if (!empty($usuario->foto)) {
                     $oldFilePath = WWW_ROOT . 'img' . DS . $usuario->foto;
@@ -257,7 +257,19 @@ class UsuariosController extends AppController
 
                 $this->getRequest()->getSession()->write('Auth',$usuario);
                 $this->getRequest()->getSession()->write('Auth.Estabelecimento.id',$estabelecimentos[0]->id);
+                $this->getRequest()->getSession()->write('Auth.Estabelecimento.logo',$estabelecimentos[0]->logo);
                 $this->getRequest()->getSession()->write('Auth.Estabelecimento.nome_fantasia',$estabelecimentos[0]->nome_fantasia);
+                $this->getRequest()->getSession()->write('Auth.Estabelecimento.cpf_cnpj',$estabelecimentos[0]->cpf_cnpj);
+                $this->getRequest()->getSession()->write('Auth.Estabelecimento.logradouro',$estabelecimentos[0]->logradouro);
+                $this->getRequest()->getSession()->write('Auth.Estabelecimento.numero',$estabelecimentos[0]->numero);
+                $this->getRequest()->getSession()->write('Auth.Estabelecimento.cep',$estabelecimentos[0]->cep);
+                $this->getRequest()->getSession()->write('Auth.Estabelecimento.complemento',$estabelecimentos[0]->complemento);
+                $this->getRequest()->getSession()->write('Auth.Estabelecimento.telefone',$estabelecimentos[0]->telefone);
+                $this->getRequest()->getSession()->write('Auth.Estabelecimento.celular',$estabelecimentos[0]->celular);
+                $this->getRequest()->getSession()->write('Auth.Estabelecimento.telefone_opcional',$estabelecimentos[0]->telefone_opcional);
+                $this->getRequest()->getSession()->write('Auth.Estabelecimento.cidade',$estabelecimentos[0]->cidade);
+                $this->getRequest()->getSession()->write('Auth.Estabelecimento.uf',$estabelecimentos[0]->uf);
+                $this->getRequest()->getSession()->write('Auth.Estabelecimento.cep',$estabelecimentos[0]->cep);
                 $this->getRequest()->getSession()->write('Auth.Assinatura.id',$estabelecimentos[0]->assinatura_id);
                 $this->getRequest()->getSession()->write('Auth.Estabelecimento.retorno_atendimento',$estabelecimentos[0]->retorno_atendimento);
 

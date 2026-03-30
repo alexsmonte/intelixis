@@ -21,19 +21,26 @@ class EstabelecimentosTableTest extends TestCase
     /**
      * Fixtures
      *
-     * @var list<string>
+     * @var array<string>
      */
     protected array $fixtures = [
         'app.Estabelecimentos',
         'app.Contas',
         'app.Assinaturas',
         'app.Agendamentos',
+        'app.Anexos',
         'app.Bloqueios',
+        'app.Caixas',
+        'app.Ccustos',
         'app.Clientes',
+        'app.Consultas',
         'app.Convenios',
+        'app.Financas',
+        'app.FormaPagamentos',
         'app.Locais',
         'app.Periodos',
         'app.Profissionais',
+        'app.Receituarios',
         'app.Servicos',
         'app.Status',
         'app.Whatsapps',
@@ -83,6 +90,17 @@ class EstabelecimentosTableTest extends TestCase
      * @link \App\Model\Table\EstabelecimentosTable::buildRules()
      */
     public function testBuildRules(): void
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    /**
+     * Test beforeMarshal method
+     *
+     * @return void
+     * @link \App\Model\Table\EstabelecimentosTable::beforeMarshal()
+     */
+    public function testBeforeMarshal(): void
     {
         $this->markTestIncomplete('Not implemented yet.');
     }

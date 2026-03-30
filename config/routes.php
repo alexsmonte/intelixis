@@ -48,9 +48,7 @@ return function (RouteBuilder $routes): void {
      * `{action}` markers.
      */
     $routes->setRouteClass(DashedRoute::class);
-
-
-    
+    $routes->setExtensions(['json']);
 
     $routes->scope('/', function (RouteBuilder $builder): void {
         /*
@@ -77,15 +75,7 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/', ['controller' => 'Usuarios', 'action' => 'login']);
         $builder->connect('meu-perfil', ['controller' => 'Usuarios', 'action' => 'meuPerfil']);
         $builder->connect('/dashboard', ['controller' => 'Pages', 'action' => 'index']);
-
-        
-        // config/routes.php
-
-
-
-
-
-        
+        $builder->connect('/documentos/validar/{codigo}', ['controller' => 'Documentos','action' => 'validar'])->setPass(['codigo']);
 
         /*
          * ...and connect the rest of 'Pages' controller's URLs.

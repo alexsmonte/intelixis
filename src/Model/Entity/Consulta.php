@@ -34,12 +34,10 @@ class Consulta extends Entity
     protected array $_accessible = [
         'estabelecimento_id' => true,
         'cliente_id' => true,
-        'profissional_id' => true,
         'created' => true,
         'modified' => true,
         'estabelecimento' => true,
         'cliente' => true,
-        'profissional' => true,
         'procedimentos' => true,
     ];
 }

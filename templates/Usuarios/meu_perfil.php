@@ -107,14 +107,32 @@ $usuario->password  =   '';
 </style>
 
 <script>
-    document.getElementById('btn-remover-foto').addEventListener('click', function() {
-        if (confirm('Tem certeza que deseja remover sua foto de perfil?')) {
+    document.getElementById('btn-remover-foto').addEventListener('click', function (e) {
+        e.preventDefault();
+
+        Swal.fire({
+            title: 'Tem certeza?',
+            text: 'Sua foto de perfil será removida.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sim, remover',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
             document.getElementById('remover-foto-input').value = 1;
+
             // Limpa a seleção do input file, se houver
             const fileInput = document.querySelector('input[type=file][name=foto]');
             if (fileInput) fileInput.value = '';
+
             // Submete o formulário automaticamente
-            this.closest('form').submit();
+            document.getElementById('btn-remover-foto')
+                .closest('form')
+                .submit();
         }
+    });
     });
 </script>

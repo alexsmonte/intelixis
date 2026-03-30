@@ -55,6 +55,12 @@ class UsuariosTable extends Table
             'foreignKey' => 'conta_id',
             'joinType' => 'INNER',
         ]);
+
+        $this->belongsTo('Profissionais', [
+            'foreignKey' => 'profissional_id',
+            'joinType' => 'LEFT',
+        ]);
+
         $this->belongsToMany('Estabelecimentos', [
             'foreignKey' => 'usuario_id',
             'targetForeignKey' => 'estabelecimento_id',
@@ -219,7 +225,10 @@ class UsuariosTable extends Table
     {
         $rules->add($rules->isUnique(['email'],'E-Mail já esta em uso'), ['errorField' => 'email']);
         $rules->add($rules->existsIn(['conta_id'], 'Contas','Verifique o ID da conta.'), ['errorField' => 'conta_id']);
-
+        $rules->add($rules->existsIn('profissional_id', 'Profissionais'), [
+            'errorField' => 'profissional_id',
+            'message' => 'Profissional não encontrado'
+        ]);
         return $rules;
     }
 
@@ -232,6 +241,6 @@ class UsuariosTable extends Table
 
     public function findAtivos(Query $query, array $options)
     {
-        return $query->where(['ativar' => true]);
+        return $query->where(['Usuarios.ativar' => true]);
     }
 }

@@ -245,6 +245,7 @@ class ProfissionaisTable extends Table
             $entity->cor = $this->gerarCorUnica($entity->estabelecimento_id);
         }
     }
+    
 
     private function gerarCorUnica(int $estabelecimentoId): string
     {
@@ -261,13 +262,11 @@ class ProfissionaisTable extends Table
             ->where([
             'estabelecimento_id' => $estabelecimentoId,
             'cor IS NOT' => null
-        ])
-            ->enableHydration(false)
+        ])            ->enableHydration(false)
             ->toArray();
 
         $usadas = array_map(
-        fn($c) => strtoupper($c),
-            array_column($coresUsadas, 'cor')
+        fn($c) => strtoupper($c),            array_column($coresUsadas, 'cor')
         );
 
         // Índice baseado na quantidade já usada
@@ -306,7 +305,7 @@ class ProfissionaisTable extends Table
 
         return $cor;
     }
-
+    
     private function gerarCorVisivel(): string
     {
         // Gera uma cor aleatória saturada e contrastante
@@ -380,8 +379,7 @@ class ProfissionaisTable extends Table
         else {
             $r = $c;
             $g = 0;
-            $b = $x;
-        }
+            $b = $x;        }
 
         $r = (int)(($r + $m) * 255);
         $g = (int)(($g + $m) * 255);

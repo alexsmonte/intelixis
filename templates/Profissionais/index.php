@@ -125,16 +125,14 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais']]);
                                     </span>
                                 </td>
                                 <td style="width:8%;">
-                                    <div class="dropdown">
-                                        <button
+                                    <div class="dropdown">                                        <button
                                             class="btn bg-transparent text-primary d-inline-flex align-items-center justify-content-center"
                                             type="button" :id="'dropdownMenu-' + item.id" data-bs-toggle="dropdown"
                                             aria-expanded="false">
                                             <i class="fas fa-bars"></i>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end"
-                                            :aria-labelledby="'dropdownMenu-' + item.id">
-                                            <li>
+                                            :aria-labelledby="'dropdownMenu-' + item.id">                                            <li>
                                                 <a class="dropdown-item" :href="`${routes.visualizar}/${item.id}`">
                                                     <span class="iconify text-gray" data-icon="solar:eye-bold-duotone"
                                                         style="font-size:15px;"></span> Visualizar

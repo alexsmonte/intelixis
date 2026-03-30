@@ -13,7 +13,6 @@ use Cake\Validation\Validator;
  *
  * @property \App\Model\Table\EstabelecimentosTable&\Cake\ORM\Association\BelongsTo $Estabelecimentos
  * @property \App\Model\Table\ClientesTable&\Cake\ORM\Association\BelongsTo $Clientes
- * @property \App\Model\Table\ProfissionaisTable&\Cake\ORM\Association\BelongsTo $Profissionais
  * @property \App\Model\Table\ProcedimentosTable&\Cake\ORM\Association\HasMany $Procedimentos
  *
  * @method \App\Model\Entity\Consulta newEmptyEntity()
@@ -58,12 +57,11 @@ class ConsultasTable extends Table
             'foreignKey' => 'cliente_id',
             'joinType' => 'INNER',
         ]);
-        $this->belongsTo('Profissionais', [
-            'foreignKey' => 'profissional_id',
-            'joinType' => 'INNER',
-        ]);
+
         $this->hasMany('Procedimentos', [
             'foreignKey' => 'consulta_id',
+            'dependent' => true,
+            'cascadeCallbacks' => true,
         ]);
     }
 
@@ -79,10 +77,8 @@ class ConsultasTable extends Table
             ->notEmptyString('estabelecimento_id');
 
         $validator
-            ->notEmptyString('cliente_id');
+            ->notEmptyString('cliente_id','Escolha um cliente');
 
-        $validator
-            ->notEmptyString('profissional_id');
 
         return $validator;
     }
@@ -98,7 +94,6 @@ class ConsultasTable extends Table
     {
         $rules->add($rules->existsIn(['estabelecimento_id'], 'Estabelecimentos'), ['errorField' => 'estabelecimento_id']);
         $rules->add($rules->existsIn(['cliente_id'], 'Clientes'), ['errorField' => 'cliente_id']);
-        $rules->add($rules->existsIn(['profissional_id'], 'Profissionais'), ['errorField' => 'profissional_id']);
 
         return $rules;
     }

@@ -28,6 +28,7 @@ use Cake\ORM\Entity;
  * @property \App\Model\Entity\Profissional $profissional
  * @property \App\Model\Entity\Anamnes[] $anamneses
  * @property \App\Model\Entity\Anotacao[] $anotacoes
+ * @property \App\Model\Entity\Anexo[] $anexos
  */
 class Procedimento extends Entity
 {
@@ -59,5 +60,6 @@ class Procedimento extends Entity
         'profissional' => true,
         'anamneses' => true,
         'anotacoes' => true,
+        'anexos' => true,
     ];
 }

@@ -283,4 +283,15 @@ class ServicosController extends AppController
         return $this->doAdvancedSearch($this->Servicos, $allowedFilters, ['Servicos.nome' => 'ASC'], ['Estabelecimentos']);
 
     }
+
+    public function view($id)
+    {
+        $servico = $this->Servicos->get($id, [
+            'contain' => [],
+            'conditions' => ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')]
+        ]);
+
+        $this->set(compact('servico'));
+        $this->viewBuilder()->setOption('serialize', ['servico']);
+    }
 }

@@ -11,28 +11,44 @@ use Cake\ORM\Entity;
  * @property int $id
  * @property int $conta_id
  * @property int $assinatura_id
+ * @property string|null $logo
  * @property string $razao_social
  * @property string $nome_fantasia
  * @property string $cpf_cnpj
+ * @property string|null $cep
  * @property string|null $logradouro
+ * @property string|null $bairro
  * @property string|null $numero
  * @property string|null $complemento
  * @property string $email
  * @property string|null $telefone
+ * @property string|null $telefone_opcional
  * @property string|null $celular
  * @property bool|null $ativar
  * @property \Cake\I18n\DateTime|null $created
  * @property \Cake\I18n\DateTime|null $modified
+ * @property int|null $habilitar_programacao
+ * @property int|null $intervalo_atendimento
+ * @property int|null $retorno_atendimento
+ * @property string|null $cidade
+ * @property string|null $uf
  *
  * @property \App\Model\Entity\Conta $conta
  * @property \App\Model\Entity\Assinatura $assinatura
  * @property \App\Model\Entity\Agendamento[] $agendamentos
+ * @property \App\Model\Entity\Anexo[] $anexos
  * @property \App\Model\Entity\Bloqueio[] $bloqueios
+ * @property \App\Model\Entity\Caixa[] $caixas
+ * @property \App\Model\Entity\Ccusto[] $ccustos
  * @property \App\Model\Entity\Cliente[] $clientes
+ * @property \App\Model\Entity\Consulta[] $consultas
  * @property \App\Model\Entity\Convenio[] $convenios
+ * @property \App\Model\Entity\Financa[] $financas
+ * @property \App\Model\Entity\FormaPagamento[] $forma_pagamentos
  * @property \App\Model\Entity\Local[] $locais
  * @property \App\Model\Entity\Periodo[] $periodos
  * @property \App\Model\Entity\Profissional[] $profissionais
+ * @property \App\Model\Entity\Receituario[] $receituarios
  * @property \App\Model\Entity\Servico[] $servicos
  * @property \App\Model\Entity\Status[] $status
  * @property \App\Model\Entity\Whatsapp[] $whatsapps
@@ -53,31 +69,43 @@ class Estabelecimento extends Entity
     protected array $_accessible = [
         'conta_id' => true,
         'assinatura_id' => true,
+        'logo' => true,
         'razao_social' => true,
         'nome_fantasia' => true,
         'cpf_cnpj' => true,
         'cep' => true,
         'logradouro' => true,
+        'bairro' => true,
         'numero' => true,
         'complemento' => true,
         'email' => true,
         'telefone' => true,
+        'telefone_opcional' => true,
         'celular' => true,
         'ativar' => true,
-        'habilitar_programacao' => true,
-        'intervalo_atendimento'=> true,
-        'retorno_atendimento'=> true,
         'created' => true,
         'modified' => true,
+        'habilitar_programacao' => true,
+        'intervalo_atendimento' => true,
+        'retorno_atendimento' => true,
+        'cidade' => true,
+        'uf' => true,
         'conta' => true,
         'assinatura' => true,
         'agendamentos' => true,
+        'anexos' => true,
         'bloqueios' => true,
+        'caixas' => true,
+        'ccustos' => true,
         'clientes' => true,
+        'consultas' => true,
         'convenios' => true,
+        'financas' => true,
+        'forma_pagamentos' => true,
         'locais' => true,
         'periodos' => true,
         'profissionais' => true,
+        'receituarios' => true,
         'servicos' => true,
         'status' => true,
         'whatsapps' => true,

@@ -47,6 +47,10 @@
             if (!(select instanceof HTMLSelectElement)) throw new Error('Element must be a select');
             this.select = select;
             this.options = Object.assign({}, defaults, options);
+            // suporte a busca remota via data-remote-url
+            if (this.select.dataset.remoteUrl) {
+                this.options.remoteUrl = this.select.dataset.remoteUrl;
+            }
             this.multiple = select.multiple;
             this.disabled = select.disabled;
             this._onDocumentClick = this._onDocumentClick.bind(this);
@@ -80,6 +84,7 @@
             }
 
 
+
             this._build();
             this.refresh();
         }
@@ -98,6 +103,8 @@
             this.buttonText = createEl('span', { class: 'btn-text' });
             this.button.appendChild(this.buttonText);
             this.container.appendChild(this.button);
+
+            this.buttonText.innerHTML = '&nbsp;';
 
             // dropdown menu
             this.menu = createEl('div', { class: 'dropdown-menu p-2', role: 'listbox' });
@@ -120,7 +127,7 @@
             this.button.addEventListener('click', (e) => {
                 e.stopPropagation();
             this.toggle();
-        });
+            });
             this.menu.addEventListener('click', (e) => e.stopPropagation());
 
             // keyboard
@@ -188,17 +195,17 @@
             if (!this.multiple) this.hide();
         }
 
-        _onSearch() {
-            const q = this.searchInput.value.trim().toLowerCase();
+        _localSearch(query) {
+            const q = query.toLowerCase();
             const items = Array.from(this.list.querySelectorAll('[data-value]'));
             let visible = 0;
 
             items.forEach(it => {
                 const txt = it.textContent.trim().toLowerCase();
-                const match = txt.includes(q);
-                it.classList.toggle('hidden', !match);
-                if (match) visible++;
-            });
+            const match = txt.includes(q);
+            it.classList.toggle('hidden', !match);
+            if (match) visible++;
+        });
 
             if (visible === 0) {
                 if (!this._noResults) {
@@ -212,14 +219,65 @@
         }
 
 
+        _remoteSearch(query) {
+            clearTimeout(this.remoteTimer);
+
+            if (this._noResults) {
+                this._noResults.remove();
+                this._noResults = null;
+            }
+
+            this.remoteTimer = setTimeout(() => {
+                if (query.length < 2)
+                    return;
+
+            fetch(this.options.remoteUrl + '?termo=' + encodeURIComponent(query))
+                .then(resp => resp.json())
+        .then(items => {
+
+                // limpar select original
+                this.select.innerHTML = '';
+
+            items.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.id;
+                opt.textContent = item.label;
+                this.select.appendChild(opt);
+            });
+
+            this.select.querySelectorAll('option').forEach(o => o.selected = false);
+
+            this._buildList();
+            this._syncFromSelect();
+        })
+        .catch(err => console.error('Erro busca remota:', err));
+
+        }, 300);
+        }
+
+        _onSearch() {
+            const query = this.searchInput.value.trim();
+
+            if (this.options.remoteUrl) {
+                this._remoteSearch(query);
+                return;
+            }
+
+            this._localSearch(query);
+        }
+
         _onDocumentClick(e) {
             if (!this.container.contains(e.target)) this.hide();
         }
 
         _onKeyDown(e) {
+
             const key = e.key;
             const items = Array.from(this.list.querySelectorAll('[data-value]'))
-                    .filter(i => i.style.display !== 'none' && !i.classList.contains('disabled'));
+                    .filter(i => !i.classList.contains('hidden') && !i.classList.contains('disabled'));
+
+            if (items.length === 0) return;
+
             const activeIndex = items.findIndex(i => i.classList.contains('active'));
 
             if (key === 'ArrowDown') {
@@ -246,22 +304,35 @@
         }
 
         _syncFromSelect() {
-            // update button text and ticks
             const selected = Array.from(this.select.selectedOptions);
-            if (selected.length === 0) this.buttonText.textContent = this.options.noneSelectedText;
-            else if (!this.multiple) this.buttonText.textContent = selected[0].textContent;
-            else this.buttonText.textContent = selected.map(s => s.textContent).join(', ');
 
-            // update ticks
+            // --- Mostrar texto do botão ---
+            if (selected.length === 0) {
+                if (!this.options.noneSelectedText || this.options.noneSelectedText.trim() === '') {
+                    this.buttonText.innerHTML = '&nbsp;';
+                } else {
+                    this.buttonText.textContent = this.options.noneSelectedText;
+                }
+            }
+            else if (!this.multiple) {
+                this.buttonText.textContent = selected[0].textContent;
+            }
+            else {
+                this.buttonText.textContent = selected.map(s => s.textContent).join(', ');
+            }
+
+            // --- Atualizar ticks (bolinha selecionada) ---
             Array.from(this.list.querySelectorAll('[data-value]')).forEach(item => {
                 const val = item.getAttribute('data-value');
-            const isSelected = Array.from(this.select.selectedOptions).some(o => o.value === val);
+            const isSelected = selected.some(o => o.value === val);
+
             if (this.options.showTick) {
                 const tick = item.querySelector('.checkmark');
                 if (tick) tick.style.display = isSelected ? '' : 'none';
             }
         });
         }
+
 
         refresh() {
             this._buildList();
@@ -322,13 +393,13 @@
         }
     }
 
-        // auto init
-        document.addEventListener('DOMContentLoaded', () => {
+    // auto init
+    document.addEventListener('DOMContentLoaded', () => {
         const nodes = document.querySelectorAll('select.selectpicker');
-            nodes.forEach(n => {
-            if (!n._bsSelect) n._bsSelect = new BootstrapSelect(n);
-            });
-        });
+    nodes.forEach(n => {
+        if (!n._bsSelect) n._bsSelect = new BootstrapSelect(n);
+});
+});
 
     // export to global
     global.BootstrapSelect = BootstrapSelect;

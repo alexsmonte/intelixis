@@ -44,6 +44,7 @@ class Usuario extends Entity
         'created' => true,
         'modified' => true,
         'conta' => true,
+        'profissionais' => true,
         'estabelecimentos' => true,
     ];
 
