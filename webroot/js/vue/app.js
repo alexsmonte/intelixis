@@ -5,6 +5,7 @@ function createEntityApp() {
     const dataInit = JSON.parse(el.dataset.entity || '[]');
     const csrfToken = el.dataset.csrf;
     const routes = JSON.parse(el.dataset.routes || '{}');
+    console.log('Routes:', routes);
 
     const app = Vue.createApp({
         data() {
@@ -67,9 +68,10 @@ function createEntityApp() {
             confirmarExclusao(event, item) {
                 event.preventDefault();
                 const form = event.target;
+              
 
                 Swal.fire({
-                    title: `Tem certeza que deseja excluir ${this.entityName}: <br> "${item.nome}"?`,
+                    title: `Tem certeza que deseja excluir ${this.entityName}: <br> "${item.name || item.nome}"?`,
                     html: `<p style="font-size:0.95rem; color:#374151;">Esta ação não poderá ser desfeita.</p>`,
                     icon: "warning",
                     showCancelButton: true,

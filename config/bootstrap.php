@@ -231,14 +231,16 @@ ServerRequest::addDetector('tablet', function ($request) {
 // set a custom date and time format
 // see https://book.cakephp.org/5/en/core-libraries/time.html#setting-the-default-locale-and-format-string
 // and https://unicode-org.github.io/icu/userguide/format_parse/datetime/#datetime-format-syntax
+
     \Cake\I18n\Date::setToStringFormat('dd/MM/yyyy');
     \Cake\I18n\Time::setToStringFormat('dd/MM/yyyy HH:mm');
     \Cake\I18n\Date::setToStringFormat('dd/MM/YYYY');
-
+/** 
 // Habilita o parseamento de datas localizadas
     TypeFactory::build('date')
             ->useLocaleParser()
             ->setLocaleFormat('dd/MM/yyyy');
+               */
 
     TypeFactory::build('datetime')
             ->useLocaleParser()
@@ -247,6 +249,7 @@ ServerRequest::addDetector('tablet', function ($request) {
     TypeFactory::build('timestamp')
             ->useLocaleParser()
             ->setLocaleFormat('dd/MM/yyyy HH:mm:ss');
+         
     TypeFactory::build('decimal')->useLocaleParser();
     TypeFactory::build('float')->useLocaleParser();
 

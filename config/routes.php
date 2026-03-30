@@ -49,15 +49,39 @@ return function (RouteBuilder $routes): void {
      */
     $routes->setRouteClass(DashedRoute::class);
 
+
+    
+
     $routes->scope('/', function (RouteBuilder $builder): void {
         /*
          * Here, we are connecting '/' (base path) to a controller called 'Pages',
          * its action called 'display', and we pass a param to select the view file
          * to use (in this case, templates/Pages/display.php)...
          */
+        $builder->get('/financas/carregar-lancamentos', 
+        ['controller' => 'Financas', 'action' => 'carregarLancamentos']);
+    
+    // 2. Rotas específicas com parâmetros
+    $builder->get('/financas/get-categorias/{abaId}', 
+        ['controller' => 'Financas', 'action' => 'getCategoriasPorAba'])
+        ->setPass(['abaId']);
+    
+    // 3. Rotas específicas normais
+    $builder->connect('/financas/lancamentos', 
+        ['controller' => 'Financas', 'action' => 'lancamentos']);
+    
+    // 4. SÓ DEPOIS: rotas genéricas
+    $builder->connect('/{controller}/{action}/*');
+
+
         $builder->connect('/', ['controller' => 'Usuarios', 'action' => 'login']);
         $builder->connect('meu-perfil', ['controller' => 'Usuarios', 'action' => 'meuPerfil']);
         $builder->connect('/dashboard', ['controller' => 'Pages', 'action' => 'index']);
+
+        
+        // config/routes.php
+
+
 
 
 

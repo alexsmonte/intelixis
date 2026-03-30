@@ -167,8 +167,7 @@ use Cake\Core\Configure;
 <!-- solar icons -->
 <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
 
-<!-- imask.js -->
-<script src="https://unpkg.com/imask"></script>
+
 
 <!-- highlight.js (code view) -->
 <script>
@@ -179,7 +178,7 @@ use Cake\Core\Configure;
 </script>
 <!-- imask.js -->
 <script src="https://unpkg.com/imask"></script>
-<?= $this->Html->script('mascaras.js') ?>
+<!--?= $this->Html->script('mascaras.js') ?-->
 <!-- select2 -->
 <!-- Fecha Alert-->
 <script>

@@ -97,39 +97,37 @@ $this->BreadcrumbsPlus->add([['title' => 'Convênios']]);
                                         Inativo
                                     </span>
                                 </td>
-                                <td style="width:8%;">
-                                    <div class="d-flex  align-items-center gap-2" style="min-width:120px;">
+                                    <td style="width:8%;">
+                                        <div class="d-flex  align-items-center gap-2" style="min-width:120px;">
 
 
 
 
 
-                                        <button
-                                            class="btn  bg-transparent text-primary  d-inline-flex align-items-center justify-content-center"
-                                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <i class="fs-5 fa fa-bars"></i>
-                                        </button>
-                                        <ul class="dropdown-menu animated flipInX">
+                                            <button
+                                                class="btn  bg-transparent text-primary  d-inline-flex align-items-center justify-content-center"
+                                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="fs-5 fa fa-bars"></i>
+                                            </button>
+                                            <ul class="dropdown-menu animated flipInX">
 
+                                                <li>
+                                                    <button class="dropdown-item btn btn-primary btn-md"
+                                                        @click="viewEntity(item.id)">Visualizar</button>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" :href="`${routes.edit}/${item.id}`">Editar</a>
+                                                </li>
                                             <li>
-                                                <button class="dropdown-item btn btn-primary btn-md"
-                                                    @click="viewEntity(item.id)">Visualizar</button>
+                                                <!-- Link direto chamando o método global -->
+<a class="dropdown-item" href="#" 
+   onclick="event.preventDefault(); window.app.confirmarExclusao(event, {id: <?= $lan->id ?>, nome: '<?= addslashes($lan->descricao) ?>', url: '/painel/financas/delete/<?= $lan->id ?>'})">
+   Excluir
+</a>
                                             </li>
-                                            <li>
-                                                <a class="dropdown-item" :href="`${routes.edit}/${item.id}`">Editar</a>
-                                            </li>
-                                            <li>
-                                                <form :action="`${routes.delete}/${item.id}`" method="post"
-                                                    @submit.prevent="confirmarExclusao($event,item)">
-                                                    <input type="hidden" name="_method" value="DELETE">
-                                                    <input type="hidden" name="_csrfToken" :value="csrfToken">
-                                                    <button type="submit"
-                                                        class="dropdown-item btn btn-primary btn-md">Excluir</button>
-                                                </form>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
+                                            </ul>
+                                        </div>
+                                    </td>
                             </tr>
                             <tr v-if="items.length === 0">
                                 <td colspan="8" class="text-center text-muted">Nenhum convenio encontrado</td>

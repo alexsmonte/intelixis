@@ -39,6 +39,7 @@ class Caixa extends Entity
         'usuario_id' => true,
         'data_abertura' => true,
         'saldo_inicial' => true,
+        'saldo_final' => true,
         'data_fechamento' => true,
         'situacao' => true,
         'usuario_conferiu' => true,
@@ -47,5 +48,6 @@ class Caixa extends Entity
         'estabelecimento' => true,
         'usuario' => true,
         'movimentacoes' => true,
+        'pagamentos' => true,
     ];
 }

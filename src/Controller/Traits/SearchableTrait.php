@@ -21,6 +21,7 @@ trait SearchableTrait
     {
         $this->request->allowMethod(['get']);
         $q = $this->request->getQuery('q');
+        
 
         $query = $table->find();
 
@@ -59,116 +60,333 @@ trait SearchableTrait
      *      ]
      * @param array $defaultOrder Ex: ['Usuarios.id' => 'ASC']
      */
-    public function doAdvancedSearch(Table $table, array $allowedFilters = [], array $defaultOrder = ['id' => 'ASC'], array $contain = [])
-    {
+    /*public function doAdvancedSearch(Table $table, array $allowedFilters = [], array $defaultOrder = ['id' => 'ASC'], array $contain = [])
+{
+    $queryParams = $this->request->getQueryParams();
+    $q = $queryParams['q'] ?? null;
+    
+    // Remove parâmetros que não são filtros diretos
+    unset($queryParams['q']);
 
-        $queryParams = $this->request->getQueryParams();
-        $q = $queryParams['q'] ?? null;
-        unset($queryParams['q']);
+    $extra = [];
 
-        $extra = [];
+    $query = $table->find();
 
-        $query = $table->find();
+    // aplica contain se tiver
+    if (!empty($contain)) {
+        $query->contain($contain);
+    }
 
-        // aplica contain se tiver
-        if (!empty($contain)) {
-            $query->contain($contain);
+    if (!empty($queryParams['situacao'])) {
+        $hoje = date('Y-m-d');
+        $situacao = $queryParams['situacao'];
+        
+        switch ($situacao) {
+            case 'pago':
+                $query->where(['Financas.data_baixa IS NOT' => null]);
+                break;
+                
+            case 'aberto':
+                $query->where([
+                    'Financas.data_baixa IS' => null,
+                    'Financas.data_vencimento >=' => $hoje
+                ]);
+                break;
+                
+            case 'vencido':
+                $query->where([
+                    'Financas.data_baixa IS' => null,
+                    'Financas.data_vencimento <' => $hoje
+                ]);
+                break;
         }
-        // Processa filtros permitidos
-        foreach ($queryParams as $param => $value) {
-            if ($value === '' || $value === null)
-                continue;
-            if (!isset($allowedFilters[$param]))
-                continue;
+    }
+    
+    // Processa filtros permitidos (incluindo datas)
+    foreach ($queryParams as $param => $value) {
+        if ($value === '' || $value === null)
+            continue;
+        if (!isset($allowedFilters[$param]))
+            continue;
 
-            $filter = $allowedFilters[$param];
-            $field = $filter['field'];
-            $operator = $filter['operator'] ?? '=';
-            $value = $filter['value'] ?? $value;
+        $filter = $allowedFilters[$param];
+        $field = $filter['field'];
+        $operator = $filter['operator'] ?? '=';
+        $value = $filter['value'] ?? $value;
 
-            if (str_contains($field, '.')) {
-                // Se for associação: Ex. Tipos.id
-                [$assoc, $col] = explode('.', $field, 2);
-                $query->matching($assoc, function ($q) use ($col, $operator, $value, $assoc) {
+        if (str_contains($field, '.')) {
+            // Se for associação: Ex. Tipos.id
+            [$assoc, $col] = explode('.', $field, 2);
+            $query->matching($assoc, function ($q) use ($col, $operator, $value, $assoc) {
+                if ($operator === 'LIKE') {
+                    return $q->where(["$assoc.$col LIKE" => "%$value%"]);
+                } else {
                     return $q->where(["$assoc.$col $operator" => $value]);
-                });
+                }
+            });
+        } else {
+            // Campos locais da tabela principal
+            if ($operator === 'LIKE') {
+                $extra["$field LIKE"] = "%$value%";
+            } elseif ($operator === 'BETWEEN' && is_string($value) && strpos($value, ',') !== false) {
+                // Para datas: data_vencimento=2024-01-01,2024-12-31
+                [$start, $end] = explode(',', $value, 2);
+                $extra[] = function ($exp) use ($field, $start, $end) {
+                    return $exp->between($field, $start, $end);
+                };
+            } elseif ($operator === '>=') {
+                // Data maior ou igual (data_inicio)
+                $extra["$field >="] = $value;
+            } elseif ($operator === '<=') {
+                // Data menor ou igual (data_fim)
+                $extra["$field <="] = $value;
             } else {
-                // Campos locais da tabela principal
+                $extra["$field $operator"] = $value;
+            }
+        }
+    }
+
+    // Filtros fixos (com 'value' definido)
+    foreach ($allowedFilters as $param => $filter) {
+        if (!isset($filter['value']))
+            continue;
+        $field = $filter['field'];
+        $operator = $filter['operator'] ?? '=';
+        $value = $filter['value'];
+
+        $extra["$field $operator"] = $value;
+    }
+
+    // Busca textual livre via 'q'
+    if (!empty($q)) {
+        // Extrai do $allowedFilters apenas os campos com operador LIKE
+        $likeFields = array_map(fn($f) => $f['field'], array_filter($allowedFilters, fn($f) => ($f['operator'] ?? '=') === 'LIKE'));
+
+        if (!empty($likeFields)) {
+            $query->where(function ($exp) use ($likeFields, $q) {
+                $or = [];
+                foreach ($likeFields as $field) {
+                    if (str_contains($field, '.')) {
+                        // Para associações, usa matching
+                        [$assoc, $col] = explode('.', $field, 2);
+                        $or[] = function ($exp2) use ($assoc, $col, $q) {
+                            return $exp2->like("LOWER($assoc.$col)", '%' . mb_strtolower($q, 'UTF-8') . '%');
+                        };
+                    } else {
+                        $or["LOWER($field) LIKE"] = '%' . mb_strtolower($q, 'UTF-8') . '%';
+                    }
+                }
+                return $exp->or($or);
+            });
+        }
+    }
+
+    // Aplica TODOS os filtros (texto + data) com AND
+    if (!empty($extra)) {
+        $query->where($extra);
+    }
+
+    // Ordenação
+    $sort = $queryParams['sort'] ?? null;
+    $direction = strtoupper($queryParams['direction'] ?? 'ASC');
+    if ($sort && array_key_exists($sort, $allowedFilters)) {
+        $query->orderBy([$allowedFilters[$sort]['field'] => in_array($direction, ['ASC', 'DESC']) ? $direction : 'ASC']);
+    } else {
+        $query->orderBy($defaultOrder);
+    }
+
+    // Paginação
+    $page = max(1, (int) ($queryParams['page'] ?? 1));
+    $limit = max(1, min(100, (int) ($queryParams['limit'] ?? 50)));
+    $offset = ($page - 1) * $limit;
+
+    $results = $query->limit($limit)->offset($offset)->all()->toArray();
+
+    $this->autoRender = false;
+    $this->response = $this->response
+        ->withType('application/json')
+        ->withStringBody(json_encode([
+            'data' => $results,
+            'paginator' => [
+                'page' => $page,
+                'limit' => $limit,
+                'count' => count($results),
+                
+            ]
+        ]));
+} */
+
+
+public function doAdvancedSearch(Table $table, array $allowedFilters = [], array $defaultOrder = ['id' => 'ASC'], array $contain = [])
+{
+    $queryParams = $this->request->getQueryParams();
+    $q = $queryParams['q'] ?? null;
+    
+    // Remove parâmetros que não são filtros diretos
+    unset($queryParams['q']);
+
+    $extra = [];
+
+    $query = $table->find();
+
+    // aplica contain se tiver
+    if (!empty($contain)) {
+        $query->contain($contain);
+    }
+/** 
+    if (!empty($queryParams['situacao'])) {
+        $hoje = date('Y-m-d');
+        $situacao = $queryParams['situacao'];
+        
+        switch ($situacao) {
+            case 'pago':
+                $query->where(['Financas.data_baixa IS NOT' => null]);
+                break;
+                
+            case 'aberto':
+                $query->where([
+                    'Financas.data_baixa IS' => null,
+                    'Financas.data_vencimento >=' => $hoje
+                ]);
+                break;
+                
+            case 'vencido':
+                $query->where([
+                    'Financas.data_baixa IS' => null,
+                    'Financas.data_vencimento <' => $hoje
+                ]);
+                break;
+        }
+    }*/
+    
+    // Processa filtros permitidos (incluindo datas)
+    foreach ($queryParams as $param => $value) {
+        if ($value === '' || $value === null)
+            continue;
+        if (!isset($allowedFilters[$param]))
+            continue;
+
+        $filter = $allowedFilters[$param];
+        $field = $filter['field'];
+        $operator = $filter['operator'] ?? '=';
+        $value = $filter['value'] ?? $value;
+
+         if (str_contains($field, '.')) {
+            // Se for associação:
+            [$assoc, $col] = explode('.', $field, 2);
+            //Se o prefixo for a própria tabela, não usa matching — só aplica o WHERE com prefixo
+            if ($assoc === $table->getAlias()) {
                 if ($operator === 'LIKE') {
                     $extra["$field LIKE"] = "%$value%";
-                } elseif ($operator === 'BETWEEN' && is_string($value) && strpos($value, ',') !== false) {
-                    [$start, $end] = explode(',', $value, 2);
-                    $extra[] = function ($exp) use ($field, $start, $end) {
-                        return $exp->between($field, $start, $end);
-                    };
                 } else {
                     $extra["$field $operator"] = $value;
                 }
+                 } else {
+            $query->matching($assoc, function ($q) use ($col, $operator, $value, $assoc) {
+                if ($operator === 'LIKE') {
+                    return $q->where(["$assoc.$col LIKE" => "%$value%"]);
+                } else {
+                    return $q->where(["$assoc.$col $operator" => $value]);
+                }
+            });
+        }
+        } else {
+            // Campos locais da tabela principal
+            if ($operator === 'LIKE') {
+                $extra["$field LIKE"] = "%$value%";
+            } elseif ($operator === 'BETWEEN' && is_string($value) && strpos($value, ',') !== false) {
+                // Para datas: data_vencimento=2024-01-01,2024-12-31
+                [$start, $end] = explode(',', $value, 2);
+                $extra[] = function ($exp) use ($field, $start, $end) {
+                    return $exp->between($field, $start, $end);
+                };
+            } elseif ($operator === '>=') {
+                // Data maior ou igual (data_inicio)
+                $extra["$field >="] = $value;
+            } elseif ($operator === '<=') {
+                // Data menor ou igual (data_fim)
+                $extra["$field <="] = $value;
+            } else {
+                $extra["$field $operator"] = $value;
             }
         }
+    }
 
-        foreach ($allowedFilters as $param => $filter) {
-            if (!isset($filter['value']))
-                continue; // só os fixos
-            $field = $filter['field'];
-            $operator = $filter['operator'] ?? '=';
-            $value = $filter['value'];
+    // Filtros fixos (com 'value' definido)
+    foreach ($allowedFilters as $param => $filter) {
+        if (!array_key_exists('value', $filter))
+            continue;
+        $field = $filter['field'];
+        $operator = $filter['operator'] ?? '=';
+        $value = $filter['value'];
 
-            $extra["$field $operator"] = $value;
-        }
+        $extra["$field $operator"] = $value;
+    }
 
-        // Busca textual livre via 'q'
-        if (!empty($q)) {
-            // Extrai do $allowedFilters apenas os campos com operador LIKE
-            $likeFields = array_map(fn($f) => $f['field'], array_filter($allowedFilters, fn($f) => ($f['operator'] ?? '=') === 'LIKE'));
+    // Busca textual livre via 'q'
+    if (!empty($q)) {
+        // Extrai do $allowedFilters apenas os campos com operador LIKE
+        $likeFields = array_map(fn($f) => $f['field'], array_filter($allowedFilters, fn($f) => ($f['operator'] ?? '=') === 'LIKE'));
 
-            if (!empty($likeFields)) {
-                $query->where(function ($exp) use ($likeFields, $q) {
-                    $or = [];
-                    //$termo = mb_strtolower($q, 'UTF-8');
-                    foreach ($likeFields as $field) {
-                        //$or["$field LIKE"] = "%$q%";
+        if (!empty($likeFields)) {
+            $query->where(function ($exp) use ($likeFields, $q) {
+                $or = [];
+                foreach ($likeFields as $field) {
+                    if (str_contains($field, '.')) {
+                        // Para associações, usa matching
+                        [$assoc, $col] = explode('.', $field, 2);
+                        $or[] = function ($exp2) use ($assoc, $col, $q) {
+                            return $exp2->like("LOWER($assoc.$col)", '%' . mb_strtolower($q, 'UTF-8') . '%');
+                        };
+                    } else {
                         $or["LOWER($field) LIKE"] = '%' . mb_strtolower($q, 'UTF-8') . '%';
                     }
-                    return $exp->or($or);
-                });
-            }
+                }
+                return $exp->or($or);
+            });
         }
-
-
-        // Aplica filtros extras
-        if (!empty($extra)) {
-            $query->where($extra);
-        }
-
-        // Ordenação
-        $sort = $queryParams['sort'] ?? null;
-        $direction = strtoupper($queryParams['direction'] ?? 'ASC');
-        if ($sort && array_key_exists($sort, $allowedFilters)) {
-            $query->orderBy([$allowedFilters[$sort]['field'] => in_array($direction, ['ASC', 'DESC']) ? $direction : 'ASC']);
-        } else {
-            $query->orderBy($defaultOrder);
-        }
-
-        // Paginação
-        $page = max(1, (int) ($queryParams['page'] ?? 1));
-        $limit = max(1, min(100, (int) ($queryParams['limit'] ?? 50)));
-        $offset = ($page - 1) * $limit;
-
-        $results = $query->limit($limit)->offset($offset)->all()->toArray();
-
-        $this->autoRender = false;
-        $this->response = $this->response
-            ->withType('application/json')
-            ->withStringBody(json_encode([
-                'data' => $results,
-                'paginator' => [
-                    'page' => $page,
-                    'limit' => $limit,
-                    'count' => count($results)
-                ]
-            ]));
     }
+
+    // Aplica TODOS os filtros (texto + data) com AND
+    if (!empty($extra)) {
+        $query->where($extra);
+    }
+
+    // Ordenação
+    $sort = $queryParams['sort'] ?? null;
+    $direction = strtoupper($queryParams['direction'] ?? 'ASC');
+    if ($sort && array_key_exists($sort, $allowedFilters)) {
+        $query->orderBy([$allowedFilters[$sort]['field'] => in_array($direction, ['ASC', 'DESC']) ? $direction : 'ASC']);
+    } else {
+        $query->orderBy($defaultOrder);
+    }
+
+   
+    $totalQuery = clone $query;
+    $total = $totalQuery->count();
+    
+    // Paginação
+    $page = max(1, (int) ($queryParams['page'] ?? 1));
+    $limit = max(1, min(100, (int) ($queryParams['limit'] ?? 50)));
+    $offset = ($page - 1) * $limit;
+    $pageCount = max(1, (int)ceil($total / $limit));
+
+    $results = $query->limit($limit)->offset($offset)->all()->toArray();
+
+    $this->autoRender = false;
+    $this->response = $this->response
+        ->withType('application/json')
+        ->withStringBody(json_encode([
+            'data' => $results,
+            'paginator' => [
+                'page' => $page,
+                'limit' => $limit,
+                'count' => count($results),
+                'total' => $total,           
+                'pageCount' => $pageCount    
+            ]
+        ]));
+}
 
     /**
      * Delete genérico para controllers

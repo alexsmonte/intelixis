@@ -36,6 +36,7 @@ class Pagamento extends Entity
     protected array $_accessible = [
         'financa_id' => true,
         'forma_pagamento_id' => true,
+        'caixa_id' => true,
         'valor' => true,
         'taxa' => true,
         'antecipar' => true,
@@ -44,6 +45,6 @@ class Pagamento extends Entity
         'created' => true,
         'modified' => true,
         'financa' => true,
-        'forma_pagamento' => true,
+        'forma_pagamento' => true
     ];
 }

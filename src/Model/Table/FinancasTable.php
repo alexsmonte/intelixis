@@ -7,12 +7,14 @@ use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\Database\Schema\TableSchema;
+use Cake\Event\Event;
 
 /**
  * Financas Model
  *
  * @property \App\Model\Table\EstabelecimentosTable&\Cake\ORM\Association\BelongsTo $Estabelecimentos
- * @property \App\Model\Table\CcustosTable&\Cake\ORM\Association\BelongsTo $Ccustoses
+ * @property \App\Model\Table\CcustosTable&\Cake\ORM\Association\BelongsTo $Ccustos
  * @property \App\Model\Table\ProfissionaisTable&\Cake\ORM\Association\BelongsTo $Profissionais
  * @property \App\Model\Table\ClientesTable&\Cake\ORM\Association\BelongsTo $Clientes
  * @property \App\Model\Table\ProcedimentosTable&\Cake\ORM\Association\BelongsTo $Procedimentos
@@ -56,9 +58,10 @@ class FinancasTable extends Table
             'foreignKey' => 'estabelecimento_id',
             'joinType' => 'INNER',
         ]);
-        $this->belongsTo('Ccustoses', [
-            'foreignKey' => 'ccustos_id',
+        $this->belongsTo('Ccustos', [
             'className' => 'Ccustos',
+            'foreignKey' => 'ccustos_id',
+            'joinType' => 'LEFT',
         ]);
         $this->belongsTo('Profissionais', [
             'foreignKey' => 'profissional_id',
@@ -72,7 +75,10 @@ class FinancasTable extends Table
         $this->hasMany('Pagamentos', [
             'foreignKey' => 'financa_id',
         ]);
+
+      
     }
+   
 
     /**
      * Default validation rules.
@@ -109,11 +115,10 @@ class FinancasTable extends Table
             ->requirePresence('descricao', 'create')
             ->notEmptyString('descricao');
 
-        $validator
-            ->date('data_vencimento')
+            $validator
+            ->date('data_vencimento', ['ymd'], 'Informe uma data válida')
             ->requirePresence('data_vencimento', 'create')
-            ->notEmptyDate('data_vencimento');
-
+            ->notEmptyDate('data_vencimento', 'Informe uma data válida');
         $validator
             ->decimal('valor')
             ->requirePresence('valor', 'create')
@@ -123,9 +128,10 @@ class FinancasTable extends Table
             ->decimal('desconto')
             ->allowEmptyString('desconto');
 
-        $validator
-            ->decimal('data_baixa')
-            ->allowEmptyString('data_baixa');
+            $validator
+            ->date('data_baixa', ['ymd'], 'Informe uma data válida')
+            
+            ->allowEmptyDate('data_baixa', 'Informe uma data válida');
 
         $validator
             ->decimal('valor_recebido')
@@ -144,11 +150,62 @@ class FinancasTable extends Table
     public function buildRules(RulesChecker $rules): RulesChecker
     {
         $rules->add($rules->existsIn(['estabelecimento_id'], 'Estabelecimentos'), ['errorField' => 'estabelecimento_id']);
-        $rules->add($rules->existsIn(['ccustos_id'], 'Ccustoses'), ['errorField' => 'ccustos_id']);
+        $rules->add($rules->existsIn(['ccustos_id'], 'Ccustos'), ['errorField' => 'ccustos_id']);
         $rules->add($rules->existsIn(['profissional_id'], 'Profissionais'), ['errorField' => 'profissional_id']);
         $rules->add($rules->existsIn(['cliente_id'], 'Clientes'), ['errorField' => 'cliente_id']);
         $rules->add($rules->existsIn(['procedimento_id'], 'Procedimentos'), ['errorField' => 'procedimento_id']);
 
         return $rules;
     }
+
+    public function beforeMarshal(Event $event, \ArrayObject $data, \ArrayObject $options)
+{
+
+    $caracterInvalido   =   [" ",".","-","/",")","(",","];
+    $caracterDecimal   =   [","];
+
+    if(isset($data['documento']))
+        $data['documento']      =   str_replace($caracterInvalido, "", $data['documento']);
+
+    if(isset($data['telefone']))
+        $data['telefone']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['telefone']));
+
+        if(isset($data['celular']))
+        $data['celular']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['celular']));
+
+        if(isset($data['cep']))
+        $data['cep']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['cep']));
+        
+        
+    }
+
+  public function afterSave(\Cake\Event\EventInterface $event, \Cake\Datasource\EntityInterface $entity)
+{
+    if (!$entity->isNew()) {
+
+        if (!is_null($entity->data_baixa) && !is_null($entity->valor_recebido)) {
+
+            $diferenca = round(floatval(((float)$entity->valor - (float)$entity->desconto) - (float)$entity->valor_recebido), 2);
+
+            if (floatval($diferenca) > 0.00) {
+
+                $contas = $this->newEntity([
+                    'ccusto_id'          => $entity->ccusto_id,
+                    'cliente_id'        => $entity->cliente_id,
+                    'estabelecimento_id' => $entity->estabelecimento_id,
+                    'fornecedor_id'     => $entity->cliente_id,
+                    'profissional_id'   => $entity->profissional_id,
+                    'tipo'              => $entity->tipo,
+                    'diferenca'         => $entity->id,
+                    'descricao'         => 'Diferença referente ao pagamento ID: ' . $entity->id . ' - ' . $entity->descricao,
+                    'data_vencimento'   => $entity->data_vencimento,
+                    'valor'             => $diferenca,
+                    'desconto'          => 0.00,
+                ]);
+
+                $this->save($contas);
+            }
+        }
+    }
+}
 }

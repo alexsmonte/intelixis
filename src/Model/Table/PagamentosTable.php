@@ -56,6 +56,9 @@ class PagamentosTable extends Table
             'foreignKey' => 'forma_pagamento_id',
             'joinType' => 'INNER',
         ]);
+        $this->belongsTo('Caixas', [
+            'foreignKey' => 'caixa_id',
+        ]);
     }
 
     /**
