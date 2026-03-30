@@ -168,6 +168,14 @@ class ClientesController extends AppController
 
         $allowedFilters = [
             'estabelecimento_id' => ['field' => 'Clientes.estabelecimento_id', 'value' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+            'q' => [
+                'operator' => 'MULTI_LIKE',
+                'fields' => [
+                    'Clientes.nome',
+                    'Clientes.documento',
+                    'Clientes.email'
+                ]
+            ],
             'nome' => ['field' => 'Clientes.nome', 'operator' => 'LIKE'],
             'documento' => ['field' => 'Clientes.documento', 'operator' => 'LIKE'],
             'email' => ['field' => 'Clientes.email', 'operator' => 'LIKE'],

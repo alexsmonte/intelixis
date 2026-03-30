@@ -215,9 +215,16 @@ class LocaisController extends AppController
 
         $allowedFilters = [
             'estabelecimento_id' => ['field' => 'Locais.estabelecimento_id', 'value' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
-            'nome' => ['field' => 'Locais.nome', 'operator' => 'LIKE'],
+            'q' => [
+                'operator' => 'MULTI_LIKE',
+                'fields'   => [
+                    'Locais.nome',
+                    'Locais.endereco'
+                ]
+            ],
+            'ativar'   => ['field' => 'Locais.ativar'],
+            'nome'     => ['field' => 'Locais.nome', 'operator' => 'LIKE'],
             'endereco' => ['field' => 'Locais.endereco', 'operator' => 'LIKE'],
-
         ];
         return $this->doAdvancedSearch($this->Locais, $allowedFilters, ['Locais.nome' => 'ASC'], ['Estabelecimentos']);
 

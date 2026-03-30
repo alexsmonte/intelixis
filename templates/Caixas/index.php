@@ -171,14 +171,10 @@ $this->BreadcrumbsPlus->add([['title' => 'Caixas']]);
                                             </li>
                                             <li><hr class="dropdown-divider"></li>
                                             <li>
-                                                <form :action="`${routes.delete}/${item.id}`" method="post"
-                                                    @submit.prevent="confirmarExclusao($event, item)">
-                                                    <input type="hidden" name="_method" value="DELETE">
-                                                    <input type="hidden" name="_csrfToken" :value="csrfToken">
-                                                    <button type="submit" class="dropdown-item text-danger">
-                                                        <span class="iconify text-danger" data-icon="solar:trash-bin-minimalistic-bold-duotone"style="font-size:15px;"></span> Excluir
-                                                    </button>
-                                                </form>
+                                                <button type="button" class="dropdown-item text-danger"
+                                                    @click="confirmarExclusao(item)">
+                                                    <span class="iconify text-danger" data-icon="solar:trash-bin-minimalistic-bold-duotone" style="font-size:15px;"></span> Excluir
+                                                </button>
                                             </li>
                                         </ul>
                                     </div>
@@ -202,7 +198,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Caixas']]);
 </div>
 
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-<?= $this->Html->script('vue/vue-index') ?>
+<?= $this->Html->script('vue/vue-index.js?v=' . filemtime(WWW_ROOT . 'js/vue/vue-index.js')) ?>
 <script>
     createVueIndex();
 </script>

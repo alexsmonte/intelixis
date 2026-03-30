@@ -1,205 +1,189 @@
 <?php
-
-$this->BreadcrumbsPlus->add([['title' => 'Usuarios']]);
-
+$this->BreadcrumbsPlus->add([['title' => 'Usuários']]);
 ?>
+<script src="https://cdn.jsdelivr.net/npm/@iconify/iconify@3/dist/iconify.min.js"></script>
+<?= $this->element('barra-titulo', ['title' => $title]); ?>
+<?= $this->Html->css('index') ?>
+<?= $this->Html->css('barra-filtro') ?>
 
-<?= $this->element('barra-titulo',['title' => $title]); ?>
+<!-- Vue App Container -->
+<div id="app" v-cloak data-csrf="<?= $this->request->getAttribute('csrfToken'); ?>" data-entity-name="o Usuário"
+    data-routes='<?= json_encode([
+        'search'     => $this->Url->build(['controller' => 'Usuarios', 'action' => 'search']),
+        'visualizar' => $this->Url->build(['controller' => 'Usuarios', 'action' => 'visualizar']),
+        'edit'       => $this->Url->build(['controller' => 'Usuarios', 'action' => 'editar']),
+        'delete'     => $this->Url->build(['controller' => 'Usuarios', 'action' => 'delete'])
+    ], JSON_HEX_APOS | JSON_HEX_QUOT) ?>'>
 
+    <div class="card w-100 position-relative overflow-x-hidden">
+        <div class="px-4 py-3 border-bottom">
+            <div class="card-body p-4">
 
-<!-- Modal Visualizar Usuario -->
-<div class="modal fade" id="view-modal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-md">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="pb-1 mb-2 border-bottom w-100">
-                    <h5>Detalhes do usuário</h5>
+                <!-- Título -->
+                <div class="d-flex mb-3 align-items-center justify-content-between">
+                    <h4 class="card-title mb-0">
+                        <?= __('Usuários') ?>
+                    </h4>
+                    <div class="col-md-6 d-flex justify-content-end">
+                        <button
+                            class="btn btn-novo bg-primary-subtle text-primary border-primary d-flex align-items-center justify-content-center"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="iconify" data-icon="solar:list-arrow-down-bold" style="font-size:22px;"></span>
+                        </button>
+                        <ul class="dropdown-menu animated flipInX">
+                            <li>
+                                <?= $this->Html->link('<span class="iconify text-gray me-2" data-icon="solar:add-circle-linear" style="font-size:16px;"></span> Novo Usuário', ['action' => 'novo'], ['class' => 'dropdown-item d-flex align-items-center', 'escape' => false]) ?>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-            </div>
-            <div class="modal-body text-start" id="modal-body-content">
-                <i class="fa fa-spinner fa-spin fa-2x"></i>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div id="app" class="card w-100 position-relative overflow-hidden">
-    <div class="px-4 py-3 border-bottom">
-        <div class="card-body p-4">
-            <div class="d-flex mb-3 align-items-center">
-                <h4 class="card-title mb-0"><?= __('Usuários') ?></h4>
-                <div class="ms-auto flex-shrink-0">
-                    <button class="btn bg-primary-subtle text-primary "  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-bars" aria-hidden="true"></i>
+                <!-- ── Linha de filtros ── -->
+                <div class="row align-items-center g-2 mb-2">
+
+                    <!-- Busca textual -->
+                    <div class="col-xl-4 col-lg-4 col-md-12">
+                        <div class="position-relative">
+                            <input v-model="query" type="text" class="form-control form-control-lg rounded-pill ps-5"
+                                placeholder="Buscar por nome ou email..." @input="debouncedSearch">
+                            <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
+                                <i class="ti ti-search"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="col-xl-4 col-lg-4 col-md-12">
+                        <select v-model="situacaoFiltro" class="form-select select-situacao w-100"
+                            @change="aplicarFiltros">
+                            <option value="">Todos os status</option>
+                            <option value="1">Ativo</option>
+                            <option value="0">Inativo</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <!-- ── Filtros ativos ── -->
+                <div v-if="temFiltrosAtivos"
+                    class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3 mb-4 pt-2 border-top">
+
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <span class="text-muted me-1" style="font-size:0.82rem;">Filtros ativos:</span>
+
+                        <!-- Texto -->
+                        <div v-if="query" class="filtro-badge">
+                            <i class="ti ti-search" style="font-size:0.8rem;"></i>
+                            <span>{{ query.length > 15 ? query.substring(0, 15) + '...' : query }}</span>
+                            <button class="btn-remover" @click="removerFiltro('texto')">✕</button>
+                        </div>
+
+                        <!-- Status -->
+                        <div v-if="situacaoFiltro !== ''" class="filtro-badge">
+                            <i class="ti ti-user" style="font-size:0.8rem;"></i>
+                            <span>{{ textoSituacao }}</span>
+                            <button class="btn-remover" @click="removerFiltro('situacao')">✕</button>
+                        </div>
+                    </div>
+
+                    <!-- Limpar todos -->
+                    <button class="btn-limpar-todos" @click="limparTodosFiltros">
+                        Limpar todos
                     </button>
-                    <ul class="dropdown-menu animated flipInX">
-                        <li><?= $this->Html->link('<i class="fa fa-plus" aria-hidden="true"></i> Novo Usuário', ['action' => 'novo'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
-                    </ul>
                 </div>
-            </div>
 
-            <!-- BUSCA -->
-            <div class="row mb-3">
-                <div class="col-md-6 d-flex">
-                    <input v-model="query" type="text" class="form-control" placeholder="Buscar usuários por nome, email">
-                    <button class="btn btn-primary ms-2" @click="onSearch">Pesquisar</button>
+                <!-- ── Tabela ── -->
+                <div class="table-responsive-sm mb-4 border rounded-1 position-relative">
+                    <div v-if="carregando"
+                        class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center bg-white"
+                        style="opacity:0.7; z-index:10;">
+                        <i class="fa fa-spinner fa-spin fa-3x text-primary"></i>
+                    </div>
+
+                    <table class="table table-striped text-nowrap mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Cadastrado em</th>
+                                <th>Opções</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="item in filteredItems" :key="item.id">
+                                <td style="width:30%;">{{ item.nome }}</td>
+                                <td>{{ item.email }}</td>
+                                <td>
+                                    <span v-if="item.ativar"
+                                        class="badge bg-success-subtle border border-success text-success">
+                                        Ativo
+                                    </span>
+                                    <span v-else class="badge bg-danger-subtle border border-danger text-danger">
+                                        Inativo
+                                    </span>
+                                </td>
+                                <td>{{ formatarDataHoraBR(item.created) }}</td>
+                                <td style="width:8%;">
+                                    <div class="dropdown">
+                                        <button
+                                            class="btn bg-transparent text-primary d-inline-flex align-items-center justify-content-center"
+                                            type="button" :id="'dropdownMenu-' + item.id" data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            <i class="fas fa-bars"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end"
+                                            :aria-labelledby="'dropdownMenu-' + item.id">
+                                            <li>
+                                                <a class="dropdown-item" :href="`${routes.visualizar}/${item.id}`">
+                                                    <span class="iconify text-gray" data-icon="solar:eye-bold-duotone"
+                                                        style="font-size:15px;"></span> Visualizar
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" :href="`${routes.edit}/${item.id}`">
+                                                    <span class="iconify text-gray" data-icon="solar:pen-bold-duotone"
+                                                        style="font-size:15px;"></span> Editar
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li>
+                                                <button type="button" class="dropdown-item text-danger"
+                                                    @click="confirmarExclusao(item)">
+                                                    <span class="iconify text-danger"
+                                                        data-icon="solar:trash-bin-minimalistic-bold-duotone"
+                                                        style="font-size:15px;"></span> Excluir
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-if="filteredItems.length === 0 && !carregando">
+                                <td colspan="5" class="text-center text-muted py-4">Nenhum usuário encontrado</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Paginação -->
+                    <div class="p-3">
+                        <?= $this->element('vue_pagination') ?>
+                    </div>
                 </div>
-            </div>
-            <div class="table-responsive mb-4 border rounded-1">
-                <table class="table table-striped text-nowrap mb-0 align-middle">
-                    <thead class="text-dark fs-4">
-                    <tr>
-                        <th style="width: 50%;"><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('nome') ?></h6></th>
-                        <th style="width: 30%;"><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('email','E-Mail') ?></h6></th>
-                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('ativar','Ativo') ?></h6></th>
-                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('created', 'Criado em') ?></h6></th>
-                        <th><?= __('Opções') ?></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-if="usuarios.length === 0">
-                            <td colspan="5" class="text-center">
-                                Nenhum registro encontrado
-                            </td>
-                        </tr>
-                        <tr v-for="usuario in usuarios" :key="usuario.id">
-                            <td><p class="mb-0 fw-normal fs-4">{{usuario.nome}}</p></td>
-                            <td><p class="mb-0 fw-normal fs-4">{{usuario.email}}</p></td>
-                            <td>
-                                <span v-if="usuario.ativar == 1" class="badge bg-success-subtle text-success">Ativo</span>
-                                <span v-else class="badge bg-warning-subtle text-warning">Não</span>
-                            </td>
-                            <td><p class="mb-0 fw-normal fs-4">
-                                    {{ new Date(usuario.created).toLocaleDateString('pt-BR', {
-                                    day: '2-digit',
-                                    month: '2-digit',
-                                    year: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                    }) }}
-                                    </p></td>
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn btn-warning dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Opções
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <li><?= $this->Html->link('Visualizar','#',['@click'=>'viewCliente(usuario.id)','class'=>'dropdown-item','escape'=>false]) ?></li>
-                                        <li><a class="dropdown-item" :href="`<?= $this->Url->build(['controller' => 'Usuarios', 'action' => 'editar'], ['fullBase' => true]); ?>/${usuario.id}`">Editar</a></li>
-                                        <li><a class="dropdown-item" href="#" @click.prevent="onDelete(usuario.id, usuario.nome)">Excluir</a></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="paginator mt-4">
-                    <ul class="pagination justify-content-center">
-                        <?= $this->Paginator->first('<< ') ?>
-                        <?= $this->Paginator->prev('< ') ?>
-                        <?= $this->Paginator->numbers() ?>
-                        <?= $this->Paginator->next(' >') ?>
-                        <?= $this->Paginator->last(' >>') ?>
-                    </ul>
-                </div>
+
             </div>
         </div>
     </div>
 </div>
-
 
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<?= $this->Html->script('vue/vue-index.js?v=' . filemtime(WWW_ROOT . 'js/vue/vue-index.js')) ?>
 <script>
-    const usuariosInit = <?= json_encode($usuarios->toArray()) ?>;
-
-    Vue.createApp({
-        data() {
-            return {
-                query: '',
-                usuarios: usuariosInit,
-                usuarioId: null,
-            }
-        },
-        methods: {
-            async onSearch() {
-        try {
-            const params = new URLSearchParams()
-
-            if (this.query) {
-                params.append("q", this.query)
-            }
-
-            // URL absoluta do endpoint
-            const url = "<?= $this->Url->build(['controller' => 'Usuarios', 'action' => 'search']); ?>?" + params.toString();
-
-            const res = await fetch(url, {
-                credentials: 'same-origin' // envia cookies de sessão
-            });
-
-            // lê JSON mesmo que haja redirect
-            const data = await res.json();
-            this.usuarios = data.data || [];
-        } catch(err) {
-            console.error(err);
-            alert('Erro ao buscar usuarios. Verifique console para detalhes.');
+    createVueIndex({
+        customFilters: {
+            situacaoFiltro: 'ativar'
         }
-    },
-    async onDelete(id, nome) {
-        if (confirm(`Tem certeza que deseja excluir #${nome}?`)) {
-            const response = await fetch(`<?= $this->Url->build(['controller' => 'Usuarios', 'action' => 'delete']); ?>/${id}`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-Token': '<?= $this->request->getAttribute('csrfToken') ?>',
-                    'X-HTTP-Method-Override': 'DELETE',
-                    'Accept': 'application/json'
-                }
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                alert(data.message);
-                // Atualizar a lista
-                    this.onSearch();
-            } else {
-                alert('Erro: ' + data.message);
-            }
-        }
-    },
-    async viewCliente(id) {
-        try {
-            const res = await fetch(`<?= $this->Url->build(['controller' => 'Usuarios', 'action' => 'visualizar']); ?>/${id}`, {
-                credentials: 'same-origin',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
-
-            if (!res.ok) throw new Error('Erro ao carregar usuário');
-
-            const html = await res.text();
-
-            // Adiciona o conteúdo no modal e inclui botão Editar
-            const modalEl = document.getElementById('view-modal');
-
-            modalEl.querySelector('#modal-body-content').innerHTML = `
-  <div>
-    ${html} <!-- conteúdo da view visualizar_tabela.php -->
-                <div class="modal-footer mt-3">
-                <a href="<?= $this->Url->build(['controller' => 'Usuarios', 'action' => 'editar'], ['fullBase' => true]); ?>/${id}"
-                class="btn btn-primary">Editar</a>
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
-                </div>
-                </div>
-                `;
-        // Inicializa e abre o modal
-        const modal = new bootstrap.Modal(modalEl);
-        modal.show();
-
-    } catch (err) {
-        console.error(err);
-        alert('Erro ao carregar usuário.');
-    }
-    }
-    }
-}).mount('#app');
+    });
 </script>

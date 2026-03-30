@@ -1,0 +1,25 @@
+--- /opt/cakephp-app/painel/templates/Agendamentos/index.php
++++ /opt/cakephp-app/painel/templates/Agendamentos/index.php
+@@ -12,13 +12,13 @@
+ <div data-vue="generic-modal" data-title="Cadastrar Cliente"
+     data-submit-url="<?= $this->Url->build(['controller' => 'Clientes', 'action' => 'novo'], ['fullBase' => true]) ?>"
+     data-trigger-btn="#btnAbrirCadastroCliente" data-modal-size="modal-xl" data-fields='[
+-        {"name":"nome","label":"Nome Completo","type":"text","id":"nome","col":6,"placeholder":"Digite o nome"},
++        {"name":"nome","label":"Nome Completo","type":"text","id":"nome","col":6,"placeholder":"Digite o nome","mask":"nome"},
+         {"name":"data_nascimento","label":"Nascimento","type":"date","id":"data_nascimento","col":3},
+-        {"name":"documento","label":"CPF","type":"text","id":"documento","col":3},
++        {"name":"documento","label":"CPF","type":"text","id":"documento","col":3,"mask":"cpf"},
+         {"name":"email","label":"Email","type":"email","id":"email","col":6},
+-        {"name":"telefone","label":"Telefone","type":"text","id":"telefone","col":3},
+-        {"name":"celular","label":"Celular","type":"text","id":"celular","col":3},
++        {"name":"telefone","label":"Telefone","type":"text","id":"telefone","col":3,"mask":"telefone"},
++        {"name":"celular","label":"Celular","type":"text","id":"celular","col":3,"mask":"celular"},
+         {"name":"cep","label":"CEP","vueComponent":"cep-autocomplete","id":"cep","col":3},
+@@ -280,6 +280,7 @@
+ 
+ <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+ <?= $this->Html->script('vue/generic-modal.js') ?>
++<?= $this->Html->script('vue/vue-masks.js') ?>
+ <?= $this->Html->script('vue/form-cadastrar.js') ?>
+ <?= $this->Html->script('vue/cep-autocomplete.js') ?>
+ 

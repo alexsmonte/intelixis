@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace App\Controller;
+use App\Controller\Traits\SearchableTrait;
 
 /**
  * Estabelecimentos Controller
@@ -10,6 +11,30 @@ namespace App\Controller;
  */
 class EstabelecimentosController extends AppController
 {
+    use SearchableTrait;
+
+    /**
+     * Search API (used by Vue index)
+     */
+    public function search()
+    {
+        $allowedFilters = [
+            'q' => [
+                'operator' => 'MULTI_LIKE',
+                'fields' => [
+                    'Estabelecimentos.nome_fantasia',
+                    'Estabelecimentos.razao_social',
+                    'Estabelecimentos.cpf_cnpj',
+                    'Estabelecimentos.email',
+                    'Estabelecimentos.telefone',
+                    'Contas.cpf_cnpj',
+                ]
+            ],
+            'ativar' => ['field' => 'Estabelecimentos.ativar'],
+        ];
+        return $this->doAdvancedSearch($this->Estabelecimentos, $allowedFilters, ['Estabelecimentos.nome_fantasia' => 'ASC'], ['Contas']);
+    }
+
     /**
      * Index method
      *

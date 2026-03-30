@@ -296,28 +296,59 @@ class UsuariosController extends AppController
     public function search()
     {
         $this->request->allowMethod(['get']);
-        $q = $this->request->getQuery('q');
 
-        $query = $this->Usuarios->find();
-        if (!empty($q)) {
+        $identity = $this->request->getAttribute('identity');
+        $contaId  = $identity->conta_id;
 
-            if($this->request->getAttribute('identity')->tipo == 'usuario')
-                $conditions =   ['Usuarios.conta_id' => $this->request->getAttribute('identity')->conta_id, 'Usuarios.tipo' => 'usuario'];
-            else
-                $conditions =   ['Usuarios.conta_id' => $this->request->getAttribute('identity')->conta_id];
-
-            $busca  =   ['OR' => ['Usuarios.nome LIKE' => "%$q%",'Usuarios.email LIKE' => "%$q%"]];
-
-            $conditions  =   array_merge($conditions, $busca);
-
-            $query->where($conditions);
+        // Scoping por tipo de usuário
+        if ($identity->tipo === 'usuario') {
+            $conditions = ['Usuarios.conta_id' => $contaId, 'Usuarios.tipo' => 'usuario'];
+        } else {
+            $conditions = ['Usuarios.conta_id' => $contaId];
         }
 
-        $usuarios = $query->limit(50)->all()->toArray(); // toArray() obrigatório
+        $params  = $this->request->getQueryParams();
+        $q       = $params['q'] ?? null;
+        $ativar  = $params['ativar'] ?? null;
+        $page    = max(1, (int)($params['page'] ?? 1));
+        $limit   = max(1, min(100, (int)($params['limit'] ?? 10)));
+
+        $query = $this->Usuarios->find()->where($conditions);
+
+        if (!empty($q)) {
+            $termo = mb_strtolower($q, 'UTF-8');
+            $query->where(function ($exp) use ($termo) {
+                return $exp->or([
+                    'LOWER(Usuarios.nome) LIKE'  => "%{$termo}%",
+                    'LOWER(Usuarios.email) LIKE' => "%{$termo}%",
+                ]);
+            });
+        }
+
+        if ($ativar !== null && $ativar !== '') {
+            $query->where(['Usuarios.ativar' => (int)$ativar]);
+        }
+
+        $total    = (clone $query)->count();
+        $pageCount = (int)ceil($total / $limit);
+        $results  = $query->orderBy(['Usuarios.nome' => 'ASC'])
+                          ->limit($limit)
+                          ->offset(($page - 1) * $limit)
+                          ->all()
+                          ->toArray();
 
         $this->autoRender = false;
         $this->response = $this->response
             ->withType('application/json')
-            ->withStringBody(json_encode(['data' => $usuarios]));
+            ->withStringBody(json_encode([
+                'data' => $results,
+                'paginator' => [
+                    'page'      => $page,
+                    'limit'     => $limit,
+                    'count'     => count($results),
+                    'total'     => $total,
+                    'pageCount' => $pageCount,
+                ],
+            ]));
     }
 }

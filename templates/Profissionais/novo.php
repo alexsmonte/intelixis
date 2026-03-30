@@ -47,10 +47,10 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais', 'url' => ['controller'
                                         </div>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                        <?= $this->Form->control('nome', ['label' => 'Nome Completo', 'class' => 'form-control',]); ?>
+                                        <?= $this->Form->control('nome', ['label' => 'Nome Completo', 'class' => 'form-control', 'v-mask' => "'nome'", 'minlength' => '3']); ?>
                                 </div>
                                 <div class="col-md-3 mb-3">
-                                        <?= $this->Form->control('data_nascimento', ['label' => 'Data de Nascimento', 'class' => 'form-control',]); ?>
+                                        <?= $this->Form->control('data_nascimento', ['label' => 'Data de Nascimento', 'class' => 'form-control', 'type' => 'date']); ?>
                                 </div>
                                 <div class="col-md-3 mb-3">
                                         <?= $this->Form->control('conselho', ['label' => 'Conselho', 'class' => 'form-control',]); ?>
@@ -59,10 +59,10 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais', 'url' => ['controller'
                                         <?= $this->Form->control('email', ['label' => 'Email', 'class' => 'form-control',]); ?>
                                 </div>
                                 <div class="col-md-3 mb-3">
-                                        <?= $this->Form->control('telefone', ['label' => 'Telefone', 'class' => 'form-control',]); ?>
+                                        <?= $this->Form->control('telefone', ['label' => 'Telefone', 'class' => 'form-control', 'v-mask' => "'telefone'"]); ?>
                                 </div>
                                 <div class="col-md-3 mb-3">
-                                        <?= $this->Form->control('celular', ['label' => 'Celular', 'class' => 'form-control',]); ?>
+                                        <?= $this->Form->control('celular', ['label' => 'Celular', 'class' => 'form-control', 'v-mask' => "'celular'"]); ?>
                                 </div>
 
                                 <div class="col-md-12">
@@ -112,13 +112,20 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais', 'url' => ['controller'
 
                         <div class="row">
                                 <div class="col-md-12 mb-3">
+                                        <div class="d-flex justify-content-between align-items-end mb-1">
+                                                <label class="form-label mb-0" for="convenios-ids">Convênios que este profissional atende</label>
+                                                <div>
+                                                        <button type="button" class="btn btn-sm btn-link text-primary p-0 me-2" onclick="$('#convenios-ids > option').prop('selected', true); $('#convenios-ids').trigger('change');">Selecionar Todos</button>
+                                                        <button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="$('#convenios-ids').val(null).trigger('change');">Desmarcar Todos</button>
+                                                </div>
+                                        </div>
                                         <?= $this->Form->control('convenios._ids', [
                                                 'type' => 'select',
                                                 'multiple' => 'multiple',
                                                 'class' => 'select2-multiple form-control',
                                                 'options' => $convenios,
-                                                'label' => 'Convênios que este profissional atende'
-
+                                                'label' => false,
+                                                'id' => 'convenios-ids'
                                         ]); ?>
                                 </div>
 
@@ -132,13 +139,20 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais', 'url' => ['controller'
                         </div>
                         <div class="row">
                                 <div class="col-md-12 mb-3">
+                                        <div class="d-flex justify-content-between align-items-end mb-1">
+                                                <label class="form-label mb-0" for="servicos-ids">Serviços que este profissional atende</label>
+                                                <div>
+                                                        <button type="button" class="btn btn-sm btn-link text-primary p-0 me-2" onclick="$('#servicos-ids > option').prop('selected', true); $('#servicos-ids').trigger('change');">Selecionar Todos</button>
+                                                        <button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="$('#servicos-ids').val(null).trigger('change');">Desmarcar Todos</button>
+                                                </div>
+                                        </div>
                                         <?= $this->Form->control('servicos._ids', [
                                                 'type' => 'select',
                                                 'multiple' => 'multiple',
                                                 'class' => 'select2-multiple form-control',
                                                 'options' => $servicos,
-                                                'label' => 'Serviços que este profissional atende'
-
+                                                'label' => false,
+                                                'id' => 'servicos-ids'
                                         ]); ?>
                                 </div>
 
@@ -159,8 +173,9 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais', 'url' => ['controller'
 
                         <div class="col-md-12">
                                 <div class="row">
-                                        <div class="col-md-2 offset-md-10  mb-3">
-                                                <?= $this->Form->button(__('Salvar'), ['class' => 'justify-content-center w-100 btn btn-success d-flex align-items-center']) ?>
+                                        <div class="col-md-12 mb-3 text-end">
+                                                <?= $this->Form->button(__('Salvar'), ['class' => 'btn btn-success rounded-pill']) ?>
+                                                <?= $this->Html->link(__('Cancelar'), ['action' => 'index'], ['class' => 'btn bg-danger-subtle text-danger rounded-pill ms-2']) ?>
                                         </div>
                                         <?= $this->Form->end() ?>
                                 </div>
@@ -179,3 +194,21 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais', 'url' => ['controller'
 
 <!-- vue cep autocomplete-->
 <?= $this->Html->script('vue/cep-autocomplete.js') ?>
+
+<!-- vue-masks -->
+<?= $this->Html->script('vue/vue-masks.js') ?>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        if (typeof IMask !== 'undefined' && window.VueMasks) {
+            // Inicializa as máscaras estáticas com base nos configs do vue-masks
+            const inputElements = document.querySelectorAll('input[v-mask]');
+            inputElements.forEach(input => {
+                const maskType = input.getAttribute('v-mask').replace(/['"]/g, '');
+                if (window.VueMasks.maskRegistry[maskType]) {
+                    IMask(input, window.VueMasks.maskRegistry[maskType]);
+                }
+            });
+        }
+    });
+</script>

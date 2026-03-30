@@ -35,6 +35,7 @@ function createVueIndex(extraConfig = {}) {
     }
 
     // ── Base config ──
+    const customFiltersMap = extraConfig.customFilters || {};
     const baseData = {
         lancamentos: [],
         items: [],
@@ -46,6 +47,8 @@ function createVueIndex(extraConfig = {}) {
         dataInicio: '',
         dataFim: '',
         situacaoFiltro: '',
+
+        customFiltersMap, // Registramos o mapa globalmente para computed e methods
 
         carregando: false,
         buscaTimeout: null,
@@ -62,15 +65,30 @@ function createVueIndex(extraConfig = {}) {
         totalTaxas: 0
     };
 
+    // Auto-injetar os customFilters como campos em baseData com valores vazios ('')
+    for (const key in customFiltersMap) {
+        baseData[key] = '';
+    }
+
     const baseComputed = {
         filteredItems() {
             return this.lancamentos;
         },
         temFiltrosAtivos() {
-            return !!(this.query || this.dataInicio || this.dataFim || this.situacaoFiltro);
+            let temBase = !!(this.query || this.dataInicio || this.dataFim || this.situacaoFiltro);
+            if (temBase) return true;
+            for (const key in this.customFiltersMap) {
+                if (this[key] !== '' && this[key] !== null && this[key] !== undefined) return true;
+            }
+            return false;
         },
         textoSituacao() {
-            return { aberto: 'Em aberto', fechado: 'Fechado' }[this.situacaoFiltro] || '';
+            return {
+                aberto: 'Em aberto',
+                fechado: 'Fechado',
+                '1': 'Ativo',
+                '0': 'Inativo'
+            }[this.situacaoFiltro] || '';
         }
     };
 
@@ -89,9 +107,11 @@ function createVueIndex(extraConfig = {}) {
         },
 
         removerFiltro(tipo) {
-            if (tipo === 'texto') this.query = '';
-            if (tipo === 'data') { this.dataInicio = ''; this.dataFim = ''; }
-            if (tipo === 'situacao') this.situacaoFiltro = '';
+            if (tipo === 'texto')       this.query = '';
+            else if (tipo === 'data') { this.dataInicio = ''; this.dataFim = ''; }
+            else if (tipo === 'situacao') this.situacaoFiltro = '';
+            else if (this[tipo] !== undefined) Object.assign(this, { [tipo]: '' });
+            
             this.aplicarFiltros();
         },
 
@@ -100,6 +120,11 @@ function createVueIndex(extraConfig = {}) {
             this.dataInicio = '';
             this.dataFim = '';
             this.situacaoFiltro = '';
+            
+            for (const key in this.customFiltersMap) {
+                if (this[key] !== undefined) this[key] = '';
+            }
+            
             this.aplicarFiltros();
         },
 
@@ -112,9 +137,15 @@ function createVueIndex(extraConfig = {}) {
             if (this.query && this.query.trim()) url += `&q=${encodeURIComponent(this.query.trim())}`;
             if (this.dataInicio) url += `&data_inicio=${this.dataInicio} 00:00:00`;
             if (this.dataFim) url += `&data_fim=${this.dataFim} 23:59:59`;
-            if (this.situacaoFiltro) url += `&status_caixa=${this.situacaoFiltro}`;
+            if (this.situacaoFiltro) url += `&situacao=${this.situacaoFiltro}`;
 
-            // Allow pages to add extra params
+            for (const key in this.customFiltersMap) {
+                if (this[key] !== '' && this[key] !== null && this[key] !== undefined) {
+                    url += `&${this.customFiltersMap[key]}=${encodeURIComponent(this[key])}`;
+                }
+            }
+
+            // Allow pages to add extra params se ainda precisarem de alguma customização não-padrão
             if (typeof this.buildSearchParams === 'function') {
                 const extra = this.buildSearchParams();
                 if (extra) url += extra;
@@ -127,6 +158,7 @@ function createVueIndex(extraConfig = {}) {
             try {
                 const url = this.buildSearchUrl();
                 const resp = await fetch(url, {
+                    credentials: 'same-origin',
                     headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
                 });
 
@@ -203,8 +235,79 @@ function createVueIndex(extraConfig = {}) {
             return str.charAt(0).toUpperCase() + str.slice(1);
         },
 
-        confirmarExclusao(e, item) {
-            if (!confirm(`Tem certeza que deseja excluir #${item.id}?`)) e.preventDefault();
+        async confirmarExclusao(item) {
+            // Guarda: protege contra cache do navegador (JS antigo passava o Event como 1º arg)
+            // ou contra chamada fora do v-for scope.
+            if (!item || item instanceof Event || typeof item.id === 'undefined') {
+                console.error('[vue-index] confirmarExclusao: item inválido recebido.', item);
+                return;
+            }
+
+            const itemId   = item.id;
+            // Tenta achar um campo de nome legível; fallback para #id
+            const itemNome = item.nome || item.name || item.descricao || item.titulo || `#${itemId}`;
+            // Capitaliza o entityName (ex: "o Caixa" → exibe como está, ou "o caixa")
+            const entidade = this.entityName || 'o registro';
+
+            const swalConfirm = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-danger ms-2',
+                    cancelButton: 'btn btn-secondary'
+                },
+                buttonsStyling: false
+            });
+
+            const result = await swalConfirm.fire({
+                title: `Excluir ${entidade}?`,
+                html: `Você está prestes a excluir <strong>${itemNome}</strong>.<br>
+                       <small class="text-muted">Esta ação não pode ser desfeita.</small>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '<i class="ti ti-trash me-1"></i> Sim, excluir',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+                focusCancel: true
+            });
+
+            if (!result.isConfirmed) return;
+
+            try {
+                const url = `${this.routes.delete}/${itemId}`;
+                const resp = await fetch(url, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `_method=DELETE&_csrfToken=${encodeURIComponent(this.csrfToken)}`
+                });
+
+                if (resp.ok) {
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Excluído!',
+                        text: `"${itemNome}" foi excluído com sucesso.`,
+                        timer: 1800,
+                        showConfirmButton: false
+                    });
+                    this.carregarDados();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro ao excluir',
+                        text: 'Não foi possível excluir o registro. Tente novamente.'
+                    });
+                }
+            } catch (err) {
+                console.error('Erro ao excluir:', err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro de conexão',
+                    text: 'Verifique sua conexão e tente novamente.'
+                });
+            }
         }
     };
 

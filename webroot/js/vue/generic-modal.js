@@ -1,4 +1,3 @@
-
 (function () {
     const { createApp, reactive } = Vue;
 
@@ -16,7 +15,9 @@
 
             let bsModal = null;
 
-            const abrirModal = () => { if (bsModal) bsModal.show(); };
+            const abrirModal = () => { 
+                if (bsModal) bsModal.show(); 
+            };
             const fecharModal = () => { if (bsModal) bsModal.hide(); };
 
             const submitForm = async () => {
@@ -102,7 +103,8 @@
                                             class="form-control"
                                             :id="f.id || f.name"
                                             :name="f.name"
-                                            :placeholder="f.placeholder || ''" />
+                                            :placeholder="f.placeholder || ''"
+                                            v-mask="f.mask" />
 
                                         <!-- Se não for autocompleteField: usa v-model -->
                                         <input v-else
@@ -111,7 +113,8 @@
                                             v-model="form[f.name]"
                                             :id="f.id || f.name"
                                             :name="f.name"
-                                            :placeholder="f.placeholder || ''" />
+                                            :placeholder="f.placeholder || ''"
+                                            v-mask="f.mask" />
                                  </div>
                                 </template>
 
@@ -139,6 +142,14 @@
                 const title = el.dataset.title || "Modal";
 
                 const app = createApp(GenericModal, { title, submitUrl, fields, modalSize });
+                
+                // Registra a diretiva v-mask
+                if (window.VueMasks && window.VueMasks.directive) {
+                    app.directive('mask', window.VueMasks.directive);
+                } else {
+                    console.warn("window.VueMasks não encontrado. Certifique-se de importar vue-masks.js ANTES deste script ou que ele esteja rodando.");
+                }
+
                 const vm = app.mount(el);
 
                 // botão que abre o modal

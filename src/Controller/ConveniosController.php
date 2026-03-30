@@ -258,9 +258,19 @@ class ConveniosController extends AppController
 
         $allowedFilters = [
             'estabelecimento_id' => ['field' => 'Convenios.estabelecimento_id', 'value' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
-            'nome' => ['field' => 'Convenios.nome', 'operator' => 'LIKE'],
-            'cnpj' => ['field' => 'Convenios.cnpj', 'operator' => 'LIKE'],
-
+            'q' => [
+                'operator' => 'MULTI_LIKE',
+                'fields' => [
+                    'Convenios.nome',
+                    'Convenios.registro_ans',
+                    'Convenios.cnpj',
+                    'Convenios.telefone',
+                    'Convenios.email'
+                ]
+            ],
+            'nome'   => ['field' => 'Convenios.nome', 'operator' => 'LIKE'],
+            'cnpj'   => ['field' => 'Convenios.cnpj', 'operator' => 'LIKE'],
+            'ativar' => ['field' => 'Convenios.ativar'],
         ];
 
         return $this->doAdvancedSearch($this->Convenios, $allowedFilters, ['Convenios.nome' => 'ASC'], ['Estabelecimentos']);

@@ -269,9 +269,16 @@ class ServicosController extends AppController
 
         $allowedFilters = [
             'estabelecimento_id' => ['field' => 'Servicos.estabelecimento_id', 'value' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
-            'nome' => ['field' => 'Servicos.nome', 'operator' => 'LIKE'],
-            'descricao' => ['field' => 'Servicos.descricao', 'operator' => 'LIKE']
-
+            'q' => [
+                'operator' => 'MULTI_LIKE',
+                'fields' => [
+                    'Servicos.nome',
+                    'Servicos.descricao'
+                ]
+            ],
+            'ativar'    => ['field' => 'Servicos.ativar'],
+            'nome'      => ['field' => 'Servicos.nome', 'operator' => 'LIKE'],
+            'descricao' => ['field' => 'Servicos.descricao', 'operator' => 'LIKE'],
         ];
         return $this->doAdvancedSearch($this->Servicos, $allowedFilters, ['Servicos.nome' => 'ASC'], ['Estabelecimentos']);
 

@@ -1,233 +1,163 @@
 <?php
 $this->BreadcrumbsPlus->add([['title' => 'Clientes']]);
 ?>
-<?= $this->element('barra-titulo',['title' => $title]); ?>
-<meta name="csrfToken" content="<?= $this->request->getAttribute('csrfToken') ?>">
+<script src="https://cdn.jsdelivr.net/npm/@iconify/iconify@3/dist/iconify.min.js"></script>
+<?= $this->element('barra-titulo', ['title' => $title]); ?>
+<?= $this->Html->css('index') ?>
+<?= $this->Html->css('barra-filtro') ?>
 
+<!-- Vue App Container -->
+<div id="app" v-cloak data-csrf="<?= $this->request->getAttribute('csrfToken'); ?>" data-entity-name="o Cliente"
+    data-routes='<?= json_encode([
+        'search'     => $this->Url->build(['controller' => 'Clientes', 'action' => 'search']),
+        'visualizar' => $this->Url->build(['controller' => 'Clientes', 'action' => 'visualizar']),
+        'edit'       => $this->Url->build(['controller' => 'Clientes', 'action' => 'editar']),
+        'delete'     => $this->Url->build(['controller' => 'Clientes', 'action' => 'delete'])
+    ], JSON_HEX_APOS | JSON_HEX_QUOT) ?>'>
 
-<button id="btnAbrirModal" class="btn btn-primary">+ Cadastrar</button>
+    <div class="card w-100 position-relative overflow-x-hidden">
+        <div class="px-4 py-3 border-bottom">
+            <div class="card-body p-4">
 
-<div data-vue="generic-modal"
-     data-title="Cadastrar Cliente"
-     data-submit-url="<?= $this->Url->build(['controller' => 'Clientes', 'action' => 'novo']) ?>"
-     data-trigger-btn="#btnAbrirModal"
-     data-modal-size="modal-xl"
-     data-fields='[
-        {"name":"nome","label":"Nome Completo","type":"text","id":"nome","col":6,"placeholder":"Digite o nome"},
-        {"name":"data_nascimento","label":"Nascimento","type":"date","id":"data_nascimento","col":3},
-        {"name":"documento","label":"CPF","type":"text","id":"documento","col":3},
-        {"name":"email","label":"Email","type":"email","id":"email","col":6},
-        {"name":"telefone","label":"Telefone","type":"text","id":"telefone","col":3},
-        {"name":"celular","label":"Celular","type":"text","id":"celular","col":3},
-        {"name":"cep","label":"CEP","vueComponent":"cep-autocomplete","id":"cep","col":3},
-        {"name":"logradouro","label":"Logradouro","type":"text","id":"logradouro","col":7,"autocompleteField":true},
-        {"name":"numero","label":"Número","type":"text","id":"numero", "col":2},
-         {"name":"bairro","label":"Bairro","type":"text","id":"bairro","col":5,"autocompleteField":true},
-        {"name":"cidade","label":"Cidade","type":"text","id":"cidade","col":5,"autocompleteField":true},
-        {"name":"uf","label":"UF","type":"text","id":"uf","col":2,"autocompleteField":true}
-     ]'>
-</div>
+                <!-- Título -->
+                <div class="d-flex mb-3 align-items-center justify-content-between">
+                    <h4 class="card-title mb-0">
+                        <?= __('Clientes') ?>
+                    </h4>
+                    <div class="col-md-6 d-flex justify-content-end">
+                        <button
+                            class="btn btn-novo bg-primary-subtle text-primary border-primary d-flex align-items-center justify-content-center"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="iconify" data-icon="solar:list-arrow-down-bold" style="font-size:22px;"></span>
+                        </button>
+                        <ul class="dropdown-menu animated flipInX">
+                            <li>
+                                <?= $this->Html->link('<span class="iconify text-gray me-2" data-icon="solar:add-circle-linear" style="font-size:16px;"></span> Novo Cliente', ['action' => 'novo'], ['class' => 'dropdown-item d-flex align-items-center', 'escape' => false]) ?>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
 
-<!-- Modal Visualizar Cliente -->
-<div class="modal fade" id="view-modal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-md">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="pb-1 mb-2 border-bottom w-100">
-          <h5>Detalhes do Cliente</h5>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-      </div>
-      <div class="modal-body text-start" id="modal-body-content">
-        <i class="fa fa-spinner fa-spin fa-2x"></i>
-      </div>
-    </div>
-  </div>
-</div>
+                <!-- ── Linha de filtros ── -->
+                <div class="row align-items-center g-2 mb-2">
 
+                    <!-- Busca textual -->
+                    <div class="col-xl-4 col-lg-4 col-md-12">
+                        <div class="position-relative">
+                            <input v-model="query" type="text" class="form-control form-control-lg rounded-pill ps-5"
+                                placeholder="Buscar por nome, documento ou email..." @input="debouncedSearch">
+                            <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
+                                <i class="ti ti-search"></i>
+                            </span>
+                        </div>
+                    </div>
 
+                </div>
 
+                <!-- ── Filtros ativos ── -->
+                <div v-if="temFiltrosAtivos"
+                    class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3 mb-4 pt-2 border-top">
 
-<div id="app" class="card w-100 position-relative overflow-hidden">
-    <div class="px-4 py-3 border-bottom">
-        <div class="card-body p-4">
-             
-        <div class="d-flex mb-3 align-items-center">
-                <h4 class="card-title mb-0"><?= __('Clientes') ?></h4>
-                <div class="ms-auto flex-shrink-0">
-                    <button class="btn bg-primary-subtle text-primary "  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-bars" aria-hidden="true"></i>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <span class="text-muted me-1" style="font-size:0.82rem;">Filtros ativos:</span>
+
+                        <!-- Texto -->
+                        <div v-if="query" class="filtro-badge">
+                            <i class="ti ti-search" style="font-size:0.8rem;"></i>
+                            <span>{{ query.length > 15 ? query.substring(0, 15) + '...' : query }}</span>
+                            <button class="btn-remover" @click="removerFiltro('texto')">✕</button>
+                        </div>
+
+                    </div>
+
+                    <!-- Limpar todos -->
+                    <button class="btn-limpar-todos" @click="limparTodosFiltros">
+                        Limpar todos
                     </button>
-                    <ul class="dropdown-menu animated flipInX">
-                        <li><?= $this->Html->link('<i class="fa fa-plus" aria-hidden="true"></i> Novo Cliente', ['action' => 'novo'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
-                    </ul>
                 </div>
-            </div>
 
+                <!-- ── Tabela ── -->
+                <div class="table-responsive-sm mb-4 border rounded-1 position-relative">
+                    <div v-if="carregando"
+                        class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center bg-white"
+                        style="opacity:0.7; z-index:10;">
+                        <i class="fa fa-spinner fa-spin fa-3x text-primary"></i>
+                    </div>
 
-            <!-- BUSCA -->
-            <div class="row mb-3">
-                <div class="col-md-6 d-flex">
-                    <input v-model="query" type="text" class="form-control" placeholder="Buscar clientes por nome, documento ou email">
-                    <button class="btn btn-primary ms-2" @click="onSearch">Pesquisar</button>
+                    <table class="table table-striped text-nowrap mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Documento</th>
+                                <th>Email</th>
+                                <th>Telefone</th>
+                                <th>Celular</th>
+                                <th>Opções</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="item in filteredItems" :key="item.id">
+                                <td style="width:30%;">{{ item.nome }}</td>
+                                <td>{{ item.documento }}</td>
+                                <td>{{ item.email }}</td>
+                                <td>{{ item.telefone }}</td>
+                                <td>{{ item.celular }}</td>
+                                <td style="width:8%;">
+                                    <div class="dropdown">
+                                        <button
+                                            class="btn bg-transparent text-primary d-inline-flex align-items-center justify-content-center"
+                                            type="button" :id="'dropdownMenu-' + item.id" data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            <i class="fas fa-bars"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end"
+                                            :aria-labelledby="'dropdownMenu-' + item.id">
+                                            <li>
+                                                <a class="dropdown-item" :href="`${routes.visualizar}/${item.id}`">
+                                                    <span class="iconify text-gray" data-icon="solar:eye-bold-duotone"
+                                                        style="font-size:15px;"></span> Visualizar
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" :href="`${routes.edit}/${item.id}`">
+                                                    <span class="iconify text-gray" data-icon="solar:pen-bold-duotone"
+                                                        style="font-size:15px;"></span> Editar
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li>
+                                                <button type="button" class="dropdown-item text-danger"
+                                                    @click="confirmarExclusao(item)">
+                                                    <span class="iconify text-danger"
+                                                        data-icon="solar:trash-bin-minimalistic-bold-duotone"
+                                                        style="font-size:15px;"></span> Excluir
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-if="filteredItems.length === 0 && !carregando">
+                                <td colspan="6" class="text-center text-muted py-4">Nenhum cliente encontrado</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Paginação -->
+                    <div class="p-3">
+                        <?= $this->element('vue_pagination') ?>
+                    </div>
                 </div>
-            </div>
 
-            <!-- TABELA -->
-            <div class="table-responsive mb-4 border rounded-1">
-                <table class="table table-striped text-nowrap mb-0 align-middle">
-                    <thead>
-                        <tr>
-
-                            <th>Nome</th>
-                            <th>Documento</th>
-                            <th>Email</th>
-                            <th>Telefone</th>
-                            <th>Celular</th>
-                            <th>Opções</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="cliente in clientes" :key="cliente.id">
-
-
-                            <td>{{ cliente.nome }}</td>
-                            <td>{{ cliente.documento }}</td>
-                            <td>{{ cliente.email }}</td>
-                            <td>{{ cliente.telefone }}</td>
-                            <td>{{ cliente.celular }}</td>
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown">Opções</button>
-                                    <ul class="dropdown-menu">
-                                    <li>
-                                        <button class="dropdown-item btn btn-primary btn-sm" @click="viewCliente(cliente.id)">Visualizar</button>
-           
-                                    </li>
-                                        <li><a class="dropdown-item" :href="`/painel/clientes/editar/${cliente.id}`">Editar</a></li>
-                                        <li>
-                                            <form :action="`/painel/clientes/delete/${cliente.id}`" method="post" @submit.prevent="confirmDelete($event)">
-                                                <button type="submit" class="dropdown-item">Excluir</button>
-                                               
-                                            </form>
-
-                                            
-                                            
-                                         
-
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-
-                        
-                        
-
-
-                        <tr v-if="clientes.length === 0">
-                            <td colspan="8" class="text-center">Nenhum cliente encontrado</td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                
-
-
-
-                <div class="paginator mt-4">
-                    <ul class="pagination justify-content-center">
-                        <?= $this->Paginator->first('<< ') ?>
-                        <?= $this->Paginator->prev('< ') ?>
-                        <?= $this->Paginator->numbers() ?>
-                        <?= $this->Paginator->next(' >') ?>
-                        <?= $this->Paginator->last(' >>') ?>
-                    </ul>
-                </div>
             </div>
         </div>
     </div>
 </div>
 
-
-<!-- vue -->
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-<?= $this->Html->script('vue/generic-modal.js') ?>
-<?= $this->Html->script('vue/form-cadastrar.js') ?>
-<?= $this->Html->script('vue/cep-autocomplete.js') ?>
+<?= $this->Html->script('vue/vue-index.js?v=' . filemtime(WWW_ROOT . 'js/vue/vue-index.js')) ?>
 <script>
-const clientesInit = <?= json_encode($clientes->toArray()) ?>;
-
-Vue.createApp({
-    data() {
-        return {
-            query: '',
-            clientes: clientesInit,
-            clienteId: null,
-        }
-    },
-    methods: {
-        async onSearch() {
-            try {
-                // URL absoluta do endpoint
-                const url = "/painel/clientes/search?q=" + encodeURIComponent(this.query);
-
-                const res = await fetch(url, {
-                    credentials: 'same-origin' // envia cookies de sessão
-                });
-
-                // lê JSON mesmo que haja redirect
-                const data = await res.json();
-                this.clientes = data.data || [];
-            } catch(err) {
-                console.error(err);
-                alert('Erro ao buscar clientes. Verifique console para detalhes.');
-            }
-        },
-        confirmDelete(event) {
-            if(!confirm('Tem certeza que deseja excluir este cliente?')) {
-                event.preventDefault();
-            } else {
-                event.target.submit();
-            }
-        },
-        async viewCliente(id) {
-            try {
-        const res = await fetch(`/painel/clientes/visualizar/${id}`, {
-            credentials: 'same-origin',
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        });
-
-        if (!res.ok) throw new Error('Erro ao carregar cliente');
-
-        const html = await res.text();
-
-        // Adiciona o conteúdo no modal e inclui botão Editar
-        const modalEl = document.getElementById('view-modal');
-        modalEl.querySelector('#modal-body-content').innerHTML = `
-            <div>
-                ${html} <!-- conteúdo da view visualizar_tabela.php -->
-                <div class="modal-footer mt-3">
-                    <a href="/painel/clientes/editar/${id}" class="btn btn-primary">Editar</a>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
-                </div>
-            </div>
-        `;
-
-        // Inicializa e abre o modal
-        const modal = new bootstrap.Modal(modalEl);
-        modal.show();
-
-    } catch (err) {
-        console.error(err);
-        alert('Erro ao carregar cliente.');
-    }
-    }
-
-        
-        
-
-
-
-    }
-}).mount('#app');
+    createVueIndex();
 </script>

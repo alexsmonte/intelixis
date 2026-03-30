@@ -32,9 +32,16 @@ class CaixasController extends AppController
         $estabelecimentoId = $this->request->getSession()->read('Auth.Estabelecimento.id');
 
         $allowedFilters = [
+            'q' => [
+                'operator' => 'MULTI_LIKE',
+                'fields' => [
+                    'Usuarios.nome',
+                    'Conferentes.nome'
+                ]
+            ],
             'q_usuario'          => ['field' => 'Usuarios.nome',         'operator' => 'LIKE'],
             'q_conferente'       => ['field' => 'Conferentes.nome',      'operator' => 'LIKE'],
-            'status_caixa'       => ['field' => 'situacao',              'operator' => '='],   // ✅ sem ponto, sem "situacao"
+            'situacao'           => ['field' => 'situacao',              'operator' => '='],   // genérico
             'data_inicio'        => ['field' => 'data_abertura',         'operator' => '>='],
             'data_fim'           => ['field' => 'data_abertura',         'operator' => '<='],
             'estabelecimento_id' => ['field' => 'estabelecimento_id',    'operator' => '=', 'value' => $estabelecimentoId],

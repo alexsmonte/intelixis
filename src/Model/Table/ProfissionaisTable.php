@@ -10,6 +10,7 @@ use Cake\Validation\Validator;
 use Cake\Event\Event;
 use Cake\Event\EventInterface;
 use Cake\Datasource\EntityInterface;
+
 /**
  * Profissionais Model
  *
@@ -65,8 +66,8 @@ class ProfissionaisTable extends Table
             'foreignKey' => 'profissional_id',
         ]);
         /*$this->hasMany('Periodos', [
-            'foreignKey' => 'profissional_id',
-        ]);*/
+         'foreignKey' => 'profissional_id',
+         ]);*/
         $this->hasMany('Periodos', [
             'foreignKey' => 'profissional_id',
             'saveStrategy' => 'replace',
@@ -96,24 +97,24 @@ class ProfissionaisTable extends Table
         $validator
             ->notEmptyString('estabelecimento_id');
 
-            $validator
+        $validator
             ->scalar('nome')
             ->minLength('nome', 5, __('O nome deve ter pelo menos 5 caracteres.'))
             ->maxLength('nome', 255)
             ->add('nome', 'fullName', [
-                'rule' => 'isFullName',
-                'provider' => 'table',
-                'message' => __('Informe nome e sobrenome.'),
-            ])
+            'rule' => 'isFullName',
+            'provider' => 'table',
+            'message' => __('Informe nome e sobrenome.'),
+        ])
             ->requirePresence('nome', 'create')
             ->notEmptyString('nome', __('O nome é obrigatório.'));
 
-            $validator
-            ->date('data_nascimento',['dmy'],'Informe uma data válida')
+        $validator
+            ->date('data_nascimento', ['dmy'], 'Informe uma data válida')
             ->requirePresence('data_nascimento', 'create')
             ->allowEmptyDate('data_nascimento');
 
-            $validator
+        $validator
             ->scalar('conselho')
             ->allowEmptyString('conselho');
 
@@ -121,19 +122,19 @@ class ProfissionaisTable extends Table
             ->email('email')
             ->allowEmptyString('email');
 
-            $validator
+        $validator
             ->scalar('telefone')
             ->minLength('telefone', 10, __('O Telefone deve conter 10 caracteres.'))
             ->maxLength('telefone', 14)
             ->allowEmptyString('telefone');
 
-            $validator
+        $validator
             ->scalar('celular')
             ->minLength('celular', 11, __('O Celular deve conter 11 caracteres.'))
             ->maxLength('celular', 15)
             ->allowEmptyString('celular');
 
-            $validator
+        $validator
             ->scalar('cep')
             ->minLength('cep', 8, __('O CEP deve conter 8 caracteres.'))
             ->maxLength('cep', 9)
@@ -163,7 +164,7 @@ class ProfissionaisTable extends Table
             ->scalar('cidade')
             ->maxLength('cidade', 120)
             ->allowEmptyString('cidade');
-        
+
         $validator
             ->scalar('uf')
             ->maxLength('uf', 2)
@@ -221,19 +222,19 @@ class ProfissionaisTable extends Table
     public function beforeMarshal(Event $event, \ArrayObject $data, \ArrayObject $options)
     {
 
-        $caracterInvalido   =   [" ",".","-","/",")","(",","];
+        $caracterInvalido = [" ", ".", "-", "/", ")", "(", ","];
 
-        if(isset($data['cpf_cnpj']))
-            $data['cpf_cnpj']      =   str_replace($caracterInvalido, "", $data['cpf_cnpj']);
+        if (isset($data['cpf_cnpj']))
+            $data['cpf_cnpj'] = str_replace($caracterInvalido, "", $data['cpf_cnpj']);
 
-        if(isset($data['cep']))
-            $data['cep']           =   str_replace($caracterInvalido, "", $data['cep']);
+        if (isset($data['cep']))
+            $data['cep'] = str_replace($caracterInvalido, "", $data['cep']);
 
-        if(isset($data['telefone']))
-            $data['telefone']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['telefone']));
+        if (isset($data['telefone']))
+            $data['telefone'] = preg_replace('/[\p{L}]/', '', str_replace($caracterInvalido, "", $data['telefone']));
 
-        if(isset($data['celular']))
-            $data['celular']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['celular']));
+        if (isset($data['celular']))
+            $data['celular'] = preg_replace('/[\p{L}]/', '', str_replace($caracterInvalido, "", $data['celular']));
 
     }
 
@@ -249,43 +250,39 @@ class ProfissionaisTable extends Table
     {
         $tabela = $this;
 
-        // Cores proibidas — não usar nem próximas delas
         $coresProibidas = [
-            '#ADB5BD', '#FAED96', '#A5D4ED', '#A4E082','#FF0000', '#FF7F7F', '#0000FF', '#A020F0'
+            '#ADB5BD', '#FAED96', '#A5D4ED', '#A4E082',
+            '#FF0000', '#FF7F7F', '#0000FF', '#A020F0'
         ];
 
-        // Paleta fixa e bonita (cores fortes e equilibradas)
-        $paleta = [
-            '#018a6f', '#022a52','#75910f', '#2980B9','#F39C12', '#C0392B','#633262','#154f4f','#224f15','#636209','#7a180b'
-        ];
-
-        // Tenta primeiro pegar uma cor livre da paleta
+        //  Busca cores já usadas
         $coresUsadas = $tabela->find()
-            ->select('cor')
-            ->where(['estabelecimento_id' => $estabelecimentoId])
+            ->select(['cor'])
+            ->where([
+            'estabelecimento_id' => $estabelecimentoId,
+            'cor IS NOT' => null
+        ])
             ->enableHydration(false)
             ->toArray();
 
-        $usadas = array_map('strtoupper', array_column($coresUsadas, 'cor'));
+        $usadas = array_map(
+        fn($c) => strtoupper($c),
+            array_column($coresUsadas, 'cor')
+        );
 
-        $disponiveis = array_diff($paleta, $usadas);
+        // Índice baseado na quantidade já usada
+        $index = count($usadas);
 
-        if (!empty($disponiveis)) {
-            $cor = array_rand(array_flip($disponiveis));
-            return strtoupper($cor);
-        }
+        // Tenta gerar uma cor válida
+        $tentativas = 0;
 
-        // Se esgotar a paleta, gera aleatória visível e única
         do {
-            $cor = $this->gerarCorVisivel();
+            $cor = $this->gerarCorHSLGoldenAngle($index + $tentativas);
 
-            // Verifica se já existe dentro do mesmo estabelecimento
-            $existe = $tabela->exists([
-                'cor' => $cor,
-                'estabelecimento_id' => $estabelecimentoId
-            ]);
+            //  Igual já usada
+            $existe = in_array($cor, $usadas);
 
-            // Calcula distância de cor com as proibidas (evita tons próximos)
+            //  Parecida com proibidas
             $proximaDeProibida = false;
             foreach ($coresProibidas as $bloqueada) {
                 if ($this->coresSaoParecidas($cor, $bloqueada, 80)) {
@@ -294,9 +291,20 @@ class ProfissionaisTable extends Table
                 }
             }
 
-        } while ($existe || $proximaDeProibida);
+            //  Parecida com usadas
+            $proximaDeUsada = false;
+            foreach ($usadas as $usada) {
+                if ($this->coresSaoParecidas($cor, $usada, 80)) {
+                    $proximaDeUsada = true;
+                    break;
+                }
+            }
 
-        return strtoupper($cor);
+            $tentativas++;
+
+        } while (($existe || $proximaDeProibida || $proximaDeUsada) && $tentativas < 20);
+
+        return $cor;
     }
 
     private function gerarCorVisivel(): string
@@ -319,6 +327,10 @@ class ProfissionaisTable extends Table
 
     private function coresSaoParecidas(string $cor1, string $cor2, int $limite = 60): bool
     {
+        if (!preg_match('/^#[0-9A-F]{6}$/i', $cor1) || !preg_match('/^#[0-9A-F]{6}$/i', $cor2)) {
+            return false; // evita erro silencioso
+        }
+
         [$r1, $g1, $b1] = sscanf($cor1, "#%02x%02x%02x");
         [$r2, $g2, $b2] = sscanf($cor2, "#%02x%02x%02x");
 
@@ -329,5 +341,66 @@ class ProfissionaisTable extends Table
         );
 
         return $distancia < $limite;
+    }
+
+    private function hslParaHex($h, $s, $l): string
+    {
+        $s /= 100;
+        $l /= 100;
+
+        $c = (1 - abs(2 * $l - 1)) * $s;
+        $x = $c * (1 - abs(fmod($h / 60, 2) - 1));
+        $m = $l - $c / 2;
+
+        if ($h < 60) {
+            $r = $c;
+            $g = $x;
+            $b = 0;
+        }
+        elseif ($h < 120) {
+            $r = $x;
+            $g = $c;
+            $b = 0;
+        }
+        elseif ($h < 180) {
+            $r = 0;
+            $g = $c;
+            $b = $x;
+        }
+        elseif ($h < 240) {
+            $r = 0;
+            $g = $x;
+            $b = $c;
+        }
+        elseif ($h < 300) {
+            $r = $x;
+            $g = 0;
+            $b = $c;
+        }
+        else {
+            $r = $c;
+            $g = 0;
+            $b = $x;
+        }
+
+        $r = (int)(($r + $m) * 255);
+        $g = (int)(($g + $m) * 255);
+        $b = (int)(($b + $m) * 255);
+
+        return sprintf("#%02X%02X%02X", $r, $g, $b);
+    }
+
+    private function gerarCorHSLGoldenAngle(int $index): string
+    {
+        $goldenAngle = 137.508;
+
+        // Distribuição perfeita
+        $h = fmod($index * $goldenAngle, 360);
+
+        // Ajustes visuais (pode brincar aqui)
+        $s = 75; // saturação
+        $l = 55; // luminosidade
+
+        return $this->hslParaHex($h, $s, $l);
     }
 }

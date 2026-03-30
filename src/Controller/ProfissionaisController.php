@@ -2,9 +2,11 @@
 declare(strict_types=1);
 
 namespace App\Controller;
+
 use App\Controller\Traits\SearchableTrait;
 use Cake\ORM\Query;
 use Cake\I18n\FrozenDate;
+
 /**
  * Profissionais Controller
  *
@@ -113,7 +115,7 @@ class ProfissionaisController extends AppController
 
             if (!empty($data['periodos'])) {
                 $data['periodos'] = array_map(
-                    fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+                fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
                     $data['periodos']
                 );
             }
@@ -129,10 +131,10 @@ class ProfissionaisController extends AppController
             }
 
             $this->Flash->error(__('Ocorreu um erro. Verifique os dados e tente novamente.'));
-            //Log::error('[SERVICOS::novo] Erros ao salvar: ' . json_encode($servico->getErrors(), JSON_UNESCAPED_UNICODE));
+        //Log::error('[SERVICOS::novo] Erros ao salvar: ' . json_encode($servico->getErrors(), JSON_UNESCAPED_UNICODE));
         }
 
-        render_form:
+        //render_form:
         //$estabelecimentos = $this->Servicos->Estabelecimentos->find('list', limit: 200)->all();
         //$convenios        = $this->Servicos->Convenios->find('list', limit: 200)->all();
 
@@ -170,14 +172,14 @@ class ProfissionaisController extends AppController
                 // 1. Extrair e validar dados
                 $habilitarProgramacao = (int)($data['habilitar_programacao'] ?? 0);
                 $periodos = $data['periodos'] ?? [];
-                
+
                 // 2. Validar se períodos é array
                 if (!is_array($periodos)) {
                     throw new \InvalidArgumentException('Períodos deve ser um array');
                 }
-                
+
                 $temPeriodos = !empty($periodos);
-            
+
                 // 3. Lógica de deleção
                 if ($habilitarProgramacao === 0 || ($habilitarProgramacao === 1 && !$temPeriodos)) {
                     $this->Profissionais->Periodos->deleteAll([
@@ -185,19 +187,20 @@ class ProfissionaisController extends AppController
                         'cadeia_id' => 1
                     ]);
                 }
-            
+
                 // 4. Processar períodos
                 if ($temPeriodos) {
-                   
-                    
+
+
                     $data['periodos'] = array_map(
-                        fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+                    fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
                         $data['periodos']
-                    ); 
-                
+                    );
+
                 }
-            
-            } catch (\InvalidArgumentException $e) {
+
+            }
+            catch (\InvalidArgumentException $e) {
                 // Logar erro ou tratar exceção
                 $this->log("Erro ao processar períodos: " . $e->getMessage());
                 throw $e; // Re-lançar se necessário
@@ -215,7 +218,8 @@ class ProfissionaisController extends AppController
             if ($this->Profissionais->save($profissional)) {
                 $this->Flash->success(__('Profissional atualizado com sucesso.'));
                 return $this->redirect(['action' => 'index']);
-            } else {
+            }
+            else {
                 $this->Flash->error(__('Não foi possível atualizar o profissional.'));
             }
         }
@@ -228,7 +232,7 @@ class ProfissionaisController extends AppController
             ->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])
             ->all();
 
-        
+
         $title = 'Editar Serviço';
         $this->set(compact('profissional', 'convenios', 'servicos', 'title'));
     }
@@ -250,7 +254,8 @@ class ProfissionaisController extends AppController
         ]);
         if ($this->Profissionais->delete($profissional)) {
             $this->Flash->success(__('Profissional excluído com sucesso.'));
-        } else {
+        }
+        else {
             $this->Flash->error(__('Ocorreu um erro ao excluir. Por favor, tente novamente.'));
         }
 
@@ -267,9 +272,17 @@ class ProfissionaisController extends AppController
 
         $allowedFilters = [
             'estabelecimento_id' => ['field' => 'Profissionais.estabelecimento_id', 'value' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+            'q' => [
+                'operator' => 'MULTI_LIKE',
+                'fields' => [
+                    'Profissionais.nome',
+                    'Profissionais.email',
+                    'Profissionais.celular'
+                ]
+            ],
+            'ativar' => ['field' => 'Profissionais.ativar'],
             'nome' => ['field' => 'Profissionais.nome', 'operator' => 'LIKE'],
             'email' => ['field' => 'Profissionais.email', 'operator' => 'LIKE'],
-
         ];
         return $this->doAdvancedSearch($this->Profissionais, $allowedFilters, ['Profissionais.nome' => 'ASC'], ['Estabelecimentos']);
 
