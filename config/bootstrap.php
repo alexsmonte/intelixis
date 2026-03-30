@@ -297,4 +297,8 @@ $categoriaMedicamento = [
     'personalizado'     => 'Personalizado',
 ];
 
+
+Configure::write('categoriaMedicamento', $categoriaMedicamento);
+Configure::write('timezones', $timezones);
+
 require  __DIR__ . '/inflector.php';

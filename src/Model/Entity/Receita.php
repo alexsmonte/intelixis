@@ -6,20 +6,20 @@ namespace App\Model\Entity;
 use Cake\ORM\Entity;
 
 /**
- * Anamnes Entity
+ * Receita Entity
  *
  * @property int $id
+ * @property int $estabelecimento_id
  * @property int $procedimento_id
- * @property int $usuario_id
- * @property string|null $texto
- * @property string|null $audio_transcricao
- * @property string|null $audio_path
+ * @property int $profissional_id
+ * @property string $texto
  * @property \Cake\I18n\DateTime|null $created
  * @property \Cake\I18n\DateTime|null $modified
  *
  * @property \App\Model\Entity\Procedimento $procedimento
+ * @property \App\Model\Entity\Profissional $profissional
  */
-class Anamnes extends Entity
+class Receita extends Entity
 {
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
@@ -31,13 +31,13 @@ class Anamnes extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
+        'estabelecimento_id' => true,
         'procedimento_id' => true,
-        'usuario_id' => true,
+        'profissional_id' => true,
         'texto' => true,
-        'audio_transcricao' => true,
-        'audio_path' => true,
         'created' => true,
         'modified' => true,
         'procedimento' => true,
+        'profissional' => true,
     ];
 }

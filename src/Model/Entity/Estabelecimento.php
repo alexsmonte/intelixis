@@ -36,12 +36,19 @@ use Cake\ORM\Entity;
  * @property \App\Model\Entity\Conta $conta
  * @property \App\Model\Entity\Assinatura $assinatura
  * @property \App\Model\Entity\Agendamento[] $agendamentos
+ * @property \App\Model\Entity\Anexo[] $anexos
  * @property \App\Model\Entity\Bloqueio[] $bloqueios
+ * @property \App\Model\Entity\Caixa[] $caixas
+ * @property \App\Model\Entity\Ccusto[] $ccustos
  * @property \App\Model\Entity\Cliente[] $clientes
+ * @property \App\Model\Entity\Consulta[] $consultas
  * @property \App\Model\Entity\Convenio[] $convenios
+ * @property \App\Model\Entity\Financa[] $financas
+ * @property \App\Model\Entity\FormaPagamento[] $forma_pagamentos
  * @property \App\Model\Entity\Local[] $locais
  * @property \App\Model\Entity\Periodo[] $periodos
  * @property \App\Model\Entity\Profissional[] $profissionais
+ * @property \App\Model\Entity\Receituario[] $receituarios
  * @property \App\Model\Entity\Servico[] $servicos
  * @property \App\Model\Entity\Status[] $status
  * @property \App\Model\Entity\Whatsapp[] $whatsapps
@@ -86,12 +93,19 @@ class Estabelecimento extends Entity
         'conta' => true,
         'assinatura' => true,
         'agendamentos' => true,
+        'anexos' => true,
         'bloqueios' => true,
+        'caixas' => true,
+        'ccustos' => true,
         'clientes' => true,
+        'consultas' => true,
         'convenios' => true,
+        'financas' => true,
+        'forma_pagamentos' => true,
         'locais' => true,
         'periodos' => true,
         'profissionais' => true,
+        'receituarios' => true,
         'servicos' => true,
         'status' => true,
         'whatsapps' => true,

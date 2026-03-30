@@ -98,18 +98,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais']]);
                                 </td>
                                 <td style="width:8%;">
                                     <div class="d-flex  align-items-center gap-2" style="min-width:120px;">
-
-
-
-
-
                                         <button
                                             class="btn  bg-transparent text-primary  d-inline-flex align-items-center justify-content-center"
                                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <i class="fs-5 fa fa-bars"></i>
                                         </button>
                                         <ul class="dropdown-menu animated flipInX">
-
                                             <li>
                                                 <button class="dropdown-item btn btn-primary btn-md"
                                                     @click="viewEntity(item.id)">Visualizar</button>

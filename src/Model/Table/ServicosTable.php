@@ -106,14 +106,8 @@ class ServicosTable extends Table
             ->allowEmptyString('descricao');
 
         $validator
-            ->numeric('valor')
-            ->allowEmptyString('valor')
-            ->add('valor', 'decimal', [
-                'rule' => function ($value, $context) {
-                    return is_float($value) || filter_var($value, FILTER_VALIDATE_FLOAT) !== false;
-                },
-                'message' => 'Por favor, insira um valor válido.'
-            ]);
+            ->decimal('valor')
+            ->allowEmptyString('valor');
 
         $validator
             ->requirePresence('duracao', 'create')

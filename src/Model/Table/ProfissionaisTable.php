@@ -244,48 +244,45 @@ class ProfissionaisTable extends Table
             $entity->cor = $this->gerarCorUnica($entity->estabelecimento_id);
         }
     }
+    
 
     private function gerarCorUnica(int $estabelecimentoId): string
     {
         $tabela = $this;
 
-        // Cores proibidas — não usar nem próximas delas
         $coresProibidas = [
-            '#ADB5BD', '#FAED96', '#A5D4ED', '#A4E082','#FF0000', '#FF7F7F', '#0000FF', '#A020F0'
+            '#ADB5BD', '#FAED96', '#A5D4ED', '#A4E082',
+            '#FF0000', '#FF7F7F', '#0000FF', '#A020F0'
         ];
 
-        // Paleta fixa e bonita (cores fortes e equilibradas)
-        $paleta = [
-            '#018a6f', '#022a52','#75910f', '#2980B9','#F39C12', '#C0392B','#633262','#154f4f','#224f15','#636209','#7a180b'
-        ];
-
-        // Tenta primeiro pegar uma cor livre da paleta
+        //  Busca cores já usadas
         $coresUsadas = $tabela->find()
-            ->select('cor')
-            ->where(['estabelecimento_id' => $estabelecimentoId])
+            ->select(['cor'])
+            ->where([
+                'estabelecimento_id' => $estabelecimentoId,
+                'cor IS NOT' => null
+            ])
             ->enableHydration(false)
             ->toArray();
 
-        $usadas = array_map('strtoupper', array_column($coresUsadas, 'cor'));
+        $usadas = array_map(
+            fn($c) => strtoupper($c),
+            array_column($coresUsadas, 'cor')
+        );
 
-        $disponiveis = array_diff($paleta, $usadas);
+        // Índice baseado na quantidade já usada
+        $index = count($usadas);
 
-        if (!empty($disponiveis)) {
-            $cor = array_rand(array_flip($disponiveis));
-            return strtoupper($cor);
-        }
+        // Tenta gerar uma cor válida
+        $tentativas = 0;
 
-        // Se esgotar a paleta, gera aleatória visível e única
         do {
-            $cor = $this->gerarCorVisivel();
+            $cor = $this->gerarCorHSLGoldenAngle($index + $tentativas);
 
-            // Verifica se já existe dentro do mesmo estabelecimento
-            $existe = $tabela->exists([
-                'cor' => $cor,
-                'estabelecimento_id' => $estabelecimentoId
-            ]);
+            //  Igual já usada
+            $existe = in_array($cor, $usadas);
 
-            // Calcula distância de cor com as proibidas (evita tons próximos)
+            //  Parecida com proibidas
             $proximaDeProibida = false;
             foreach ($coresProibidas as $bloqueada) {
                 if ($this->coresSaoParecidas($cor, $bloqueada, 80)) {
@@ -294,11 +291,22 @@ class ProfissionaisTable extends Table
                 }
             }
 
-        } while ($existe || $proximaDeProibida);
+            //  Parecida com usadas
+            $proximaDeUsada = false;
+            foreach ($usadas as $usada) {
+                if ($this->coresSaoParecidas($cor, $usada, 80)) {
+                    $proximaDeUsada = true;
+                    break;
+                }
+            }
 
-        return strtoupper($cor);
+            $tentativas++;
+
+        } while (($existe || $proximaDeProibida || $proximaDeUsada) && $tentativas < 20);
+
+        return $cor;
     }
-
+    
     private function gerarCorVisivel(): string
     {
         // Gera uma cor aleatória saturada e contrastante
@@ -319,6 +327,10 @@ class ProfissionaisTable extends Table
 
     private function coresSaoParecidas(string $cor1, string $cor2, int $limite = 60): bool
     {
+        if (!preg_match('/^#[0-9A-F]{6}$/i', $cor1) || !preg_match('/^#[0-9A-F]{6}$/i', $cor2)) {
+            return false; // evita erro silencioso
+        }
+
         [$r1, $g1, $b1] = sscanf($cor1, "#%02x%02x%02x");
         [$r2, $g2, $b2] = sscanf($cor2, "#%02x%02x%02x");
 
@@ -329,5 +341,49 @@ class ProfissionaisTable extends Table
         );
 
         return $distancia < $limite;
+    }
+
+    private function hslParaHex($h, $s, $l): string
+    {
+        $s /= 100;
+        $l /= 100;
+
+        $c = (1 - abs(2 * $l - 1)) * $s;
+        $x = $c * (1 - abs(fmod($h / 60, 2) - 1));
+        $m = $l - $c / 2;
+
+        if ($h < 60) {
+            $r = $c; $g = $x; $b = 0;
+        } elseif ($h < 120) {
+            $r = $x; $g = $c; $b = 0;
+        } elseif ($h < 180) {
+            $r = 0; $g = $c; $b = $x;
+        } elseif ($h < 240) {
+            $r = 0; $g = $x; $b = $c;
+        } elseif ($h < 300) {
+            $r = $x; $g = 0; $b = $c;
+        } else {
+            $r = $c; $g = 0; $b = $x;
+        }
+
+        $r = (int)(($r + $m) * 255);
+        $g = (int)(($g + $m) * 255);
+        $b = (int)(($b + $m) * 255);
+
+        return sprintf("#%02X%02X%02X", $r, $g, $b);
+    }
+
+    private function gerarCorHSLGoldenAngle(int $index): string
+    {
+        $goldenAngle = 137.508;
+
+        // Distribuição perfeita
+        $h = fmod($index * $goldenAngle, 360);
+
+        // Ajustes visuais (pode brincar aqui)
+        $s = 75; // saturação
+        $l = 55; // luminosidade
+
+        return $this->hslParaHex($h, $s, $l);
     }
 }

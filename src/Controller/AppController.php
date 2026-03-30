@@ -17,7 +17,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Cake\Controller\Controller;
-
+use Cake\View\JsonView;
 /**
  * Application Controller
  *
@@ -28,6 +28,12 @@ use Cake\Controller\Controller;
  */
 class AppController extends Controller
 {
+    public function viewClasses(): array
+    {
+        return [
+            'json' => JsonView::class,
+        ];
+    }
     /**
      * Initialization hook method.
      *
@@ -43,6 +49,7 @@ class AppController extends Controller
 
         $this->loadComponent('Flash');
         $this->loadComponent('Authentication.Authentication');
+
 
         /*
          * Enable the following component for recommended CakePHP form protection settings.

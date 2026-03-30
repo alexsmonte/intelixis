@@ -18,6 +18,19 @@
 /logs/*
 !/logs/empty
 
+
+storage/anexos/*
+!storage/anexos/.gitkeep
+
+webroot/img/profile/*
+!webroot/img/profile/.gitkeep
+
+webroot/img/usuarios/*
+!webroot/img/usuarios/.gitkeep
+
+webroot/img/logo/*
+!webroot/img/logo/.gitkeep
+
 # CakePHP 2
 
 /app/tmp/*
@@ -81,3 +94,4 @@ yarn-error.log
 config/app.php
 config/app.php.PGBKP
 *.BKP
+

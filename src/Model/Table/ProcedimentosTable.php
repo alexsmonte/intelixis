@@ -41,6 +41,7 @@ class ProcedimentosTable extends Table
      * @param array<string, mixed> $config The configuration for the Table.
      * @return void
      */
+
     public function initialize(array $config): void
     {
         parent::initialize($config);
@@ -63,27 +64,20 @@ class ProcedimentosTable extends Table
             'foreignKey' => 'profissional_id',
             'joinType' => 'INNER',
         ]);
-        $this->hasMany('Anamneses', [
-            'foreignKey' => 'procedimento_id',
-            'dependent' => true,
-            'cascadeCallbacks' => true,
-        ]);
-        $this->hasMany('Anotacoes', [
-            'foreignKey' => 'procedimento_id',
-            'sort' => ['Anotacoes.created' => 'DESC'],
-            'dependent' => true,
-            'cascadeCallbacks' => true,
-        ]);
 
         $this->hasMany('Anexos', [
             'foreignKey' => 'entidade_id',
-            'conditions' => [
-                'Anexos.entidade' => 'Procedimentos'
-            ],
+            'conditions' => ['Anexos.entidade' => 'Procedimentos'],
             'dependent' => true,
             'cascadeCallbacks' => true,
         ]);
 
+        $this->hasMany('Documentos', [
+            'foreignKey' => 'procedimento_id',
+            'className' => 'Documentos',
+            'sort' => ['Documentos.created' => 'DESC'],
+            'dependent' => true
+        ]);
     }
 
     /**

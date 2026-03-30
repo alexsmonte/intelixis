@@ -15,12 +15,19 @@ use Cake\Event\Event;
  * @property \App\Model\Table\ContasTable&\Cake\ORM\Association\BelongsTo $Contas
  * @property \App\Model\Table\AssinaturasTable&\Cake\ORM\Association\BelongsTo $Assinaturas
  * @property \App\Model\Table\AgendamentosTable&\Cake\ORM\Association\HasMany $Agendamentos
+ * @property \App\Model\Table\AnexosTable&\Cake\ORM\Association\HasMany $Anexos
  * @property \App\Model\Table\BloqueiosTable&\Cake\ORM\Association\HasMany $Bloqueios
+ * @property \App\Model\Table\CaixasTable&\Cake\ORM\Association\HasMany $Caixas
+ * @property \App\Model\Table\CcustosTable&\Cake\ORM\Association\HasMany $Ccustos
  * @property \App\Model\Table\ClientesTable&\Cake\ORM\Association\HasMany $Clientes
+ * @property \App\Model\Table\ConsultasTable&\Cake\ORM\Association\HasMany $Consultas
  * @property \App\Model\Table\ConveniosTable&\Cake\ORM\Association\HasMany $Convenios
+ * @property \App\Model\Table\FinancasTable&\Cake\ORM\Association\HasMany $Financas
+ * @property \App\Model\Table\FormaPagamentosTable&\Cake\ORM\Association\HasMany $FormaPagamentos
  * @property \App\Model\Table\LocaisTable&\Cake\ORM\Association\HasMany $Locais
  * @property \App\Model\Table\PeriodosTable&\Cake\ORM\Association\HasMany $Periodos
  * @property \App\Model\Table\ProfissionaisTable&\Cake\ORM\Association\HasMany $Profissionais
+ * @property \App\Model\Table\ReceituariosTable&\Cake\ORM\Association\HasMany $Receituarios
  * @property \App\Model\Table\ServicosTable&\Cake\ORM\Association\HasMany $Servicos
  * @property \App\Model\Table\StatusTable&\Cake\ORM\Association\HasMany $Status
  * @property \App\Model\Table\WhatsappsTable&\Cake\ORM\Association\HasMany $Whatsapps
@@ -72,11 +79,9 @@ class EstabelecimentosTable extends Table
         $this->hasMany('Agendamentos', [
             'foreignKey' => 'estabelecimento_id',
         ]);
-
         $this->hasMany('Anexos', [
             'foreignKey' => 'estabelecimento_id',
         ]);
-
         $this->hasMany('Bloqueios', [
             'foreignKey' => 'estabelecimento_id',
         ]);
@@ -108,6 +113,9 @@ class EstabelecimentosTable extends Table
             'foreignKey' => 'estabelecimento_id',
         ]);
         $this->hasMany('Profissionais', [
+            'foreignKey' => 'estabelecimento_id',
+        ]);
+        $this->hasMany('Receitas', [
             'foreignKey' => 'estabelecimento_id',
         ]);
         $this->hasMany('Receituarios', [
@@ -262,7 +270,6 @@ class EstabelecimentosTable extends Table
         return $rules;
     }
 
-
     public function beforeMarshal(Event $event, \ArrayObject $data, \ArrayObject $options)
     {
 
@@ -272,10 +279,10 @@ class EstabelecimentosTable extends Table
             $data['cpf_cnpj']      =   str_replace($caracterInvalido, "", $data['cpf_cnpj']);
         /**
         if(isset($data['cep']))
-        $data['cep']           =   str_replace($caracterInvalido, "", $data['cep']);
+            $data['cep']           =   str_replace($caracterInvalido, "", $data['cep']);
 
         if(isset($data['telefone']))
-        $data['telefone']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['telefone']));
+            $data['telefone']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['telefone']));
 
         if(isset($data['celular']))
         $data['celular']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['celular']));
