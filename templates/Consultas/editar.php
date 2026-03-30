@@ -32,13 +32,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                     <!-- Links comuns -->
                                     <?= $this->Html->link('<iconify-icon icon="solar:document-add-bold-duotone" class="fs-9 aside-icon"></iconify-icon>', ['#'], ['class' => 'sidebar-link primary-hover-bg', 'aria-expanded' => 'false', 'alt' => 'Registrar anamnese', 'title' => 'Registrar anamnese', 'escape' => false, 'v-show' => 'item.id && item.aprovar == 1','@click.prevent'=> 'abrirModalAnamnese(item)']) ?>
                                     <?= $this->Html->link('<iconify-icon icon="solar:notebook-bold-duotone" class="fs-9 aside-icon"></iconify-icon>', ['#'], ['class' => 'sidebar-link primary-hover-bg', 'aria-expanded' => 'false', 'alt' => 'Registrar evolução', 'title' => 'Registrar evolução', 'escape' => false,'v-show' => 'item.id && item.aprovar == 1','@click.prevent'=>'abrirModalAnotacao(item)']) ?>
-                                    <?php if(!empty($this->request->getAttribute('identity')->profissional_id)) { ?>
+                                    
                                     <?= $this->Html->link('<iconify-icon icon="solar:book-bookmark-bold-duotone" class="fs-9 aside-icon"></iconify-icon>', ['#'], ['class' => 'sidebar-link primary-hover-bg', 'aria-expanded' => 'false', 'alt' => 'Emitir receita', 'title' => 'Emitir receita', 'escape' => false,'v-show' => 'item.id && item.aprovar == 1','@click.prevent'=>'abrirModalReceita(item)']) ?>
 
                                     <?= $this->Html->link('<iconify-icon icon="solar:document-medicine-bold-duotone" class="fs-9 aside-icon"></iconify-icon>', ['#'], ['class' => 'sidebar-link primary-hover-bg', 'aria-expanded' => 'false', 'alt' => 'Laudo', 'title' => 'Laudo', 'escape' => false,'v-show' => 'item.id && item.aprovar == 1','@click.prevent'=>'abrirModalLaudo(item)']) ?>
                                     
 <?= $this->Html->link('<iconify-icon icon="solar:medical-kit-bold-duotone" class="fs-9 aside-icon"></iconify-icon>', ['#'], ['class' => 'sidebar-link primary-hover-bg', 'aria-expanded' => 'false', 'alt' => 'Documentos', 'title' => 'Documentos', 'escape' => false,'v-show' => 'item.id && item.aprovar == 1','@click.prevent'=>'abrirModalDocumento(item)']) ?>
-                                    <?php } ?>
+                                    
                                     <?= $this->Html->link('<iconify-icon icon="solar:microphone-2-bold-duotone" class="fs-9 aside-icon"></iconify-icon>', ['#'], ['class' => 'sidebar-link primary-hover-bg', 'aria-expanded' => 'false', 'alt' => 'Gravar', 'title' => 'Gravar', 'escape' => false, 'v-show' => 'item.id && item.aprovar == 1']) ?>
                                     <a href="#" class="sidebar-link primary-hover-bg" @click.prevent="abrirUpload(item)" v-show="item.id && item.aprovar == 1" title="Enviar arquivo"><iconify-icon icon="solar:cloud-upload-bold-duotone" class="fs-9 aside-icon"></iconify-icon></a>
                                     <!-- Botão excluir COM VUE - CORRIGIDO -->
