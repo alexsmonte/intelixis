@@ -54,5 +54,6 @@ class Documento extends Entity
         'estabelecimento' => true,
         'usuario' => true,
         'profissional' => true,
+        'url' => true,
     ];
 }

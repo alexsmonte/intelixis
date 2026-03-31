@@ -101,9 +101,11 @@ class DocumentosTable extends Table
             ->allowEmptyString('audio_transcricao');
 
         $validator
-            ->scalar('audio_path')
-            ->maxLength('audio_path', 255)
-            ->allowEmptyString('audio_path');
+            ->scalar('url')
+            ->maxLength('url', 255)
+            ->allowEmptyString('url');
+
+
 
         return $validator;
     }

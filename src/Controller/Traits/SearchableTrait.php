@@ -273,9 +273,11 @@ trait SearchableTrait
 
         $query = $table->find()->distinct();
 
-        // contain        if (!empty($contain)) {
+        // contain
+        if (!empty($contain)) {
             $query->contain($contain);
         }
+
 
         /*
          * DETECTA ASSOCIAÇÕES NECESSÁRIAS PARA JOIN
@@ -305,12 +307,30 @@ trait SearchableTrait
         }
 
         /*
-         * JOINs vindos dos filtros
-         */                if ($alias !== $table->getAlias()) {
+         * JOINs vindos dos filtros (Campos em outras tabelas sem matching)
+         */
+        foreach ($queryParams as $param => $value) {
+
+            if ($value === '' || $value === null || !isset($allowedFilters[$param])) {
+                continue;
+            }
+
+            $filter = $allowedFilters[$param];
+
+            // Se for associação complexa (matching), o próprio matching() ja faz o join
+            if (!empty($filter['association'])) {
+                continue;
+            }
+
+            $field = $filter['field'] ?? null;
+            if ($field && str_contains($field, '.')) {
+                [$alias] = explode('.', $field, 2);
+                if ($alias !== $table->getAlias()) {
                     $joinsNeeded[$alias] = $alias;
                 }
             }
         }
+
 
         /*
          * APLICA JOINs
@@ -322,7 +342,9 @@ trait SearchableTrait
         }
         /* =========================
          * SEARCH (q → MULTI_LIKE)
-         * ========================= */        if (!empty($q) && isset($allowedFilters['q'])) {
+         * ========================= */
+        if (!empty($q) && isset($allowedFilters['q'])) {
+
             $filter = $allowedFilters['q'];
 
             if (($filter['operator'] ?? null) === 'MULTI_LIKE') {
@@ -355,7 +377,9 @@ trait SearchableTrait
             $operator = strtoupper($filter['operator'] ?? '=');
 
             // associação (matching)
-            if (!empty($filter['association'])) {                $assoc = $filter['association'];
+            if (!empty($filter['association'])) {
+                $assoc = $filter['association'];
+
 
                 $query->matching($assoc, function ($q) use ($field, $operator, $value) {
 
@@ -385,7 +409,9 @@ trait SearchableTrait
                 $vals = is_array($value) ? $value : explode(',', $value);
                 $extra["$field IN"] = $vals;
             }
-            elseif ($operator === 'BETWEEN' && is_string($value) && str_contains($value, ',')) {                [$start, $end] = explode(',', $value, 2);
+            elseif ($operator === 'BETWEEN' && is_string($value) && str_contains($value, ',')) {
+                [$start, $end] = explode(',', $value, 2);
+
                 $extra[] = function ($exp) use ($field, $start, $end) {
                     return $exp->between($field, $start, $end);
                 };
