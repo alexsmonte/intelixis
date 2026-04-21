@@ -255,6 +255,263 @@ trait SearchableTrait
      &page=1
      &limit=10
      ***/
+<?php
+// src/Controller/Traits/SearchableTrait.php
+namespace App\Controller\Traits;
+
+use Cake\ORM\Table;
+use Cake\Datasource\Exception\RecordNotFoundException;
+
+
+trait SearchableTrait
+{
+
+    /**
+     * Busca genérica com retorno em JSON
+     *
+     * @param Table $table   Tabela que será consultada
+     * @param array $fields  Campos que serão buscados
+     * @param array $extraConditions Condições adicionais opcionais
+     * @return void
+     */
+    public function doSearch(Table $table, array $fields, array $extraConditions = [])
+    {
+        $this->request->allowMethod(['get']);
+        $q = $this->request->getQuery('q');
+
+        $query = $table->find();
+
+        if (!empty($q)) {
+            $or = [];
+
+            foreach ($fields as $field) {
+                //$term = mb_strtolower($q, 'UTF-8');
+                $or["$field LIKE"] = "%$q%";
+            }
+
+            $conditions = array_merge($extraConditions, ['OR' => $or]);
+
+            $query->where($conditions);
+        }
+        elseif (!empty($extraConditions)) {
+            $query->where($extraConditions);
+        }
+
+        $results = $query->limit(50)->all()->toArray();
+
+        $this->autoRender = false;
+        $this->response = $this->response
+            ->withType('application/json')
+            ->withStringBody(json_encode(['data' => $results]));
+    }
+
+
+    /**
+     * Busca avançada genérica com filtros seguros, ordenação e paginação
+     *
+     * @param Table $table
+     * @param array $allowedFilters Campos permitidos para filtros diretos, ex:
+     *      [
+     *          'nome' => ['field' => 'Usuarios.nome_completo', 'operator' => 'LIKE'],
+     *          'email' => ['field' => 'Usuarios.email'], // '=' por padrão
+     *      ]
+     * @param array $defaultOrder Ex: ['Usuarios.id' => 'ASC']
+     *
+     *
+     ==================================================================
+     MANUAL DE USO —  doAdvancedSearch (CakePHP)
+     ==================================================================
+     Este component permite:
+     - Busca livre (q) com MULTI_LIKE
+     - Filtros simples (=, LIKE)
+     - Filtros IN
+     - Filtros BETWEEN
+     - Filtros em associações (matching)
+     - Ordenação
+     - Paginação completa
+     Todos os filtros são enviados via QUERY STRING.
+     ------------------------------------------------------------------
+     ==================================================================
+     1) BUSCA LIVRE (q → MULTI_LIKE)
+     ==================================================================
+     $allowedFilters:
+     'q' => [
+     'operator' => 'MULTI_LIKE',
+     'fields' => [
+     'Consultas.nome',
+     'Clientes.nome',
+     'Clientes.email'
+     ]
+     ]
+     URL:
+     ? q=joao
+     Resultado SQL:
+     LOWER(Consultas.nome) LIKE '%joao%'
+     OR LOWER(Clientes.nome) LIKE '%joao%'
+     OR LOWER(Clientes.email) LIKE '%joao%'
+     ==================================================================
+     2) FILTRO SIMPLES (=)
+     ==================================================================
+     $allowedFilters:
+     'status' => [
+     'field' => 'Consultas.status',
+     'operator' => '='
+     ]
+     URL:
+     ? status=ativo
+     Resultado SQL:
+     Consultas.status = 'ativo'
+     ==================================================================
+     3) FILTRO LIKE
+     ==================================================================
+     $allowedFilters:
+     'nome' => [
+     'field' => 'Consultas.nome',
+     'operator' => 'LIKE'
+     ]
+     URL:
+     ? nome=mar
+     Resultado SQL:
+     Consultas.nome LIKE '%mar%'
+     ==================================================================
+     4) FILTRO IN
+     ==================================================================
+     $allowedFilters:
+     'profissional_id' => [
+     'field' => 'Consultas.profissional_id',
+     'operator' => 'IN'
+     ]
+     URL (string):
+     ? profissional_id=10,20,30
+     URL (array):
+     ? profissional_id[]=10&profissional_id[]=20
+     Resultado SQL:
+     Consultas.profissional_id IN (10,20,30)
+     ==================================================================
+     5) FILTRO BETWEEN
+     ==================================================================
+     $allowedFilters:
+     'created' => [
+     'field' => 'Consultas.created',
+     'operator' => 'BETWEEN'
+     ]
+     URL:
+     ? created=2025-01-01,2025-01-31
+     Resultado SQL:
+     Consultas.created BETWEEN '2025-01-01' AND '2025-01-31'
+     ==================================================================
+     6) FILTRO EM ASSOCIAÇÃO (matching)
+     ==================================================================
+     $allowedFilters:
+     'cliente_id' => [
+     'field' => 'Clientes.id',
+     'operator' => '=',
+     'association' => 'Clientes'
+     ]
+     URL:
+     ? cliente_id=90
+     Resultado SQL:
+     matching('Clientes') WHERE Clientes.id = 90
+     ==================================================================
+     7) ASSOCIAÇÃO + IN
+     ==================================================================
+     $allowedFilters:
+     'procedimento_id' => [
+     'field' => 'Procedimentos.id',
+     'operator' => 'IN',
+     'association' => 'Procedimentos'
+     ]
+     URL:
+     ? procedimento_id=1,2,3
+     Resultado SQL:
+     Procedimentos.id IN (1,2,3)
+     ==================================================================
+     8) ASSOCIAÇÃO + BETWEEN
+     ==================================================================
+     $allowedFilters:
+     'valor' => [
+     'field' => 'Procedimentos.valor',
+     'operator' => 'BETWEEN',
+     'association' => 'Procedimentos'
+     ]
+     URL:
+     ? valor=100,500
+     Resultado SQL:
+     Procedimentos.valor BETWEEN 100 AND 500
+     ==================================================================
+     9) FILTRO FIXO (não vem da URL)
+     ==================================================================
+     $allowedFilters:
+     'empresa_id' => [
+     'field' => 'Consultas.empresa_id',
+     'operator' => '=',
+     'value' => 5
+     ]
+     OBS:
+     Este filtro SEMPRE será aplicado, mesmo que não exista na URL.
+     Resultado SQL:
+     Consultas.empresa_id = 5
+     ==================================================================
+     10) ORDENAÇÃO
+     ==================================================================
+     $allowedFilters:
+     'created' => [
+     'field' => 'Consultas.created'
+     ]
+     URL:
+     ? sort=created&direction=DESC
+     Resultado SQL:
+     ORDER BY Consultas.created DESC
+     ==================================================================
+     11) PAGINAÇÃO
+     ==================================================================
+     URL:
+     ? page=2&limit=20
+     Retorno JSON:
+     "paginator": {
+     "page": 2,
+     "limit": 20,
+     "count": 20,
+     "total": 143,
+     "pageCount": 8
+     }
+     Onde:
+     page       = página atual
+     limit      = registros por página
+     count      = registros retornados nesta página
+     total      = total geral de registros
+     pageCount  = total de páginas
+     ==================================================================
+     12) EXEMPLO COMPLETO REAL
+     ==================================================================
+     $allowedFilters:
+     'q' => [
+     'operator' => 'MULTI_LIKE',
+     'fields' => [
+     'Consultas.descricao',
+     'Clientes.nome'
+     ]
+     ],
+     'status' => [
+     'field' => 'Consultas.status'
+     ],
+     'profissional_id' => [
+     'field' => 'Consultas.profissional_id',
+     'operator' => 'IN'
+     ],
+     'data' => [
+     'field' => 'Consultas.data',
+     'operator' => 'BETWEEN'
+     ]
+     URL FINAL:
+     /consultas/search
+     ?q=retorno
+     &status=ativo
+     &profissional_id=2,3
+     &data=2025-01-01,2025-01-31
+     &page=1
+     &limit=10
+     ***/
     public function doAdvancedSearch(
         Table $table,
         array $allowedFilters = [],
@@ -512,6 +769,60 @@ trait SearchableTrait
             ]));
     }
 
+
+    /**
+     * Delete genérico para controllers
+     *
+     * @param Table $table A tabela do model, ex: $this->Usuarios
+     * @param int|null $id ID do registro
+     * @param array $conditions Condições adicionais para buscar o registro
+     */
+    public function doDelete(Table $table, $id = null, array $conditions = [])
+    {
+        $this->request->allowMethod(['post', 'delete']);
+
+        try {
+            $entity = $table->get($id, ['conditions' => $conditions]);
+        }
+        catch (RecordNotFoundException $e) {
+            $entity = null;
+        }
+
+        if (empty($entity)) {
+            $message = __('Registro não encontrado.');
+            if ($this->request->is('ajax') || $this->request->accepts('application/json')) {
+                $this->autoRender = false;
+                $this->response = $this->response
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(['success' => false, 'message' => $message]));
+                return;
+            }
+            $this->Flash->error($message);
+            return $this->redirect(['action' => 'index']);
+        }
+
+        $success = $table->delete($entity);
+        $message = $success
+            ? __('O registro foi excluído com sucesso.')
+            : __('Ocorreu um erro na tentativa de excluir. Por favor, tente novamente.');
+
+        if ($this->request->is('ajax') || $this->request->accepts('application/json')) {
+            $this->autoRender = false;
+            $this->response = $this->response
+                ->withType('application/json')
+                ->withStringBody(json_encode(['success' => $success, 'message' => $message]));
+            return;
+        }
+
+        if ($success) {
+            $this->Flash->success($message);
+        }
+        else {
+            $this->Flash->error($message);
+        }
+        return $this->redirect(['action' => 'index']);
+    }
+}
 
     /**
      * Delete genérico para controllers
