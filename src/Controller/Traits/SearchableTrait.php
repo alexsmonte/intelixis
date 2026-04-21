@@ -764,7 +764,7 @@ trait SearchableTrait
                     'limit' => $limit,
                     'count' => count($results),
                     'total' => $total,
-                    'pageCount' => $pageCount
+                    'pageCount' => max(1, (int) ceil($total / $limit))
                 ]
             ]));
     }
