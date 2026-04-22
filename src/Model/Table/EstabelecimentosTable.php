@@ -7,6 +7,8 @@ use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\Event\EventInterface;
+use ArrayObject;
 
 /**
  * Estabelecimentos Model
@@ -282,7 +284,7 @@ class EstabelecimentosTable extends Table
     }
 
 
-    public function beforeMarshal(Event $event, \ArrayObject $data, \ArrayObject $options)
+    public function beforeMarshal(EventInterface $event, ArrayObject $data, ArrayObject $options): void
     {
 
         $caracterInvalido   =   [" ",".","-","/",")","(",","];
