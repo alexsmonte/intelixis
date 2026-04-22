@@ -60,6 +60,9 @@ return function (RouteBuilder $routes): void {
         ['controller' => 'Financas', 'action' => 'carregarLancamentos']);
     
     // 2. Rotas específicas com parâmetros
+    $builder->connect('/signatures/hash/{id}', ['controller' => 'Documentos', 'action' => 'hashAssinatura'])->setPass(['id']);
+    $builder->connect('/signatures/finalize', ['controller' => 'Documentos', 'action' => 'finalizarAssinatura']);
+
     $builder->get('/financas/get-categorias/{abaId}', 
         ['controller' => 'Financas', 'action' => 'getCategoriasPorAba'])
         ->setPass(['abaId']);
@@ -76,6 +79,11 @@ return function (RouteBuilder $routes): void {
         $builder->connect('meu-perfil', ['controller' => 'Usuarios', 'action' => 'meuPerfil']);
         $builder->connect('/dashboard', ['controller' => 'Pages', 'action' => 'index']);
         $builder->connect('/documentos/validar/{codigo}', ['controller' => 'Documentos','action' => 'validar'])->setPass(['codigo']);
+        $builder->connect('/documentos/gerar-link-teste/{id}', ['controller' => 'Documentos','action' => 'gerarLinkTeste'])->setPass(['id']);
+        $builder->connect('/documentos/gerar_link_teste/{id}', ['controller' => 'Documentos','action' => 'gerarLinkTeste'])->setPass(['id']);
+        $builder->connect('/assinar/{codigo}', ['controller' => 'Documentos', 'action' => 'publicSign'])->setPass(['codigo']);
+        // Tela de assinatura do profissional
+        $builder->connect('/documentos/assinar-profissional/{id}', ['controller' => 'Documentos', 'action' => 'assinarProfissional'])->setPass(['id']);
 
         /*
          * ...and connect the rest of 'Pages' controller's URLs.

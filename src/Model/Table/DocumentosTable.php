@@ -126,4 +126,37 @@ class DocumentosTable extends Table
 
         return $rules;
     }
+
+    /**
+     * Blocagem de integridade: Impede a alteração de campos críticos se o documento já
+     * foi assinado digitalmente pelo profissional (ICP-Brasil).
+     *
+     * @param \Cake\Event\EventInterface $event O evento
+     * @param \App\Model\Entity\Documento $entity A entidade
+     * @param \ArrayObject $options Opções
+     * @return bool|void
+     */
+    public function beforeSave(\Cake\Event\EventInterface $event, $entity, \ArrayObject $options)
+    {
+        // Se não é uma entidade nova e já possui assinatura do profissional original no banco...
+        if (!$entity->isNew() && !empty($entity->getOriginal('assinatura_prof_hash'))) {
+            
+            // Lista de campos que NÃO podem ser alterados após a assinatura PAdES
+            $camposBloqueados = [
+                'texto', 
+                'tipo', 
+                'procedimento_id', 
+                'estabelecimento_id', 
+                'assinatura_hash', // Impede assinatura do paciente por cima da do profissional
+                'assinatura_prof_hash' // Impede sobrescrever a assinatura existente
+            ];
+
+            foreach ($camposBloqueados as $campo) {
+                if ($entity->isDirty($campo)) {
+                    $event->stopPropagation();
+                    return false;
+                }
+            }
+        }
+    }
 }
