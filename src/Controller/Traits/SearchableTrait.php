@@ -255,15 +255,13 @@ trait SearchableTrait
      &page=1
      &limit=10
      ***/
-
     public function doAdvancedSearch(
         Table $table,
         array $allowedFilters = [],
         array $defaultOrder = ['id' => 'ASC'],
         array $contain = []
-        )
+    )
     {
-
         $queryParams = $this->request->getQueryParams();
 
         $q = $queryParams['q'] ?? null;
@@ -271,22 +269,24 @@ trait SearchableTrait
 
         $extra = [];
 
-        $query = $table->find()->distinct();
+        $alias = $table->getAlias();
 
-        // contain
+        $query = $table->find()
+            ->distinct([$alias . '.id']);
+
         if (!empty($contain)) {
             $query->contain($contain);
         }
 
+        /* ========================= */
+        $normalizeAssociation = function ($path) {
+            return is_array($path) ? implode('.', $path) : $path;
+        };
 
-        /*
-         * DETECTA ASSOCIAÇÕES NECESSÁRIAS PARA JOIN
-         */
+        /* ========================= */
         $joinsNeeded = [];
 
-        /*
-         * JOINs vindos do q (MULTI_LIKE)
-         */
+        // FROM q
         if (!empty($q) && isset($allowedFilters['q'])) {
 
             $filter = $allowedFilters['q'];
@@ -297,71 +297,78 @@ trait SearchableTrait
 
                     if (str_contains($field, '.')) {
 
-                        [$alias] = explode('.', $field, 2);
-                        if ($alias !== $table->getAlias()) {
-                            $joinsNeeded[$alias] = $alias;
+                        $parts = explode('.', $field);
+
+                        if (count($parts) > 1) {
+                            array_pop($parts);
+                            $assocPath = implode('.', $parts);
+
+                            if ($assocPath !== $alias) {
+                                $joinsNeeded[$assocPath] = $assocPath;
+                            }
                         }
                     }
                 }
             }
         }
 
-        /*
-         * JOINs vindos dos filtros (Campos em outras tabelas sem matching)
-         */
-        foreach ($queryParams as $param => $value) {
+        // FROM filtros
+        foreach ($allowedFilters as $filter) {
 
-            if ($value === '' || $value === null || !isset($allowedFilters[$param])) {
-                continue;
-            }
-
-            $filter = $allowedFilters[$param];
-
-            // Se for associação complexa (matching), o próprio matching() ja faz o join
             if (!empty($filter['association'])) {
-                continue;
+                $assoc = $normalizeAssociation($filter['association']);
+                $joinsNeeded[$assoc] = $assoc;
             }
 
-            $field = $filter['field'] ?? null;
-            if ($field && str_contains($field, '.')) {
-                [$alias] = explode('.', $field, 2);
-                if ($alias !== $table->getAlias()) {
-                    $joinsNeeded[$alias] = $alias;
+            if (!empty($filter['field']) && str_contains($filter['field'], '.')) {
+
+                $parts = explode('.', $filter['field']);
+
+                if (count($parts) > 1) {
+                    array_pop($parts);
+                    $assocPath = implode('.', $parts);
+
+                    if ($assocPath !== $alias) {
+                        $joinsNeeded[$assocPath] = $assocPath;
+                    }
                 }
             }
         }
 
+        /* ========================= */
+        foreach ($joinsNeeded as $assocPath) {
 
-        /*
-         * APLICA JOINs
-         */
-        foreach ($joinsNeeded as $assoc) {
-            if ($table->hasAssociation($assoc)) {
-                $query->leftJoinWith($assoc);
+            try {
+                if ($table->hasAssociation(explode('.', $assocPath)[0])) {
+                    $query->leftJoinWith($assocPath);
+                }
+            } catch (\Exception $e) {
+                // opcional: log
             }
         }
-        /* =========================
-         * SEARCH (q → MULTI_LIKE)
-         * ========================= */
+
+        /* ========================= */
         if (!empty($q) && isset($allowedFilters['q'])) {
 
             $filter = $allowedFilters['q'];
 
             if (($filter['operator'] ?? null) === 'MULTI_LIKE') {
+
                 $query->where(function ($exp) use ($filter, $q) {
+
                     $or = [];
+
                     foreach ($filter['fields'] as $field) {
                         $or["LOWER($field) LIKE"] =
                             '%' . mb_strtolower($q, 'UTF-8') . '%';
                     }
+
                     return $exp->or($or);
                 });
             }
         }
 
-        /* =========================
-         * FILTERS
-         * ========================= */
+        /* ========================= */
         foreach ($queryParams as $param => $value) {
 
             if ($value === '' || $value === null) {
@@ -376,10 +383,10 @@ trait SearchableTrait
             $field = $filter['field'];
             $operator = strtoupper($filter['operator'] ?? '=');
 
-            // associação (matching)
+            /* ASSOCIATION */
             if (!empty($filter['association'])) {
-                $assoc = $filter['association'];
 
+                $assoc = $normalizeAssociation($filter['association']);
 
                 $query->matching($assoc, function ($q) use ($field, $operator, $value) {
 
@@ -388,20 +395,20 @@ trait SearchableTrait
                         return $q->where([$field . ' IN' => $vals]);
                     }
 
-                    if ($operator === 'BETWEEN' && is_string($value) && str_contains($value, ',')) {
+                    if ($operator === 'BETWEEN' && str_contains($value, ',')) {
                         [$start, $end] = explode(',', $value, 2);
                         return $q->where(function ($exp) use ($field, $start, $end) {
-                                    return $exp->between($field, $start, $end);
-                                }
-                                );
-                            }
-
-                            return $q->where(["$field $operator" => $value]);
+                            return $exp->between($field, $start, $end);
                         });
+                    }
+
+                    return $q->where(["$field $operator" => $value]);
+                });
+
                 continue;
             }
 
-            // campo local
+            /* CAMPOS LOCAIS */
             if ($operator === 'LIKE') {
                 $extra["$field LIKE"] = "%$value%";
             }
@@ -409,7 +416,7 @@ trait SearchableTrait
                 $vals = is_array($value) ? $value : explode(',', $value);
                 $extra["$field IN"] = $vals;
             }
-            elseif ($operator === 'BETWEEN' && is_string($value) && str_contains($value, ',')) {
+            elseif ($operator === 'BETWEEN' && str_contains($value, ',')) {
                 [$start, $end] = explode(',', $value, 2);
 
                 $extra[] = function ($exp) use ($field, $start, $end) {
@@ -424,31 +431,27 @@ trait SearchableTrait
                 $extra[] = function ($exp) use ($field, $start, $end) {
                     return $exp->between($field, $start, $end);
                 };
-
             }
             else {
                 $extra["$field $operator"] = $value;
             }
         }
 
-        // filtros fixos
+        /* ========================= */
         foreach ($allowedFilters as $filter) {
+
             if (!isset($filter['value'])) {
                 continue;
             }
 
-            $extra[
-                ($filter['field']) . ' ' . ($filter['operator'] ?? '=')
-                ] = $filter['value'];
+            $extra[$filter['field'] . ' ' . ($filter['operator'] ?? '=')] = $filter['value'];
         }
 
         if (!empty($extra)) {
             $query->where($extra);
         }
 
-        /* =========================
-         * ORDER
-         * ========================= */
+        /* ========================= */
         $sort = $queryParams['sort'] ?? null;
         $direction = strtoupper($queryParams['direction'] ?? 'ASC');
 
@@ -457,48 +460,33 @@ trait SearchableTrait
                 $allowedFilters[$sort]['field'] =>
                 in_array($direction, ['ASC', 'DESC']) ? $direction : 'ASC'
             ]);
-        }
-        else {
+        } else {
             $query->orderBy($defaultOrder);
         }
-        /* =========================
-         * PAGINATION (FUNCIONAL)
-         * ========================= */
+
+        /* ========================= */
         $page = max(1, (int)($queryParams['page'] ?? 1));
         $limit = max(1, min(100, (int)($queryParams['limit'] ?? 50)));
         $offset = (($page - 1) * $limit);
 
-        /*
-         * QUERY DE COUNT (SEPARADA)
-         */
         $countQuery = $table->find()
-            ->enableAutoFields(false)
-            ->select([$table->getAlias() . '.id'])
-            ->distinct([$table->getAlias() . '.id']);
+            ->select([$alias . '.id'])
+            ->distinct([$alias . '.id']);
 
-        /*
-         * REAPLICA OS JOINS NECESSÁRIOS
-         */
-        foreach ($joinsNeeded as $assoc) {
-
-            if ($table->hasAssociation($assoc)) {
-                $countQuery->leftJoinWith($assoc);
+        foreach ($joinsNeeded as $assocPath) {
+            try {
+                if ($table->hasAssociation(explode('.', $assocPath)[0])) {
+                    $countQuery->leftJoinWith($assocPath);
+                }
+            } catch (\Exception $e) {
+                // opcional: log
             }
         }
 
-        /*
-         * REAPLICA O WHERE
-         */
         $countQuery->where($query->clause('where'));
 
-        /*
-         * COUNT FINAL (SEM GROUP BY PROBLEMÁTICO)
-         */
         $total = $countQuery->count();
 
-        /*
-         * RESULTADOS PAGINADOS
-         */
         $results = $query
             ->limit($limit)
             ->offset($offset)
@@ -507,23 +495,21 @@ trait SearchableTrait
 
         $pageCount = (int)ceil($total / $limit);
 
-
-        /* =========================
-         * RESPONSE
-         * ========================= */
+        /* ========================= */
         $this->autoRender = false;
+
         $this->response = $this->response
             ->withType('application/json')
             ->withStringBody(json_encode([
-            'data' => $results,
-            'paginator' => [
-                'page' => $page,
-                'limit' => $limit,
-                'count' => count($results),
-                'total' => $total,
-                'pageCount' => $pageCount
-            ]
-        ]));
+                'data' => $results,
+                'paginator' => [
+                    'page' => $page,
+                    'limit' => $limit,
+                    'count' => count($results),
+                    'total' => $total,
+                    'pageCount' => $pageCount
+                ]
+            ]));
     }
 
 
