@@ -16,6 +16,7 @@ use Cake\ORM\Entity;
  * @property bool|null $ativar
  * @property \Cake\I18n\DateTime|null $created
  * @property \Cake\I18n\DateTime|null $modified
+ * @property string|null $valor
  *
  * @property \App\Model\Entity\Estabelecimento $estabelecimento
  * @property \App\Model\Entity\Agendamento[] $agendamentos
@@ -36,17 +37,14 @@ class Servico extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
-        '*' => true,
-        'id' => false,
         'estabelecimento_id' => true,
         'nome' => true,
         'descricao' => true,
         'duracao' => true,
-        'valor' => true,
         'ativar' => true,
-        'habilitar_programacao' => true,
         'created' => true,
         'modified' => true,
+        'valor' => true,
         'estabelecimento' => true,
         'agendamentos' => true,
         'bloqueios' => true,

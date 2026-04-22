@@ -221,7 +221,7 @@ class DocumentosController extends AppController
             ->first();
 
         if (!$documento) {
-            throw new NotFoundException('Documento não encontrado');
+            throw new \NotFoundException('Documento não encontrado');
         }
 
         $this->set(compact('documento'));

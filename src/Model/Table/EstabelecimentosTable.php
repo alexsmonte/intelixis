@@ -7,7 +7,6 @@ use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
-use Cake\Event\Event;
 
 /**
  * Estabelecimentos Model
@@ -100,6 +99,12 @@ class EstabelecimentosTable extends Table
         $this->hasMany('Convenios', [
             'foreignKey' => 'estabelecimento_id',
         ]);
+        $this->hasMany('Documentos', [
+            'foreignKey' => 'estabelecimento_id',
+        ]);
+        $this->hasMany('Estoques', [
+            'foreignKey' => 'estabelecimento_id',
+        ]);
         $this->hasMany('Financas', [
             'foreignKey' => 'estabelecimento_id',
         ]);
@@ -109,13 +114,19 @@ class EstabelecimentosTable extends Table
         $this->hasMany('Locais', [
             'foreignKey' => 'estabelecimento_id',
         ]);
+        $this->hasMany('Modelos', [
+            'foreignKey' => 'estabelecimento_id',
+        ]);
+        $this->hasMany('Orcamentos', [
+            'foreignKey' => 'estabelecimento_id',
+        ]);
         $this->hasMany('Periodos', [
             'foreignKey' => 'estabelecimento_id',
         ]);
-        $this->hasMany('Profissionais', [
+        $this->hasMany('Produtos', [
             'foreignKey' => 'estabelecimento_id',
         ]);
-        $this->hasMany('Receitas', [
+        $this->hasMany('Profissionais', [
             'foreignKey' => 'estabelecimento_id',
         ]);
         $this->hasMany('Receituarios', [
@@ -179,7 +190,7 @@ class EstabelecimentosTable extends Table
             ->scalar('cpf_cnpj')
             ->maxLength('cpf_cnpj', 21)
             ->requirePresence('cpf_cnpj', 'create')
-            ->notEmptyString('cpf_cnpj','Você precisa informa o CPF/CNPJ');
+            ->notEmptyString('cpf_cnpj');
 
         $validator
             ->scalar('cep')
@@ -270,6 +281,7 @@ class EstabelecimentosTable extends Table
         return $rules;
     }
 
+
     public function beforeMarshal(Event $event, \ArrayObject $data, \ArrayObject $options)
     {
 
@@ -287,5 +299,28 @@ class EstabelecimentosTable extends Table
         if(isset($data['celular']))
         $data['celular']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['celular']));
          **/
+    }
+
+    public function dados(int $id)
+    {
+        return $this->find()
+            ->select([
+                'id',
+                'razao_social',
+                'nome_fantasia',
+                'cpf_cnpj',
+                'logradouro',
+                'numero',
+                'bairro',
+                'cidade',
+                'uf',
+                'cep',
+                'telefone',
+                'celular',
+                'email',
+                'logo'
+            ])
+            ->where(['id' => $id, 'ativar' => 1])
+            ->firstOrFail();
     }
 }

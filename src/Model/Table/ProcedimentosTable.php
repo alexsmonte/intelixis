@@ -14,8 +14,7 @@ use Cake\Validation\Validator;
  * @property \App\Model\Table\ConsultasTable&\Cake\ORM\Association\BelongsTo $Consultas
  * @property \App\Model\Table\ServicosTable&\Cake\ORM\Association\BelongsTo $Servicos
  * @property \App\Model\Table\ProfissionaisTable&\Cake\ORM\Association\BelongsTo $Profissionais
- * @property \App\Model\Table\AnamnesesTable&\Cake\ORM\Association\HasMany $Anamneses
- * @property \App\Model\Table\AnotacoesTable&\Cake\ORM\Association\HasMany $Anotacoes
+ * @property \App\Model\Table\DocumentosTable&\Cake\ORM\Association\HasMany $Documentos
  *
  * @method \App\Model\Entity\Procedimento newEmptyEntity()
  * @method \App\Model\Entity\Procedimento newEntity(array $data, array $options = [])
@@ -41,7 +40,6 @@ class ProcedimentosTable extends Table
      * @param array<string, mixed> $config The configuration for the Table.
      * @return void
      */
-
     public function initialize(array $config): void
     {
         parent::initialize($config);
@@ -64,19 +62,27 @@ class ProcedimentosTable extends Table
             'foreignKey' => 'profissional_id',
             'joinType' => 'INNER',
         ]);
+        $this->hasMany('Anamneses', [
+            'foreignKey' => 'procedimento_id',
+        ]);
+        $this->hasMany('Anotacoes', [
+            'foreignKey' => 'procedimento_id',
+        ]);
+        $this->hasMany('Documentos', [
+            'foreignKey' => 'procedimento_id',
+        ]);
+        $this->hasMany('Financas', [
+            'foreignKey' => 'procedimento_id',
+        ]);
+        $this->hasMany('Insumos', [
+            'foreignKey' => 'procedimento_id',
+        ]);
 
         $this->hasMany('Anexos', [
             'foreignKey' => 'entidade_id',
             'conditions' => ['Anexos.entidade' => 'Procedimentos'],
             'dependent' => true,
             'cascadeCallbacks' => true,
-        ]);
-
-        $this->hasMany('Documentos', [
-            'foreignKey' => 'procedimento_id',
-            'className' => 'Documentos',
-            'sort' => ['Documentos.created' => 'DESC'],
-            'dependent' => true
         ]);
     }
 

@@ -62,19 +62,30 @@ class ServicosTable extends Table
         $this->hasMany('Bloqueios', [
             'foreignKey' => 'servico_id',
         ]);
-        //$this->hasMany('Periodos', [
-          //  'foreignKey' => 'servico_id',
-        //]);
+        $this->hasMany('Materiais', [
+            'foreignKey' => 'servico_id',
+        ]);
         $this->hasMany('Periodos', [
             'foreignKey' => 'servico_id',
-            'saveStrategy' => 'replace',
-            'dependent' => true,
-            'cascadeCallbacks' => true,
+        ]);
+        $this->hasMany('Procedimentos', [
+            'foreignKey' => 'servico_id',
         ]);
         $this->belongsToMany('Convenios', [
             'foreignKey' => 'servico_id',
             'targetForeignKey' => 'convenio_id',
             'joinTable' => 'convenios_servicos',
+        ]);
+/**        
+$this->belongsToMany('Orcamentos', [
+            'foreignKey' => 'servico_id',
+            'targetForeignKey' => 'orcamento_id',
+            'joinTable' => 'orcamentos_servicos',
+        ]);
+**/
+
+        $this->hasMany('OrcamentosServicos', [
+            'foreignKey' => 'servico_id',
         ]);
         $this->belongsToMany('Profissionais', [
             'foreignKey' => 'servico_id',
@@ -82,8 +93,7 @@ class ServicosTable extends Table
             'joinTable' => 'profissionais_servicos',
         ]);
     }
-
-    /**
+ /**
      * Default validation rules.
      *
      * @param \Cake\Validation\Validator $validator Validator instance.
@@ -112,7 +122,6 @@ class ServicosTable extends Table
         $validator
             ->requirePresence('duracao', 'create')
             ->notEmptyString('duracao',__('Informe a duração do serviço!'));
-        
 
         $validator
             ->boolean('ativar')
