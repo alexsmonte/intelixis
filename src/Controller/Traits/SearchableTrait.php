@@ -270,8 +270,7 @@ trait SearchableTrait
 
     $alias = $table->getAlias();
 
-    $query = $table->find()
-        ->distinct([$alias . '.id']);
+    $query = $table->find();
 
     if (!empty($contain)) {
         $query->contain($contain);
@@ -454,14 +453,31 @@ trait SearchableTrait
     $sort = $queryParams['sort'] ?? null;
     $direction = strtoupper($queryParams['direction'] ?? 'ASC');
 
+    $order = [];
     if ($sort && isset($allowedFilters[$sort]['field'])) {
-        $query->orderBy([
-            $allowedFilters[$sort]['field'] =>
-            in_array($direction, ['ASC', 'DESC']) ? $direction : 'ASC'
-        ]);
+        $order[$allowedFilters[$sort]['field']] = in_array($direction, ['ASC', 'DESC']) ? $direction : 'ASC';
     } else {
-        $query->orderBy($defaultOrder);
+        $order = $defaultOrder;
     }
+
+    // Para PostgreSQL, o DISTINCT ON deve coincidir com o início do ORDER BY.
+    // Adicionamos os campos do ORDER BY ao DISTINCT ON para satisfazer essa regra.
+    $distinctFields = [];
+    foreach ($order as $field => $dir) {
+        if (is_string($field)) {
+            $distinctFields[] = $field;
+        }
+    }
+
+    // Adicionamos o ID da tabela principal para garantir a unicidade por registro,
+    // e também o adicionamos ao ORDER BY caso não esteja lá, para satisfazer o PostgreSQL.
+    $primaryIdField = $alias . '.id';
+    if (!in_array($primaryIdField, $distinctFields) && !in_array('id', $distinctFields)) {
+        $distinctFields[] = $primaryIdField;
+        $order[$primaryIdField] = 'ASC';
+    }
+
+    $query->distinct($distinctFields)->orderBy($order);
 
     /* ========================= */
     $page = max(1, (int)($queryParams['page'] ?? 1));
