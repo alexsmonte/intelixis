@@ -1377,6 +1377,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                         this.modelo.titulo = '';
                         this.modelo.descricao = '';
                         this.modelo.cabecalho = false;
+                        this.modelo.exigir_assinatura_paciente = false;
+                        this.modelo.exigir_assinatura_profissional = false;
 
                     } else {
                         Swal.fire({
