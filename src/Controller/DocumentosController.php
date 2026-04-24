@@ -24,7 +24,7 @@ class DocumentosController extends AppController
     public function beforeFilter(\Cake\Event\EventInterface $event): void
     {
         parent::beforeFilter($event);
-        $this->Authentication->addUnauthenticatedActions(['validar', 'publicSign']);
+        $this->Authentication->addUnauthenticatedActions(['validar', 'publicSign', 'logLeitura', 'publicPdf']);
     }
 
 
@@ -137,10 +137,63 @@ class DocumentosController extends AppController
         }
 
         // Registra visualização
-        $this->_log($documento->id, 'visualizado', $documento->assinatura_hash, null, $this->request->clientIp());
+        $this->_log($documento->id, 'visualizado', $documento->assinatura_hash, null, $this->_getRealIp(), [], $this->Authentication->getIdentity()->id ?? null);
 
         $jaAssinado = !empty($documento->assinatura_hash);
         $this->set(compact('documento', 'jaAssinado'));
+    }
+
+    public function logLeitura($codigo = null)
+    {
+        $this->request->allowMethod(['post']);
+
+        $documento = $this->Documentos->find()
+            ->where(['codigo_validacao' => $codigo])
+            ->first();
+
+        if (!$documento) {
+            return $this->_jsonResponse(false, 'Documento não encontrado.');
+        }
+
+        $ip = $this->request->getData('ip_publico') ?: $this->_getRealIp();
+        $geo = $this->request->getData('geolocalizacao') ?? 'Indisponível';
+        
+        $detalhes = [
+            'user_agent' => $this->request->getHeaderLine('User-Agent'),
+            'ip' => $ip,
+            'usuario' => 'Usuário Não Logado (Anônimo)',
+            'geolocalizacao' => $geo,
+            'data_hora' => date('d/m/Y H:i:s'),
+            'timestamp' => time(),
+        ];
+
+        $this->_log($documento->id, 'documento_lido', $documento->assinatura_hash, null, $ip, $detalhes, $this->Authentication->getIdentity()->id ?? null);
+
+        return $this->_jsonResponse(true, 'Leitura registrada com sucesso.');
+    }
+
+    public function publicPdf($codigo = null)
+    {
+        $this->disableAutoRender();
+
+        $documento = $this->Documentos->find()
+            ->where(['codigo_validacao' => $codigo])
+            ->contain(['Profissionais', 'Procedimentos' => ['Consultas' => ['Clientes']], 'Estabelecimentos'])
+            ->first();
+
+        if (!$documento) {
+            throw new \Cake\Http\Exception\NotFoundException('Documento não encontrado.');
+        }
+
+        $path = $this->_getStorageDir($documento) . DS . $documento->id . '.pdf';
+        if (!file_exists($path)) {
+            throw new \Cake\Http\Exception\NotFoundException('O documento ainda não foi gerado pelo profissional. Solicite que o mesmo seja visualizado/impresso pela clínica antes de acessá-lo.');
+        }
+
+        return $this->response->withFile($path, [
+            'download' => false,
+            'name' => "documento_{$documento->id}.pdf"
+        ])->withType('application/pdf');
     }
 
 
@@ -182,6 +235,14 @@ class DocumentosController extends AppController
             return $this->response->withType('application/json')->withStringBody(json_encode([
                 'ok' => false,
                 'message' => 'Este documento já foi assinado digitalmente por um profissional e não pode ser alterado ou assinado novamente.',
+            ]));
+        }
+
+        // Bloqueio de Precedência: Se exigir assinatura do paciente e não estiver assinado
+        if ($documento->exigir_assinatura_paciente && empty($documento->assinatura_hash)) {
+            return $this->response->withType('application/json')->withStringBody(json_encode([
+                'ok' => false,
+                'message' => 'A assinatura do paciente é obrigatória e deve ser realizada antes da assinatura profissional.',
             ]));
         }
 
@@ -233,7 +294,7 @@ class DocumentosController extends AppController
         // PyHanko devolve em Hexadecimal, nosso GO espera Base64:
         $hashB64 = base64_encode(hex2bin($res['hash']));
 
-        $this->_log($documento->id, 'hash_solicitado', hash_file('sha256', $pdfPath), null, $this->request->clientIp());
+        $this->_log($documento->id, 'hash_solicitado', hash_file('sha256', $pdfPath), null, $this->_getRealIp(), [], $this->Authentication->getIdentity()->id ?? null);
 
         return $this->response->withType('application/json')->withStringBody(json_encode([
             'hash' => $hashB64,
@@ -275,6 +336,14 @@ class DocumentosController extends AppController
             return $this->response->withType('application/json')->withStringBody(json_encode([
                 'ok' => false,
                 'message' => 'Documento não encontrado ou token inválido.',
+            ]));
+        }
+
+        // Validação de Precedência (Backend)
+        if ($documento->exigir_assinatura_paciente && empty($documento->assinatura_hash)) {
+            return $this->response->withType('application/json')->withStringBody(json_encode([
+                'ok' => false,
+                'message' => 'Erro de integridade: A assinatura do paciente é obrigatória e não foi encontrada.',
             ]));
         }
 
@@ -326,7 +395,7 @@ class DocumentosController extends AppController
 
             // Persiste metadados no banco
             $documento->assinatura_prof_hash = $hashDepois;
-            $documento->assinatura_prof_ip = $this->request->clientIp();
+            $documento->assinatura_prof_ip = $this->_getRealIp();
             $documento->assinatura_prof_data = new \Cake\I18n\DateTime();
             $documento->assinatura_prof_detalhes = [
                 'agente' => 'localhost:7777',
@@ -339,7 +408,7 @@ class DocumentosController extends AppController
             ];
 
             if ($this->Documentos->save($documento)) {
-                $this->_log($documento->id, 'assinatura_prof_concluida', $hashAntes, $hashDepois, $this->request->clientIp(), ['p7s' => $p7sPath]);
+                $this->_log($documento->id, 'assinatura_prof_concluida', $hashAntes, $hashDepois, $this->_getRealIp(), ['p7s' => $p7sPath], $this->Authentication->getIdentity()->id ?? null);
 
                 $urlPdf = \Cake\Routing\Router::url(['action' => 'imprimir', $documento->id]);
 
@@ -386,19 +455,37 @@ class DocumentosController extends AppController
         $data = [];
         foreach ($logs as $log) {
             $data[] = [
-                'id'          => $log->id,
-                'acao'        => $log->acao,
-                'hash_antes'  => $log->hash_antes,
+                'id' => $log->id,
+                'acao' => $log->acao,
+                'hash_antes' => $log->hash_antes,
                 'hash_depois' => $log->hash_depois,
-                'ip'          => $log->ip,
-                'detalhes'    => $log->detalhes,
-                'created'     => $log->created ? $log->created->format('d/m/Y H:i:s') : '-',
-                'usuario'     => $log->usuario ? $log->usuario->nome : 'Sistema/Paciente',
+                'ip' => $log->ip,
+                'detalhes' => $log->detalhes,
+                'created' => $log->created ? $log->created->format('d/m/Y H:i:s') : '-',
+                'usuario' => $log->usuario ? $log->usuario->nome : 'Sistema/Paciente',
             ];
         }
 
         return $this->response->withType('application/json')
-            ->withStringBody(json_encode(['ok' => true, 'logs' => $data]));
+            ->withStringBody(json_encode([
+                'ok' => true,
+                'logs' => $data,
+                'metadata' => [
+                    'id' => $documento->id,
+                    'titulo' => $documento->titulo,
+                    'codigo_validacao' => $documento->codigo_validacao,
+                    'created' => $documento->created ? $documento->created->format('d/m/Y H:i:s') : '-',
+                    'exigir_paciente' => (bool) $documento->exigir_assinatura_paciente,
+                    'exigir_profissional' => (bool) $documento->exigir_assinatura_profissional,
+                    'paciente_hash' => $documento->assinatura_hash,
+                    'paciente_data' => $documento->assinatura_data ? $documento->assinatura_data->format('d/m/Y H:i:s') : null,
+                    'paciente_ip' => $documento->assinatura_ip,
+                    'profissional_hash' => $documento->assinatura_prof_hash,
+                    'profissional_data' => $documento->assinatura_prof_data ? $documento->assinatura_prof_data->format('d/m/Y H:i:s') : null,
+                    'profissional_ip' => $documento->assinatura_prof_ip,
+                    'profissional_signer' => $documento->assinatura_prof_detalhes['signer_name'] ?? null,
+                ]
+            ]));
     }
 
     /**
@@ -440,10 +527,11 @@ class DocumentosController extends AppController
             ->withStringBody($csv);
     }
 
-    public function gerarLinkTeste($id = null)
+    public function assinarPaciente($id = null)
     {
         $documento = $this->Documentos->get($id, [
             'conditions' => ['Documentos.estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+            'contain' => ['Procedimentos'],
         ]);
 
         $urlCurta = Router::url('/assinar/' . $documento->codigo_validacao, true);
@@ -467,6 +555,15 @@ class DocumentosController extends AppController
         } catch (\Exception $e) {
             return $this->response->withType('application/json')
                 ->withStringBody(json_encode(['success' => false, 'message' => 'Documento não encontrado.']));
+        }
+
+        // BLOQUEIO: Não permitir excluir se houver assinatura
+        if (!empty($modelo->assinatura_prof_hash) || !empty($modelo->assinatura_hash)) {
+            return $this->response->withType('application/json')
+                ->withStringBody(json_encode([
+                    'success' => false,
+                    'message' => 'Este documento possui assinaturas digitais e não pode ser excluído por razões de integridade.'
+                ]));
         }
 
         if ($this->Documentos->delete($modelo)) {
@@ -634,7 +731,7 @@ class DocumentosController extends AppController
         }
 
         $usuarioId = $this->getRequest()->getSession()->read('Auth.Usuario.id');
-        $this->_log($documento->id, 'gerado', null, null, $this->request->clientIp(), ['usuario_id_interno' => $usuarioId], $usuarioId);
+        $this->_log($documento->id, 'gerado', null, null, $this->_getRealIp(), ['usuario_id_interno' => $usuarioId], $usuarioId);
     }
 
     // =========================================================================
@@ -661,8 +758,7 @@ class DocumentosController extends AppController
             return $this->_jsonResponse(false, 'Assinatura e selfie são obrigatórias.');
         }
 
-        $ipHeader = $this->request->getHeaderLine('X-Forwarded-For');
-        $ip = !empty($ipHeader) ? trim(explode(',', $ipHeader)[0]) : $this->request->clientIp();
+        $ip = $this->request->getData('ip_publico') ?: $this->_getRealIp();
         $geo = $this->request->getData('geolocalizacao') ?? 'Indisponível';
         $responsavel = $this->request->getData('responsavel');
         $dir = $this->_getStorageDir($documento);
@@ -950,5 +1046,23 @@ HTML;
     {
         return $this->response->withType('application/json')
             ->withStringBody(json_encode(['success' => $success, 'message' => $message]));
+    }
+
+    /**
+     * Tenta obter o IP real do cliente se estiver atrás de um proxy.
+     */
+    private function _getRealIp(): string
+    {
+        $ip = $this->request->getHeaderLine('X-Forwarded-For');
+        if (empty($ip)) {
+            $ip = $this->request->getHeaderLine('X-Real-IP');
+        }
+        if (empty($ip)) {
+            $ip = $this->request->clientIp();
+        }
+        
+        // Pega o primeiro IP caso venha uma lista (ex: IP_CLIENTE, IP_PROXY1, IP_PROXY2)
+        $ipParts = explode(',', $ip);
+        return trim($ipParts[0] ?? '0.0.0.0');
     }
 }

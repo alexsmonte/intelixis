@@ -14,123 +14,22 @@ $docTitulo = h($documento->titulo ?? $documento->tipo ?? 'Documento');
 $profNome = h($documento->profissional->nome ?? '');
 $estabelecimento = h($documento->estabelecimento->nome_fantasia ?? $documento->estabelecimento->razao_social ?? '');
 $codigoValidacao = $documento->codigo_validacao;
+$csrfToken = $this->request->getAttribute('csrfToken') ?? '';
 ?>
 
+<!-- Importação do Iconify caso não exista no layout -->
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+
 <style>
-    /* ========== Design System ========== */
-    :root {
-        --blue: #2563eb;
-        --blue-dark: #1d4ed8;
-        --green: #16a34a;
-        --red: #dc2626;
-        --gray-50: #f8fafc;
-        --gray-100: #f1f5f9;
-        --gray-200: #e2e8f0;
-        --gray-500: #64748b;
-        --gray-700: #334155;
-        --gray-900: #0f172a;
-        --radius: 14px;
-        --shadow: 0 4px 24px rgba(0, 0, 0, .1);
-    }
-
-    /* ========== Page ========== */
-    .assin-page {
-        min-height: 100dvh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 0 0 48px;
-        background: linear-gradient(160deg, #eff6ff 0%, #f1f5f9 60%);
-    }
-
-    /* ========== Header ========== */
-    .assin-header {
-        width: 100%;
-        background: var(--blue);
-        color: #fff;
-        padding: 18px 20px 14px;
-        text-align: center;
-        box-shadow: 0 2px 12px rgba(37, 99, 235, .4);
-    }
-
-    .assin-header .logo-clinica {
-        font-size: .75rem;
-        opacity: .85;
-        margin-bottom: 2px;
-        letter-spacing: .04em;
-        text-transform: uppercase;
-    }
-
-    .assin-header .doc-titulo {
-        font-size: 1.05rem;
-        font-weight: 700;
-        margin: 0;
-    }
-
-    .assin-header .paciente-nome {
-        font-size: .88rem;
-        opacity: .9;
-        margin-top: 2px;
-    }
-
-    /* ========== Card ========== */
-    .assin-card {
-        background: #fff;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        padding: 22px 18px;
-        width: 100%;
-        max-width: 520px;
-        margin-top: 20px;
-    }
-
-    @media (max-width: 539px) {
-        .assin-card {
-            margin: 16px 12px 0;
-            width: calc(100% - 24px);
-        }
-    }
-
-    /* ========== Section label ========== */
-    .section-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: .8rem;
-        font-weight: 700;
-        color: var(--blue);
-        text-transform: uppercase;
-        letter-spacing: .07em;
-        margin-bottom: 10px;
-    }
-
-    .section-label .num {
-        width: 22px;
-        height: 22px;
-        background: var(--blue);
-        color: #fff;
-        border-radius: 50%;
-        font-size: .7rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 800;
-        flex-shrink: 0;
-    }
-
-    /* ========== Selfie ========== */
-    .selfie-area {
-        text-align: center;
-    }
-
+    /* Estilos mínimos para os componentes de câmera e canvas */
     .selfie-preview-wrap {
         position: relative;
         width: 180px;
         height: 180px;
         margin: 0 auto 12px;
         border-radius: 50%;
-        background: var(--gray-100);
-        border: 3px dashed var(--gray-200);
+        background: #f8fafc;
+        border: 3px dashed #e2e8f0;
         overflow: hidden;
         display: flex;
         align-items: center;
@@ -139,7 +38,7 @@ $codigoValidacao = $documento->codigo_validacao;
     }
 
     .selfie-preview-wrap.captured {
-        border-color: var(--green);
+        border-color: #198754;
         border-style: solid;
     }
 
@@ -150,64 +49,10 @@ $codigoValidacao = $documento->codigo_validacao;
         object-fit: cover;
     }
 
-    .selfie-placeholder {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 6px;
-        color: var(--gray-500);
-        font-size: .8rem;
-    }
-
-    .selfie-placeholder svg {
-        opacity: .4;
-    }
-
-    .btn-selfie {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: var(--blue);
-        color: #fff;
-        border: none;
-        border-radius: 50px;
-        padding: 12px 28px;
-        font-size: .95rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background .2s, transform .1s;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, .35);
-    }
-
-    .btn-selfie:active {
-        transform: scale(.97);
-    }
-
-    .btn-selfie.captured {
-        background: var(--green);
-    }
-
-    .btn-refazer {
-        background: none;
-        border: 1.5px solid var(--gray-200);
-        color: var(--gray-500);
-        border-radius: 50px;
-        padding: 8px 18px;
-        font-size: .8rem;
-        cursor: pointer;
-        margin-top: 6px;
-        transition: border-color .2s;
-    }
-
-    .btn-refazer:hover {
-        border-color: var(--gray-500);
-    }
-
-    /* ========== Signature Pad ========== */
     .sig-wrap {
-        border: 2px solid var(--gray-200);
+        border: 2px solid #e2e8f0;
         border-radius: 10px;
-        background: var(--gray-50);
+        background: #f8fafc;
         overflow: hidden;
         position: relative;
         touch-action: none;
@@ -226,63 +71,12 @@ $codigoValidacao = $documento->codigo_validacao;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        color: var(--gray-200);
+        color: #cbd5e1;
         font-size: .85rem;
         pointer-events: none;
         transition: opacity .3s;
     }
 
-    .btn-limpar {
-        background: none;
-        border: none;
-        color: var(--gray-500);
-        font-size: .8rem;
-        cursor: pointer;
-        margin-top: 6px;
-        text-decoration: underline;
-    }
-
-    /* ========== Divider ========== */
-    .assin-divider {
-        border: none;
-        border-top: 1.5px solid var(--gray-100);
-        margin: 20px 0;
-    }
-
-    /* ========== Submit button ========== */
-    .btn-assinar {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        width: 100%;
-        padding: 16px;
-        background: var(--blue);
-        color: #fff;
-        border: none;
-        border-radius: 50px;
-        font-size: 1.05rem;
-        font-weight: 700;
-        cursor: pointer;
-        box-shadow: 0 6px 20px rgba(37, 99, 235, .4);
-        transition: background .2s, transform .1s, opacity .2s;
-    }
-
-    .btn-assinar:hover {
-        background: var(--blue-dark);
-    }
-
-    .btn-assinar:active {
-        transform: scale(.98);
-    }
-
-    .btn-assinar:disabled {
-        opacity: .5;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    /* ========== Estado loading ========== */
     .btn-assinar .spinner {
         width: 20px;
         height: 20px;
@@ -293,278 +87,184 @@ $codigoValidacao = $documento->codigo_validacao;
         display: none;
     }
 
-    .btn-assinar.loading .spinner {
-        display: block;
-    }
-
-    .btn-assinar.loading .btn-text {
-        opacity: 0;
-    }
+    .btn-assinar.loading .spinner { display: inline-block; }
+    .btn-assinar.loading .btn-text { display: none; }
 
     @keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
-    }
-
-    /* ========== Tela de Sucesso ========== */
-    .tela-sucesso {
-        display: none;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        padding: 20px;
-    }
-
-    .tela-sucesso .check-circle {
-        width: 90px;
-        height: 90px;
-        background: #dcfce7;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 20px;
-        animation: pop .4s ease;
-    }
-
-    @keyframes pop {
-        0% {
-            transform: scale(0);
-        }
-
-        70% {
-            transform: scale(1.15);
-        }
-
-        100% {
-            transform: scale(1);
-        }
-    }
-
-    .tela-sucesso h2 {
-        color: var(--green);
-        font-size: 1.35rem;
-        margin: 0 0 8px;
-    }
-
-    .tela-sucesso p {
-        color: var(--gray-500);
-        font-size: .9rem;
-        margin: 0;
-        line-height: 1.6;
-    }
-
-    /* ========== Já assinado ========== */
-    .badge-assinado {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: #dcfce7;
-        color: #15803d;
-        border-radius: 50px;
-        padding: 6px 14px;
-        font-size: .82rem;
-        font-weight: 600;
-    }
-
-    /* ========== Info rodapé ========== */
-    .assin-footer-info {
-        font-size: .72rem;
-        color: var(--gray-500);
-        text-align: center;
-        margin-top: 16px;
-        line-height: 1.6;
-    }
-
-    /* ========== Alert ========== */
-    .assin-alert {
-        border-radius: 8px;
-        padding: 12px 14px;
-        font-size: .84rem;
-        margin-bottom: 14px;
-        display: none;
-    }
-
-    .assin-alert.error {
-        background: #fef2f2;
-        color: #b91c1c;
-        border: 1px solid #fca5a5;
-    }
-
-    .assin-alert.success {
-        background: #f0fdf4;
-        color: #166534;
-        border: 1px solid #86efac;
+        to { transform: rotate(360deg); }
     }
 </style>
 
-<div class="assin-page">
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
 
-    <?php if ($jaAssinado): ?>
-        <!-- ====== DOCUMENTO JÁ ASSINADO ====== -->
-        <div class="assin-header">
-            <div class="logo-clinica"><?= $estabelecimento ?></div>
-            <h1 class="doc-titulo"><?= $docTitulo ?></h1>
-            <div class="paciente-nome"><?= $pacienteNome ?></div>
-        </div>
-        <div class="assin-card" style="text-align:center;padding:40px 24px;">
-            <div class="check-circle"
-                style="width:80px;height:80px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 6 9 17 4 12" />
-                </svg>
-            </div>
-            <div class="badge-assinado" style="margin-bottom:14px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <polyline points="20 6 9 17 4 12" />
-                </svg>
-                Documento assinado
-            </div>
-            <p style="color:#334155;font-size:.9rem;line-height:1.7;margin-top:10px;">
-                Este documento já foi <strong>assinado eletronicamente</strong>.<br>
-                A assinatura foi registrada em
-                <?= $documento->assinatura_data ? $documento->assinatura_data->format('d/m/Y \à\s H:i') : 'data registrada' ?>.
-            </p>
-            <p style="color:#64748b;font-size:.78rem;margin-top:12px;">
-                Hash SHA-256:<br>
-                <code style="font-size:.72rem;word-break:break-all;"><?= h($documento->assinatura_hash) ?></code>
-            </p>
-        </div>
-
-    <?php else: ?>
-        <!-- ====== FORMULÁRIO DE ASSINATURA ====== -->
-        <div class="assin-header">
-            <div class="logo-clinica"><?= $estabelecimento ?></div>
-            <h1 class="doc-titulo"><?= $docTitulo ?></h1>
-            <div class="paciente-nome">Paciente: <?= $pacienteNome ?></div>
-        </div>
-
-        <!-- Card principal -->
-        <div class="assin-card" id="formCard">
-            <!-- Alert de erro/sucesso -->
-            <div class="assin-alert error" id="alertErro"></div>
-
-            <!-- ===== PASSO 1: SELFIE ===== -->
-            <div class="section-label">
-                <span class="num">1</span>
-                Tire uma foto sua (selfie) para identificação
-            </div>
-
-            <!-- ===== SE RESPONSÁVEL LEGAL ===== -->
-            <div style="margin-bottom: 20px; font-size: 0.9rem; color: var(--gray-700);">
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                    <input type="checkbox" id="chkResponsavel" style="width:16px;height:16px;">
-                    <b>Assinar como Responsável Legal pelo paciente</b>
-                </label>
-            </div>
-            
-            <div id="formResponsavel" style="display:none; background:var(--gray-50); border:1px solid var(--gray-200); border-radius:8px; padding:14px; margin-bottom:20px;">
-                <div style="margin-bottom:12px;">
-                    <label style="display:block; font-size:0.8rem; font-weight:bold; color:var(--gray-700); margin-bottom:4px;">Nome do Responsável Legal</label>
-                    <input type="text" id="respNome" style="width:100%; padding:10px; border:1px solid var(--gray-200); border-radius:6px; font-size:0.9rem;" placeholder="Ex: Maria da Silva">
-                </div>
-                <div>
-                    <label style="display:block; font-size:0.8rem; font-weight:bold; color:var(--gray-700); margin-bottom:4px;">CPF do Responsável Legal</label>
-                    <input type="text" id="respCpf" style="width:100%; padding:10px; border:1px solid var(--gray-200); border-radius:6px; font-size:0.9rem;" placeholder="Ex: 000.000.000-00" oninput="this.value = this.value.replace(/\D/g,'').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2')" maxlength="14">
-                </div>
-            </div>
-
-            <div class="selfie-area">
-                <!-- Câmera (getUserMedia) -->
-                <div class="selfie-preview-wrap" id="selfieWrap">
-                    <div class="selfie-placeholder" id="selfiePlaceholder">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                            <circle cx="12" cy="7" r="4" />
-                        </svg>
-                        Sua foto aqui
+            <?php if ($jaAssinado): ?>
+                <!-- ====== DOCUMENTO JÁ ASSINADO ====== -->
+                <div class="card w-100 position-relative overflow-hidden mt-2 shadow-sm border-0">
+                    <div class="card-header bg-primary text-white p-4 text-center border-0">
+                        <div class="small opacity-75 mb-1 text-uppercase fw-bold"><?= $estabelecimento ?></div>
+                        <h4 class="mb-1 text-white"><?= $docTitulo ?></h4>
+                        <div class="small opacity-75 mt-1"><?= $pacienteNome ?></div>
                     </div>
-                    <video id="cameraVideo" autoplay playsinline style="display:none;"></video>
-                    <img id="selfieImg" style="display:none;" alt="Selfie capturada" />
+                    <div class="card-body p-5 text-center">
+                        <iconify-icon icon="solar:check-circle-bold" class="text-success mb-3" style="font-size: 5rem;"></iconify-icon>
+                        
+                        <div class="badge bg-success-subtle text-success rounded-pill px-3 py-2 mb-3 fs-6">
+                            <iconify-icon icon="solar:check-read-linear" class="align-middle me-1"></iconify-icon> Documento assinado
+                        </div>
+                        
+                        <p class="text-muted mb-2">
+                            Este documento já foi <strong>assinado eletronicamente</strong>.
+                        </p>
+                        <p class="text-muted small mb-3">
+                            Registrado em: <?= $documento->assinatura_data ? $documento->assinatura_data->format('d/m/Y \à\s H:i') : 'Data registrada' ?>
+                        </p>
+                        
+                        <div class="bg-light p-3 rounded-3 text-start">
+                            <label class="form-label text-muted small text-uppercase fw-bold mb-1">Hash SHA-256</label>
+                            <code class="d-block text-dark small" style="word-break:break-all;"><?= h($documento->assinatura_hash) ?></code>
+                        </div>
+
+                        <div class="mt-4">
+                            <a href="<?= $this->Url->build(['action' => 'publicPdf', $codigoValidacao]) ?>" target="_blank" class="btn btn-outline-primary rounded-pill fw-bold w-100">
+                                <iconify-icon icon="solar:document-text-bold" class="align-middle me-1"></iconify-icon> Visualizar Documento
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
-                <div id="btnsSelfie">
-                    <button class="btn-selfie" id="btnAbrirCamera" type="button">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                            <circle cx="12" cy="13" r="4" />
-                        </svg>
-                        Abrir Câmera
-                    </button>
+            <?php else: ?>
+                <!-- ====== FORMULÁRIO DE ASSINATURA ====== -->
+                <div class="card w-100 position-relative overflow-hidden mt-2 shadow-sm border-0" id="formCard">
+                    <div class="card-header bg-primary text-white p-4 text-center border-0">
+                        <div class="small opacity-75 mb-1 text-uppercase fw-bold"><?= $estabelecimento ?></div>
+                        <h4 class="mb-1 text-white"><?= $docTitulo ?></h4>
+                        <div class="small opacity-75 mt-1">Paciente: <?= $pacienteNome ?></div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <!-- Alert de erro -->
+                        <div class="alert alert-danger d-none align-items-center gap-2 mb-4" id="alertErro"></div>
+
+                        <!-- Passo 0: LER DOCUMENTO -->
+                        <div class="text-center mb-4">
+                            <p class="text-muted small mb-2">Antes de assinar, você deve ler o documento clicando no botão abaixo:</p>
+                            <button type="button" class="btn btn-outline-primary rounded-pill fw-bold py-2 px-4 w-100 position-relative" id="btnLerDocumento">
+                                <span class="btn-text"><iconify-icon icon="solar:document-text-bold" class="fs-5 align-middle me-1"></iconify-icon> Ler Documento</span>
+                                <div class="spinner border border-2 border-primary border-top-transparent rounded-circle position-absolute top-50 start-50 translate-middle" style="width: 20px; height: 20px; display: none;" id="spinnerLer"></div>
+                            </button>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- PASSO 1: SELFIE -->
+                        <h6 class="text-primary fw-bold mb-3 d-flex align-items-center gap-2">
+                            <span class="badge bg-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;">1</span>
+                            Tire uma foto (selfie)
+                        </h6>
+
+                        <!-- Responsável Legal -->
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" role="switch" id="chkResponsavel">
+                            <label class="form-check-label text-muted small fw-bold" for="chkResponsavel">Assinar como Responsável Legal</label>
+                        </div>
+                        
+                        <div id="formResponsavel" class="bg-light border rounded p-3 mb-4 d-none">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">Nome do Responsável Legal</label>
+                                <input type="text" id="respNome" class="form-control" placeholder="Ex: Maria da Silva">
+                            </div>
+                            <div class="mb-0">
+                                <label class="form-label small fw-bold text-muted">CPF do Responsável Legal</label>
+                                <input type="text" id="respCpf" class="form-control" placeholder="Ex: 000.000.000-00" oninput="this.value = this.value.replace(/\D/g,'').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2')" maxlength="14">
+                            </div>
+                        </div>
+
+                        <div class="text-center mb-4">
+                            <div class="selfie-preview-wrap" id="selfieWrap">
+                                <div class="text-muted small d-flex flex-column align-items-center gap-2" id="selfiePlaceholder">
+                                    <iconify-icon icon="solar:camera-bold" class="fs-1 text-secondary opacity-50"></iconify-icon>
+                                    Sua foto aqui
+                                </div>
+                                <video id="cameraVideo" autoplay playsinline style="display:none;"></video>
+                                <img id="selfieImg" style="display:none;" alt="Selfie capturada" />
+                            </div>
+
+                            <div id="btnsSelfie">
+                                <button class="btn btn-primary rounded-pill fw-bold" id="btnAbrirCamera" type="button">
+                                    <iconify-icon icon="solar:camera-line-duotone" class="fs-5 align-middle me-1"></iconify-icon> Abrir Câmera
+                                </button>
+                            </div>
+                            <div id="btnsCaptura" class="d-none flex-column align-items-center gap-2">
+                                <button class="btn btn-success rounded-pill fw-bold" id="btnCapturar" type="button">
+                                    <iconify-icon icon="solar:record-circle-bold" class="fs-5 align-middle me-1"></iconify-icon> Capturar Foto
+                                </button>
+                                <button class="btn btn-link text-muted text-decoration-none small" id="btnRefazer" type="button">Refazer</button>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- PASSO 2: ASSINATURA -->
+                        <h6 class="text-primary fw-bold mb-3 d-flex align-items-center gap-2">
+                            <span class="badge bg-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;">2</span>
+                            Assine no campo abaixo
+                        </h6>
+                        <div class="sig-wrap mb-2">
+                            <canvas id="signatureCanvas"></canvas>
+                            <div class="sig-hint" id="sigHint">✍️ Assine com o dedo</div>
+                        </div>
+                        <div class="text-end mb-4">
+                            <button class="btn btn-link text-muted text-decoration-none p-0 small" id="btnLimpar" type="button">Limpar assinatura</button>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- PASSO 3: CONFIRMAR -->
+                        <div class="d-grid mb-3">
+                            <button class="btn btn-primary rounded-pill py-2 fw-bold btn-assinar d-flex justify-content-center align-items-center" id="btnAssinar" type="button" disabled>
+                                <div class="spinner"></div>
+                                <span class="btn-text">
+                                    <iconify-icon icon="solar:check-read-bold" class="fs-5 align-middle me-2"></iconify-icon> Concluir e Assinar
+                                </span>
+                            </button>
+                        </div>
+
+                        <div class="text-center text-muted small lh-sm">
+                            Ao assinar, você confirma que leu e concorda com o conteúdo.<br>
+                            Esta assinatura tem validade jurídica (MP 2.200-2/2001).
+                        </div>
+                    </div>
                 </div>
-                <div id="btnsCaptura" style="display:none; flex-direction:column; align-items:center; gap:16px;">
-                    <button class="btn-selfie" id="btnCapturar" type="button">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2.2">
-                            <circle cx="12" cy="12" r="10" />
-                            <circle cx="12" cy="12" r="3" />
-                        </svg>
-                        Capturar Foto
-                    </button>
-                    <button class="btn-refazer" id="btnRefazer" type="button">Refazer</button>
+
+                <!-- Tela de sucesso (hidden) -->
+                <div class="card w-100 position-relative overflow-hidden mt-2 shadow-sm border-0 d-none" id="telaSucesso">
+                    <div class="card-body p-5 text-center">
+                        <iconify-icon icon="solar:check-circle-bold" class="text-success mb-3" style="font-size: 5rem;"></iconify-icon>
+                        <h3 class="text-success mb-3 fw-bold">Documento assinado!</h3>
+                        <p class="text-muted mb-4">
+                            Sua assinatura foi registrada com sucesso.<br>
+                            Um protocolo de prova foi anexado ao documento.
+                        </p>
+                        
+                        <div class="bg-light p-3 rounded-3 text-start mb-4">
+                            <label class="form-label text-muted small text-uppercase fw-bold mb-1">Código de validação</label>
+                            <code class="d-block text-dark small" style="word-break:break-all;"><?= h($codigoValidacao) ?></code>
+                        </div>
+
+                        <a href="<?= $this->Url->build(['action' => 'publicPdf', $codigoValidacao]) ?>" target="_blank" class="btn btn-outline-primary rounded-pill fw-bold w-100">
+                            <iconify-icon icon="solar:document-text-bold" class="align-middle me-1"></iconify-icon> Baixar / Visualizar Cópia
+                        </a>
+                    </div>
                 </div>
-            </div>
+            <?php endif; ?>
 
-            <hr class="assin-divider" />
-
-            <!-- ===== PASSO 2: ASSINATURA ===== -->
-            <div class="section-label">
-                <span class="num">2</span>
-                Assine com o dedo no campo abaixo
-            </div>
-            <div class="sig-wrap">
-                <canvas id="signatureCanvas"></canvas>
-                <div class="sig-hint" id="sigHint">✍️ Assine aqui</div>
-            </div>
-            <button class="btn-limpar" id="btnLimpar" type="button">Limpar assinatura</button>
-
-            <hr class="assin-divider" />
-
-            <!-- ===== PASSO 3: CONFIRMAR ===== -->
-            <button class="btn-assinar" id="btnAssinar" type="button" disabled>
-                <div class="spinner"></div>
-                <span class="btn-text">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                        stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                    </svg>
-                    Assinar Documento
-                </span>
-            </button>
-
-            <div class="assin-footer-info">
-                Ao assinar, você confirma que leu e concorda com o conteúdo.<br>
-                Esta assinatura tem validade jurídica (MP 2.200-2/2001).
+            <div class="text-center text-muted small mt-4 opacity-75">
+                <iconify-icon icon="solar:shield-check-bold" class="align-middle"></iconify-icon>
+                Intelixis · Assinatura Eletrônica Segura
             </div>
         </div>
-
-        <!-- Tela de sucesso (hidden) -->
-        <div class="assin-card tela-sucesso" id="telaSucesso">
-            <div class="check-circle">
-                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 6 9 17 4 12" />
-                </svg>
-            </div>
-            <h2>Documento assinado!</h2>
-            <p>
-                Sua assinatura foi registrada com sucesso.<br>
-                Um protocolo de prova foi anexado ao documento.<br><br>
-                <strong>Código de validação:</strong><br>
-                <code style="font-size:.8rem;word-break:break-all;"><?= $codigoValidacao ?></code>
-            </p>
-        </div>
-    <?php endif; ?>
-
-    <div class="assin-footer-info" style="margin-top:24px;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            style="vertical-align:middle;">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-        </svg>
-        Intelixis · Assinatura Eletrônica Segura
     </div>
 </div>
 
@@ -576,8 +276,11 @@ $codigoValidacao = $documento->codigo_validacao;
             'use strict';
 
             // ===== Config =====
-            const SIGN_URL = window.location.href; // Garante que a requisição siga a URL atual (com ou sem /painel)
-            const CSRF_TOKEN = <?= json_encode($this->request->getAttribute('csrfToken') ?? '') ?>;
+            const BASE_URL = window.location.origin; // Opcional, depende do router
+            const SIGN_URL = window.location.href; 
+            const READ_LOG_URL = "<?= $this->Url->build(['action' => 'logLeitura', $codigoValidacao]) ?>";
+            const READ_PDF_URL = "<?= $this->Url->build(['action' => 'publicPdf', $codigoValidacao]) ?>";
+            const CSRF_TOKEN = "<?= h($csrfToken) ?>";
 
             // ===== Elementos =====
             const selfieWrap = document.getElementById('selfieWrap');
@@ -602,15 +305,90 @@ $codigoValidacao = $documento->codigo_validacao;
             const respNome = document.getElementById('respNome');
             const respCpf = document.getElementById('respCpf');
 
+            const btnLerDocumento = document.getElementById('btnLerDocumento');
+            const spinnerLer = document.getElementById('spinnerLer');
+
             chkResponsavel.addEventListener('change', function() {
-                formResponsavel.style.display = this.checked ? 'block' : 'none';
-                checkPronto(); // Reavalia estado do botão
+                if(this.checked) {
+                    formResponsavel.classList.remove('d-none');
+                } else {
+                    formResponsavel.classList.add('d-none');
+                }
+                checkPronto();
             });
 
             // ===== Estado =====
             let selfieBase64 = null;
             let stream = null;
             let signaturePad = null;
+            let leuDocumento = false; // Só deixa habilitar se já abriu
+
+            // ===== Erro =====
+            function mostrarErro(msg) {
+                alertErro.innerHTML = `<iconify-icon icon="solar:danger-circle-bold" class="fs-5"></iconify-icon> <div>${msg}</div>`;
+                alertErro.classList.remove('d-none');
+                alertErro.classList.add('d-flex');
+                alertErro.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            // ===== Fetch IP Público =====
+            const obterIpPublico = async () => {
+                try {
+                    const resp = await fetch('https://api.ipify.org?format=json', { timeout: 3000 });
+                    const data = await resp.json();
+                    return data.ip;
+                } catch (e) {
+                    return null;
+                }
+            };
+
+            // ===== Ler Documento (Log) =====
+            btnLerDocumento.addEventListener('click', async function() {
+                // UI state
+                btnLerDocumento.disabled = true;
+                btnLerDocumento.querySelector('.btn-text').style.opacity = '0';
+                spinnerLer.style.display = 'block';
+
+                const geolocalizacao = await obterLocalizacao();
+                const ipPublico = await obterIpPublico();
+
+                try {
+                    const resp = await fetch(READ_LOG_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-Token': CSRF_TOKEN
+                        },
+                        body: JSON.stringify({ 
+                            geolocalizacao: geolocalizacao,
+                            ip_publico: ipPublico
+                        }),
+                    });
+
+                    const data = await resp.json();
+                    
+                    // Independentemente de dar erro na gravação do log, o paciente tem que poder ler
+                    window.open(READ_PDF_URL, '_blank');
+                    
+                    leuDocumento = true;
+                    btnLerDocumento.classList.remove('btn-outline-primary');
+                    btnLerDocumento.classList.add('btn-success');
+                    btnLerDocumento.querySelector('.btn-text').innerHTML = '<iconify-icon icon="solar:check-circle-bold" class="fs-5 align-middle me-1"></iconify-icon> Documento Lido';
+                    checkPronto();
+
+                } catch (err) {
+                    // Falha de internet, vamos liberar pra ler mesmo assim
+                    window.open(READ_PDF_URL, '_blank');
+                    leuDocumento = true;
+                    checkPronto();
+                } finally {
+                    btnLerDocumento.disabled = false;
+                    btnLerDocumento.querySelector('.btn-text').style.opacity = '1';
+                    spinnerLer.style.display = 'none';
+                }
+            });
+
 
             // ===== SignaturePad =====
             function initSignaturePad() {
@@ -635,6 +413,7 @@ $codigoValidacao = $documento->codigo_validacao;
                 signaturePad.clear();
                 signaturePad.fromData(data);
             });
+            setTimeout(initSignaturePad, 200); // init delay to assure canvas gets width
 
             // ===== CÂMERA ======
             btnAbrirCamera.addEventListener('click', async function () {
@@ -647,10 +426,12 @@ $codigoValidacao = $documento->codigo_validacao;
                     cameraVideo.style.display = 'block';
                     selfiePlaceholder.style.display = 'none';
                     selfieImg.style.display = 'none';
-                    btnsSelfie.style.display = 'none';
-                    btnsCaptura.style.display = 'flex';
+                    
+                    btnsSelfie.classList.add('d-none');
+                    btnsCaptura.classList.remove('d-none');
+                    btnsCaptura.classList.add('d-flex');
                 } catch (err) {
-                    mostrarErro('Não foi possível acessar a câmera. Verifique as permissões e tente novamente.');
+                    mostrarErro('Não foi possível acessar a câmera. Verifique as permissões do seu navegador.');
                 }
             });
 
@@ -672,10 +453,12 @@ $codigoValidacao = $documento->codigo_validacao;
                 selfiePlaceholder.style.display = 'none';
                 selfieWrap.classList.add('captured');
 
-                btnsCaptura.style.display = 'none';
-                btnsSelfie.style.display = 'block';
-                btnAbrirCamera.textContent = '📷 Refazer selfie';
-                btnAbrirCamera.classList.add('captured');
+                btnsCaptura.classList.add('d-none');
+                btnsCaptura.classList.remove('d-flex');
+                btnsSelfie.classList.remove('d-none');
+                
+                btnAbrirCamera.innerHTML = '<iconify-icon icon="solar:camera-line-duotone" class="fs-5 align-middle me-1"></iconify-icon> Refazer selfie';
+                btnAbrirCamera.classList.replace('btn-primary', 'btn-outline-primary');
 
                 checkPronto();
             });
@@ -688,17 +471,6 @@ $codigoValidacao = $documento->codigo_validacao;
                 checkPronto();
             });
 
-            // Clicar na imagem tb abre câmera novamente
-            btnAbrirCamera.addEventListener('click', function () {
-                if (selfieBase64) {
-                    selfieBase64 = null;
-                    selfieImg.style.display = 'none';
-                    selfiePlaceholder.style.display = 'none';
-                    selfieWrap.classList.remove('captured');
-                    btnAbrirCamera.classList.remove('captured');
-                }
-            }, true);  // capture=true para rodar antes do handler de câmera
-
             // ===== Limpar assinatura =====
             btnLimpar.addEventListener('click', function () {
                 signaturePad.clear();
@@ -709,24 +481,30 @@ $codigoValidacao = $documento->codigo_validacao;
             // ===== Habilitar botão somente quando pronto =====
             function checkPronto() {
                 const assinado = signaturePad && !signaturePad.isEmpty();
-                btnAssinar.disabled = !(selfieBase64 && assinado);
+                // Agora tb exige leuDocumento
+                btnAssinar.disabled = !(selfieBase64 && assinado && leuDocumento);
             }
 
-            // Verificar também quando a assinatura é desenhada
             canvas.addEventListener('pointerup', checkPronto);
 
-            // ===== Erro =====
-            function mostrarErro(msg) {
-                alertErro.textContent = msg;
-                alertErro.style.display = 'block';
-                alertErro.className = 'assin-alert error';
-                alertErro.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+            const obterLocalizacao = () => new Promise((resolve) => {
+                if (!navigator.geolocation) {
+                    resolve('Não suportado pelo navegador');
+                    return;
+                }
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => resolve(`Lat ${pos.coords.latitude.toFixed(6)}, Lng ${pos.coords.longitude.toFixed(6)}`),
+                    (err) => resolve('Acesso negado/indisponível'),
+                    { timeout: 5000, maximumAge: 0 }
+                );
+            });
 
             // ===== Enviar assinatura =====
             btnAssinar.addEventListener('click', async function () {
-                alertErro.style.display = 'none';
+                alertErro.classList.add('d-none');
+                alertErro.classList.remove('d-flex');
 
+                if (!leuDocumento) { mostrarErro('Você precisa ler o documento primeiro.'); return; }
                 if (!selfieBase64) { mostrarErro('Por favor, tire a selfie primeiro.'); return; }
                 if (!signaturePad || signaturePad.isEmpty()) { mostrarErro('Por favor, assine no campo de assinatura.'); return; }
 
@@ -751,19 +529,8 @@ $codigoValidacao = $documento->codigo_validacao;
                 btnAssinar.disabled = true;
                 btnAssinar.classList.add('loading');
 
-                const obterLocalizacao = () => new Promise((resolve) => {
-                    if (!navigator.geolocation) {
-                        resolve('Não suportado pelo navegador');
-                        return;
-                    }
-                    navigator.geolocation.getCurrentPosition(
-                        (pos) => resolve(`Lat ${pos.coords.latitude.toFixed(6)}, Lng ${pos.coords.longitude.toFixed(6)}`),
-                        (err) => resolve('Acesso negado/indisponível'),
-                        { timeout: 10000, maximumAge: 0 }
-                    );
-                });
-
                 const geolocalizacao = await obterLocalizacao();
+                const ipPublico = await obterIpPublico();
 
                 try {
                     const resp = await fetch(SIGN_URL, {
@@ -777,6 +544,7 @@ $codigoValidacao = $documento->codigo_validacao;
                             assinatura_base64: assinaturaBase64, 
                             selfie_base64: selfieBase64,
                             geolocalizacao: geolocalizacao,
+                            ip_publico: ipPublico,
                             responsavel: responsavel
                         }),
                     });
@@ -784,8 +552,8 @@ $codigoValidacao = $documento->codigo_validacao;
                     const data = await resp.json();
 
                     if (data.success) {
-                        formCard.style.display = 'none';
-                        telaSucesso.style.display = 'flex';
+                        formCard.classList.add('d-none');
+                        telaSucesso.classList.remove('d-none');
                         telaSucesso.scrollIntoView({ behavior: 'smooth' });
                     } else {
                         mostrarErro(data.message || 'Erro ao processar a assinatura. Tente novamente.');
@@ -798,13 +566,6 @@ $codigoValidacao = $documento->codigo_validacao;
                     btnAssinar.classList.remove('loading');
                 }
             });
-
-            // ===== Init =====
-            document.addEventListener('DOMContentLoaded', function () {
-                initSignaturePad();
-            });
-            if (document.readyState !== 'loading') initSignaturePad();
-
         })();
     </script>
 <?php endif; ?>
