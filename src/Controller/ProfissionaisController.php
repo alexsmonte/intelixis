@@ -285,6 +285,37 @@ class ProfissionaisController extends AppController
             'email' => ['field' => 'Profissionais.email', 'operator' => 'LIKE'],
         ];
         return $this->doAdvancedSearch($this->Profissionais, $allowedFilters, ['Profissionais.nome' => 'ASC'], ['Estabelecimentos']);
+    }
 
+    public function localizar()
+    {
+        $this->request->allowMethod(['get']);
+        $termo = $this->request->getQuery('termo');
+        $query = $this->Profissionais->find();
+
+        if (!empty($termo)) {
+            $query->where([
+                'Profissionais.estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id'),
+                'OR' => [
+                    "Profissionais.nome LIKE" => "%$termo%",
+                    "Profissionais.email LIKE " => "%$termo%",
+                ]
+            ]);
+        }
+
+        $profissionais = $query->orderBy('Profissionais.nome ASC')->limit(10)->all();
+        $res = [];
+        foreach ($profissionais as $p) {
+            $res[] = [
+                'id' => $p->id,
+                'label' => trim($p->nome),
+                'avatar' => null // Pode adicionar lógica de avatar se houver
+            ];
+        }
+
+        $this->autoRender = false;
+        $this->response = $this->response
+            ->withType('application/json')
+            ->withStringBody(json_encode($res));
     }
 }

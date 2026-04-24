@@ -43,13 +43,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Serviços']]);
 
                     <!-- Busca textual -->
                     <div class="col-xl-4 col-lg-4 col-md-12">
-                        <div class="position-relative">
-                            <input v-model="query" type="text" class="form-control form-control-lg rounded-pill ps-5"
-                                placeholder="Buscar por nome ou descrição..." @input="debouncedSearch">
-                            <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
-                                <i class="ti ti-search"></i>
-                            </span>
-                        </div>
+                        <filtro-busca v-model="query" placeholder="Buscar por nome ou descrição..." @search="debouncedSearch"></filtro-busca>
                     </div>
 
                     <!-- Status -->
@@ -65,29 +59,14 @@ $this->BreadcrumbsPlus->add([['title' => 'Serviços']]);
                 </div>
 
                 <!-- ── Filtros ativos ── -->
-                <div v-if="temFiltrosAtivos"
-                    class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3 mb-4 pt-2 border-top">
-
-                    <div class="d-flex flex-wrap align-items-center gap-2">
-                        <span class="text-muted me-1" style="font-size:0.82rem;">Filtros ativos:</span>
-
-                        <div v-if="query" class="filtro-badge">
-                            <i class="ti ti-search" style="font-size:0.8rem;"></i>
-                            <span>{{ query.length > 15 ? query.substring(0, 15) + '...' : query }}</span>
-                            <button class="btn-remover" @click="removerFiltro('texto')">✕</button>
-                        </div>
-
-                        <div v-if="situacaoFiltro !== ''" class="filtro-badge">
-                            <i class="ti ti-settings" style="font-size:0.8rem;"></i>
-                            <span>{{ textoSituacao }}</span>
-                            <button class="btn-remover" @click="removerFiltro('situacao')">✕</button>
-                        </div>
+                <filtro-badges :query="query" :data-inicio="dataInicio" :data-fim="dataFim"
+                    :tem-filtros-ativos="temFiltrosAtivos" @remover-filtro="removerFiltro" @limpar-filtros="limparFiltros">
+                    <div v-if="situacaoFiltro !== ''" class="filtro-badge">
+                        <i class="ti ti-settings" style="font-size:0.8rem;"></i>
+                        <span>{{ textoSituacao }}</span>
+                        <button class="btn-remover" @click="removerFiltro('situacao')">✕</button>
                     </div>
-
-                    <button class="btn-limpar-todos" @click="limparTodosFiltros">
-                        Limpar todos
-                    </button>
-                </div>
+                </filtro-badges>
 
                 <!-- ── Tabela ── -->
                 <div class="table-responsive-sm mb-4 border rounded-1 position-relative">

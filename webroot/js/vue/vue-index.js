@@ -1,20 +1,89 @@
 /**
  * vue-index.js — Reusable Vue 3 Index Component
- *
- * Provides a factory function `createVueIndex(extraConfig)` that creates
- * a standard Vue index app with search, filters, pagination, and utilities.
- *
- * Usage:
- *   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
- *   <script src="/js/vue/vue-index.js"></script>
- *   <script>
- *       createVueIndex({
- *           data() { return { myExtra: true }; },
- *           computed: { ... },
- *           methods: { ... }
- *       });
- *   </script>
  */
+
+const FiltroPeriodo = {
+    props: ['inicio', 'fim'],
+    emits: ['update:inicio', 'update:fim', 'change'],
+    template: `
+        <div class="grupo-datas">
+            <div class="data-input">
+                <input :value="inicio" type="date" 
+                    @input="$emit('update:inicio', $event.target.value)" 
+                    @change="$emit('change')">
+            </div>
+            <div class="separador-ate">até</div>
+            <div class="data-input">
+                <input :value="fim" type="date" 
+                    @input="$emit('update:fim', $event.target.value)" 
+                    @change="$emit('change')">
+            </div>
+        </div>
+    `
+};
+
+const FiltroBusca = {
+    props: ['modelValue', 'placeholder'],
+    emits: ['update:modelValue', 'search'],
+    template: `
+        <div class="position-relative">
+            <input :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" 
+                type="text" class="form-control rounded-pill ps-5" 
+                :placeholder="placeholder || 'Buscar...'" @keyup.enter="$emit('search')">
+            <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
+                <i class="ti ti-search"></i>
+            </span>
+        </div>
+    `
+};
+
+const FiltroBadges = {
+    props: ['query', 'dataInicio', 'dataFim', 'temFiltrosAtivos'],
+    emits: ['removerFiltro', 'limparFiltros'],
+    methods: {
+        formatarDataSimples(data) {
+            if (!data) return '';
+            const [y, m, d] = data.split('-');
+            return `${d}/${m}`;
+        }
+    },
+    mounted() {
+        if (typeof Iconify !== 'undefined') {
+            Iconify.scan();
+        }
+    },
+    template: `
+        <div v-if="temFiltrosAtivos"
+            class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3 mb-4 pt-3 border-top">
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <span class="text-muted me-1" style="font-size:0.82rem;">Filtros ativos:</span>
+
+                <div v-if="query" class="filtro-badge">
+                    <i class="ti ti-search" style="font-size:0.8rem;"></i>
+                    <span>{{ query.length > 15 ? query.substring(0, 15) + '...' : query }}</span>
+                    <button class="btn-remover" @click="$emit('removerFiltro', 'texto')">✕</button>
+                </div>
+
+                <div v-if="dataInicio || dataFim" class="filtro-badge">
+                    <i class="ti ti-calendar" style="font-size:0.8rem;"></i>
+                    <span>
+                        {{ dataInicio ? formatarDataSimples(dataInicio) : '—' }}
+                        &nbsp;-&nbsp;
+                        {{ dataFim ? formatarDataSimples(dataFim) : '—' }}
+                    </span>
+                    <button class="btn-remover" @click="$emit('removerFiltro', 'data')">✕</button>
+                </div>
+
+                <slot></slot>
+            </div>
+
+            <button v-if="temFiltrosAtivos" class="btn-limpar-todos" @click="$emit('limparFiltros')" title="Limpar todos os filtros">
+                <span class="iconify" data-icon="tabler:filter-2-x" style="font-size:1.3rem;"></span>
+            </button>
+        </div>
+    `
+};
+
 function createVueIndex(extraConfig = {}) {
     const elApp = document.getElementById('app');
     const csrfToken = elApp.getAttribute('data-csrf');
@@ -107,11 +176,11 @@ function createVueIndex(extraConfig = {}) {
         },
 
         removerFiltro(tipo) {
-            if (tipo === 'texto')       this.query = '';
+            if (tipo === 'texto') this.query = '';
             else if (tipo === 'data') { this.dataInicio = ''; this.dataFim = ''; }
             else if (tipo === 'situacao') this.situacaoFiltro = '';
             else if (this[tipo] !== undefined) Object.assign(this, { [tipo]: '' });
-            
+
             this.aplicarFiltros();
         },
 
@@ -120,12 +189,17 @@ function createVueIndex(extraConfig = {}) {
             this.dataInicio = '';
             this.dataFim = '';
             this.situacaoFiltro = '';
-            
+
             for (const key in this.customFiltersMap) {
                 if (this[key] !== undefined) this[key] = '';
             }
-            
+
             this.aplicarFiltros();
+        },
+
+        // Alias usado pelo componente filtro-badges
+        limparFiltros() {
+            this.limparTodosFiltros();
         },
 
         /**
@@ -243,7 +317,7 @@ function createVueIndex(extraConfig = {}) {
                 return;
             }
 
-            const itemId   = item.id;
+            const itemId = item.id;
             // Tenta achar um campo de nome legível; fallback para #id
             const itemNome = item.nome || item.name || item.descricao || item.titulo || `#${itemId}`;
             // Capitaliza o entityName (ex: "o Caixa" → exibe como está, ou "o caixa")
@@ -317,6 +391,7 @@ function createVueIndex(extraConfig = {}) {
     const mergedMethods = mergeObjects(baseMethods, extraConfig.methods || {});
 
     const appConfig = {
+        ...extraConfig,
         data() {
             return { ...baseData, ...extraData };
         },
@@ -331,6 +406,9 @@ function createVueIndex(extraConfig = {}) {
     };
 
     const app = Vue.createApp(appConfig);
+    app.component('filtro-periodo', FiltroPeriodo);
+    app.component('filtro-busca', FiltroBusca);
+    app.component('filtro-badges', FiltroBadges);
     app.mount('#app');
     return app;
 }

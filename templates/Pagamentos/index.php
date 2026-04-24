@@ -33,13 +33,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Pagamentos']]);
 
                     <!-- Descrição -->
                     <div class="col-xl-3 col-lg-3 col-md-6">
-                        <div class="position-relative">
-                            <input v-model="query" type="text" class="form-control form-control-lg rounded-pill ps-5"
-                                placeholder="Buscar..." @input="debouncedSearch">
-                            <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
-                                <i class="ti ti-search"></i>
-                            </span>
-                        </div>
+                        <filtro-busca v-model="query" @search="debouncedSearch"></filtro-busca>
                     </div>
 
                     <!-- Meio de pagamento -->
@@ -53,13 +47,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Pagamentos']]);
 
                     <!-- Período de baixa -->
                     <div class="col-xl-3 col-lg-3 col-md-6">
-                        <div class="input-group input-group-lg bg-white rounded-pill border overflow-hidden">
-                            <input v-model="dataInicio" type="date"
-                                class="form-control border-0 bg-transparent text-muted px-2" @change="aplicarFiltros">
-                            <span class="input-group-text bg-transparent border-0 text-muted px-1">a</span>
-                            <input v-model="dataFim" type="date"
-                                class="form-control border-0 bg-transparent text-muted px-2" @change="aplicarFiltros">
-                        </div>
+                        <filtro-periodo v-model:inicio="dataInicio" v-model:fim="dataFim" @change="aplicarFiltros"></filtro-periodo>
                     </div>
 
                     <!-- Antecipado -->
@@ -74,48 +62,23 @@ $this->BreadcrumbsPlus->add([['title' => 'Pagamentos']]);
                 </div>
 
                 <!-- ── Filtros ativos ── -->
-                <div v-if="temFiltrosAtivos"
-                    class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3 mb-4 pt-3 border-top">
-                    <div class="d-flex flex-wrap align-items-center gap-2">
-                        <span class="text-muted me-1" style="font-size:0.82rem;">Filtros ativos:</span>
-
-                        <!-- Descrição -->
-                        <div v-if="query" class="filtro-badge">
-                            <i class="ti ti-search" style="font-size:0.8rem;"></i>
-                            <span>{{ query.length > 15 ? query.substring(0, 15) + '...' : query }}</span>
-                            <button class="btn-remover" @click="removerFiltro('texto')">✕</button>
-                        </div>
-
-                        <!-- Forma de pagamento -->
-                        <div v-if="formaPagamentoFiltro" class="filtro-badge">
-                            <i class="ti ti-credit-card" style="font-size:0.8rem;"></i>
-                            <span>{{ formasPagamento[formaPagamentoFiltro] || formaPagamentoFiltro }}</span>
-                            <button class="btn-remover" @click="removerFiltro('formaPagamentoFiltro')">✕</button>
-                        </div>
-
-                        <!-- Datas -->
-                        <div v-if="dataInicio || dataFim" class="filtro-badge">
-                            <i class="ti ti-calendar" style="font-size:0.8rem;"></i>
-                            <span>
-                                {{ dataInicio ? formatarDataSimples(dataInicio) : '—' }}
-                                &nbsp;-&nbsp;
-                                {{ dataFim ? formatarDataSimples(dataFim) : '—' }}
-                            </span>
-                            <button class="btn-remover" @click="removerFiltro('data')">✕</button>
-                        </div>
-
-                        <!-- Antecipado -->
-                        <div v-if="antecipadoFiltro !== ''" class="filtro-badge">
-                            <i class="ti ti-bolt" style="font-size:0.8rem;"></i>
-                            <span>{{ antecipadoFiltro === '1' ? 'Antecipado' : 'Não antecipado' }}</span>
-                            <button class="btn-remover" @click="removerFiltro('antecipadoFiltro')">✕</button>
-                        </div>
+                <filtro-badges :query="query" :data-inicio="dataInicio" :data-fim="dataFim" 
+                    :tem-filtros-ativos="temFiltrosAtivos" @remover-filtro="removerFiltro" @limpar-filtros="limparFiltros">
+                    
+                    <!-- Forma de pagamento (Badge Extra) -->
+                    <div v-if="formaPagamentoFiltro" class="filtro-badge">
+                        <i class="ti ti-credit-card" style="font-size:0.8rem;"></i>
+                        <span>{{ formasPagamento[formaPagamentoFiltro] || formaPagamentoFiltro }}</span>
+                        <button class="btn-remover" @click="removerFiltro('formaPagamentoFiltro')">✕</button>
                     </div>
 
-                    <button class="btn-limpar-todos" @click="limparTodosFiltros">
-                        Limpar todos
-                    </button>
-                </div>
+                    <!-- Antecipado (Badge Extra) -->
+                    <div v-if="antecipadoFiltro" class="filtro-badge">
+                        <i class="ti ti-clock" style="font-size:0.8rem;"></i>
+                        <span>{{ antecipadoFiltro == '1' ? 'Antecipado' : 'Não antecipado' }}</span>
+                        <button class="btn-remover" @click="removerFiltro('antecipadoFiltro')">✕</button>
+                    </div>
+                </filtro-badges>
 
                 <hr class="my-4">
 

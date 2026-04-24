@@ -84,6 +84,8 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/assinar/{codigo}', ['controller' => 'Documentos', 'action' => 'publicSign'])->setPass(['codigo']);
         // Tela de assinatura do profissional
         $builder->connect('/documentos/assinar-profissional/{id}', ['controller' => 'Documentos', 'action' => 'assinarProfissional'])->setPass(['id']);
+        $builder->get('/documentos/get-logs/{id}', ['controller' => 'Documentos', 'action' => 'getLogs'])->setPass(['id']);
+        $builder->get('/documentos/download-logs/{id}', ['controller' => 'Documentos', 'action' => 'downloadLogs'])->setPass(['id']);
 
         /*
          * ...and connect the rest of 'Pages' controller's URLs.

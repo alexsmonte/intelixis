@@ -12,6 +12,7 @@ use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use App\Model\Entity\Documento;
 use App\Model\Entity\Estabelecimento;
+use Cake\Http\Exception\NotFoundException;
 
 /**
  * Documentos Controller
@@ -363,6 +364,82 @@ class DocumentosController extends AppController
         }
     }
 
+    /**
+     * GET /documentos/get-logs/{id}
+     * Retorna os logs de auditoria de um documento como JSON.
+     */
+    public function getLogs($id = null)
+    {
+        $this->request->allowMethod(['get']);
+
+        $documento = $this->Documentos->get($id, [
+            'conditions' => ['Documentos.estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+        ]);
+
+        $logsTable = $this->fetchTable('DocumentoLogs');
+        $logs = $logsTable->find()
+            ->where(['documento_id' => $documento->id])
+            ->contain(['Usuarios'])
+            ->orderBy(['DocumentoLogs.created' => 'ASC'])
+            ->all();
+
+        $data = [];
+        foreach ($logs as $log) {
+            $data[] = [
+                'id'          => $log->id,
+                'acao'        => $log->acao,
+                'hash_antes'  => $log->hash_antes,
+                'hash_depois' => $log->hash_depois,
+                'ip'          => $log->ip,
+                'detalhes'    => $log->detalhes,
+                'created'     => $log->created ? $log->created->format('d/m/Y H:i:s') : '-',
+                'usuario'     => $log->usuario ? $log->usuario->nome : 'Sistema/Paciente',
+            ];
+        }
+
+        return $this->response->withType('application/json')
+            ->withStringBody(json_encode(['ok' => true, 'logs' => $data]));
+    }
+
+    /**
+     * GET /documentos/download-logs/{id}
+     * Retorna os logs de auditoria de um documento como CSV para download.
+     */
+    public function downloadLogs($id = null)
+    {
+        $this->request->allowMethod(['get']);
+
+        $documento = $this->Documentos->get($id, [
+            'conditions' => ['Documentos.estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+        ]);
+
+        $logsTable = $this->fetchTable('DocumentoLogs');
+        $logs = $logsTable->find()
+            ->where(['documento_id' => $documento->id])
+            ->contain(['Usuarios'])
+            ->orderBy(['DocumentoLogs.created' => 'ASC'])
+            ->all();
+
+        $csv = "ID;Ação;Usuário;IP;Hash Antes;Hash Depois;Data/Hora\n";
+        foreach ($logs as $log) {
+            $usuario = $log->usuario ? $log->usuario->nome : 'Sistema/Paciente';
+            $csv .= implode(';', [
+                $log->id,
+                $log->acao,
+                $usuario,
+                $log->ip,
+                $log->hash_antes ?? '',
+                $log->hash_depois ?? '',
+                $log->created ? $log->created->format('d/m/Y H:i:s') : '-',
+            ]) . "\n";
+        }
+
+        return $this->response
+            ->withType('text/csv')
+            ->withHeader('Content-Disposition', 'attachment; filename="logs_documento_' . $id . '.csv"')
+            ->withStringBody($csv);
+    }
+
     public function gerarLinkTeste($id = null)
     {
         $documento = $this->Documentos->get($id, [
@@ -413,7 +490,7 @@ class DocumentosController extends AppController
             ->first();
 
         if (!$documento) {
-            throw new \NotFoundException('Documento não encontrado');
+            throw new NotFoundException('Documento não encontrado');
         }
 
         $this->set(compact('documento'));

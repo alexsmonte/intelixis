@@ -577,6 +577,21 @@ class FinancasController extends AppController
             $data = $this->request->getData();
             $entity = $this->Financas->get($id);
 
+            if ($entity->data_baixa !== null) {
+                if ($isAjax) {
+                    $this->autoRender = false;
+                    return $this->response
+                        ->withStatus(400)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode([
+                            'success' => false,
+                            'message' => 'Não é possível editar um lançamento já pago. Estorne-o primeiro.'
+                        ]));
+                }
+                $this->Flash->error('Não é possível editar um lançamento já pago. Estorne-o primeiro.');
+                return $this->redirect(['action' => 'lancamentos']);
+            }
+
             // Validação
             $erros = [];
             if (isset($data['descricao']) && mb_strlen(trim((string)$data['descricao'])) < 3) {
@@ -677,6 +692,21 @@ class FinancasController extends AppController
 
             $entity = $this->Financas->get($id);
             
+            if ($entity->data_baixa !== null) {
+                if ($isAjax) {
+                    $this->autoRender = false;
+                    return $this->response
+                        ->withStatus(400)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode([
+                            'success' => false,
+                            'message' => 'Não é possível excluir um lançamento já pago. Estorne-o primeiro.'
+                        ]));
+                }
+                $this->Flash->error('Não é possível excluir um lançamento já pago. Estorne-o primeiro.');
+                return $this->redirect(['action' => 'lancamentos']);
+            }
+
             if ($this->Financas->delete($entity)) {
                 if ($isAjax) {
                     $this->autoRender = false;
@@ -791,6 +821,62 @@ class FinancasController extends AppController
 }
 
 
+
+    public function estornar($id = null)
+    {
+        $this->request->allowMethod(['post']);
+        $this->autoRender = false;
+        
+        try {
+            $id = (int)$id;
+            if ($id <= 0) {
+                throw new \InvalidArgumentException('ID inválido.');
+            }
+
+            $entity = $this->Financas->get($id);
+            
+            if ($entity->data_baixa === null) {
+                return $this->response
+                    ->withStatus(400)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode([
+                        'success' => false,
+                        'message' => 'Lançamento não está pago.'
+                    ]));
+            }
+
+            $entity = $this->Financas->patchEntity($entity, [
+                'data_baixa' => null,
+                'valor_recebido' => null,
+                'desconto' => null
+            ]);
+
+            if ($this->Financas->save($entity)) {
+                return $this->response
+                    ->withType('application/json')
+                    ->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => 'Estorno realizado com sucesso.'
+                    ]));
+            } else {
+                return $this->response
+                    ->withStatus(400)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode([
+                        'success' => false,
+                        'message' => 'Erro ao realizar o estorno.'
+                    ]));
+            }
+        } catch (\Exception $e) {
+            return $this->response
+                ->withStatus(500)
+                ->withType('application/json')
+                ->withStringBody(json_encode([
+                    'success' => false,
+                    'message' => 'Erro interno ao realizar o estorno: ' . $e->getMessage()
+                ]));
+        }
+    }
 
  
  /**    public function search()

@@ -9,10 +9,10 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais']]);
 <!-- Vue App Container -->
 <div id="app" v-cloak data-csrf="<?= $this->request->getAttribute('csrfToken'); ?>" data-entity-name="o Profissional"
     data-routes='<?= json_encode([
-        'search'     => $this->Url->build(['controller' => 'Profissionais', 'action' => 'search']),
+        'search' => $this->Url->build(['controller' => 'Profissionais', 'action' => 'search']),
         'visualizar' => $this->Url->build(['controller' => 'Profissionais', 'action' => 'visualizar']),
-        'edit'       => $this->Url->build(['controller' => 'Profissionais', 'action' => 'editar']),
-        'delete'     => $this->Url->build(['controller' => 'Profissionais', 'action' => 'delete'])
+        'edit' => $this->Url->build(['controller' => 'Profissionais', 'action' => 'editar']),
+        'delete' => $this->Url->build(['controller' => 'Profissionais', 'action' => 'delete'])
     ], JSON_HEX_APOS | JSON_HEX_QUOT) ?>'>
 
     <div class="card w-100 position-relative overflow-x-hidden">
@@ -43,13 +43,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais']]);
 
                     <!-- Busca textual -->
                     <div class="col-xl-4 col-lg-4 col-md-12">
-                        <div class="position-relative">
-                            <input v-model="query" type="text" class="form-control form-control-lg rounded-pill ps-5"
-                                placeholder="Buscar por nome ou email..." @input="debouncedSearch">
-                            <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
-                                <i class="ti ti-search"></i>
-                            </span>
-                        </div>
+                        <filtro-busca v-model="query" placeholder="Buscar por nome, email ou telefone"
+                            @search="debouncedSearch"></filtro-busca>
                     </div>
 
                     <!-- Status -->
@@ -65,32 +60,15 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais']]);
                 </div>
 
                 <!-- ── Filtros ativos ── -->
-                <div v-if="temFiltrosAtivos"
-                    class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3 mb-4 pt-2 border-top">
-
-                    <div class="d-flex flex-wrap align-items-center gap-2">
-                        <span class="text-muted me-1" style="font-size:0.82rem;">Filtros ativos:</span>
-
-                        <!-- Texto -->
-                        <div v-if="query" class="filtro-badge">
-                            <i class="ti ti-search" style="font-size:0.8rem;"></i>
-                            <span>{{ query.length > 15 ? query.substring(0, 15) + '...' : query }}</span>
-                            <button class="btn-remover" @click="removerFiltro('texto')">✕</button>
-                        </div>
-
-                        <!-- Status -->
-                        <div v-if="situacaoFiltro !== ''" class="filtro-badge">
-                            <i class="ti ti-user" style="font-size:0.8rem;"></i>
-                            <span>{{ textoSituacao }}</span>
-                            <button class="btn-remover" @click="removerFiltro('situacao')">✕</button>
-                        </div>
+                <filtro-badges :query="query" :data-inicio="dataInicio" :data-fim="dataFim"
+                    :tem-filtros-ativos="temFiltrosAtivos" @remover-filtro="removerFiltro"
+                    @limpar-filtros="limparFiltros">
+                    <div v-if="situacaoFiltro !== ''" class="filtro-badge">
+                        <i class="ti ti-user" style="font-size:0.8rem;"></i>
+                        <span>{{ textoSituacao }}</span>
+                        <button class="btn-remover" @click="removerFiltro('situacao')">✕</button>
                     </div>
-
-                    <!-- Limpar todos -->
-                    <button class="btn-limpar-todos" @click="limparTodosFiltros">
-                        Limpar todos
-                    </button>
-                </div>
+                </filtro-badges>
 
                 <!-- ── Tabela ── -->
                 <div class="table-responsive-sm mb-4 border rounded-1 position-relative">
@@ -125,14 +103,15 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais']]);
                                     </span>
                                 </td>
                                 <td style="width:8%;">
-                                    <div class="dropdown">                                        <button
+                                    <div class="dropdown"> <button
                                             class="btn bg-transparent text-primary d-inline-flex align-items-center justify-content-center"
                                             type="button" :id="'dropdownMenu-' + item.id" data-bs-toggle="dropdown"
                                             aria-expanded="false">
                                             <i class="fas fa-bars"></i>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end"
-                                            :aria-labelledby="'dropdownMenu-' + item.id">                                            <li>
+                                            :aria-labelledby="'dropdownMenu-' + item.id">
+                                            <li>
                                                 <a class="dropdown-item" :href="`${routes.visualizar}/${item.id}`">
                                                     <span class="iconify text-gray" data-icon="solar:eye-bold-duotone"
                                                         style="font-size:15px;"></span> Visualizar

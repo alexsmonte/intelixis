@@ -228,10 +228,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                             <table class="table table-hover  mb-0 align-middle">
                                                 <thead class="text-dark fs-4">
                                                 <tr>
-                                                    <th style="width: 45%;"><h6 class="fs-4 fw-semibold mb-0">Descrição</h6></th>
-                                                    <th style="width: 15%; text-align:center;"><h6 class="fs-4 fw-semibold mb-0">Profissional</h6></th>
-                                                    <th style="width: 15%; text-align: center;"><h6 class="fs-4 fw-semibold mb-0">Feito em</h6></th>
-                                                    <th style="width: 5%; text-align: center;"><h6 class="fs-4 fw-semibold mb-0">Opções</h6></th>
+                                                    <th style="width: 30%;"><h6 class="fs-4 fw-semibold mb-0">Descrição</h6></th>
+                                                    <th style="width: 10%; text-align:center;"><h6 class="fs-4 fw-semibold mb-0">Profissional</h6></th>
+                                                    <th style="width: 10%; text-align: center;"><h6 class="fs-4 fw-semibold mb-0">Feito em</h6></th>
+                                                    <th style="width: 17%; text-align: center;"><h6 class="fs-4 fw-semibold mb-0">Assinatura Paciente</h6></th>
+                                                    <th style="width: 17%; text-align: center;"><h6 class="fs-4 fw-semibold mb-0">Assinatura Profissional</h6></th>
+                                                    <th style="width: 9%; text-align: center;"><h6 class="fs-4 fw-semibold mb-0">Integridade</h6></th>
+                                                    <th style="width: 7%; text-align: center;"><h6 class="fs-4 fw-semibold mb-0">Opções</h6></th>
                                                 </tr>
                                                 </thead>
                                                 <tbody v-if="item.docs && item.docs.length">
@@ -239,15 +242,82 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                         <td style="white-space: normal;" :title="resumoReceita(doc.texto, 500)">{{ resumoReceita(doc.texto, 120) }}</td>
                                                         <td style="text-align: center;">{{ doc.profissional?.nome || '-' }}</td>
                                                         <td style="text-align: center;">{{ formatarData(doc.created) }}</td>
+
+                                                        <!-- Coluna: Assinatura do Paciente -->
+                                                        <td style="text-align: center;">
+                                                            <template v-if="doc.assinatura_hash">
+                                                                <span class="badge d-inline-flex align-items-center gap-1 px-2 py-1"
+                                                                      style="background:rgba(34,197,94,0.12);color:#15803d;border:1px solid rgba(34,197,94,0.3);border-radius:8px;font-size:11px;white-space:nowrap;">
+                                                                    <iconify-icon icon="solar:verified-check-bold-duotone" class="fs-6" style="color:#16a34a;"></iconify-icon>
+                                                                    Assinado
+                                                                </span>
+                                                                <div v-if="doc.assinatura_data" class="text-muted mt-1" style="font-size:10px;">{{ formatarData(doc.assinatura_data) }}</div>
+                                                            </template>
+                                                            <template v-else>
+                                                                <span class="badge d-inline-flex align-items-center gap-1 px-2 py-1"
+                                                                      style="background:rgba(148,163,184,0.1);color:#64748b;border:1px solid rgba(148,163,184,0.3);border-radius:8px;font-size:11px;white-space:nowrap;">
+                                                                    <iconify-icon icon="solar:clock-circle-bold-duotone" class="fs-6"></iconify-icon>
+                                                                    Pendente
+                                                                </span>
+                                                            </template>
+                                                        </td>
+
+                                                        <!-- Coluna: Assinatura do Profissional -->
+                                                        <td style="text-align: center;">
+                                                            <template v-if="doc.assinatura_prof_hash">
+                                                                <span class="badge d-inline-flex align-items-center gap-1 px-2 py-1"
+                                                                      style="background:rgba(59,130,246,0.1);color:#1d4ed8;border:1px solid rgba(59,130,246,0.3);border-radius:8px;font-size:11px;white-space:nowrap;">
+                                                                    <iconify-icon icon="solar:lock-keyhole-bold-duotone" class="fs-6" style="color:#2563eb;"></iconify-icon>
+                                                                    Assinado digitalmente
+                                                                </span>
+                                                                <div v-if="doc.profissional?.nome" class="text-muted mt-1" style="font-size:10px;">
+                                                                    por: {{ doc.assinatura_prof_detalhes?.signer_name || doc.profissional?.nome || '-' }}
+                                                                </div>
+                                                                <div v-if="doc.assinatura_prof_data" class="text-muted" style="font-size:10px;">{{ formatarData(doc.assinatura_prof_data) }}</div>
+                                                            </template>
+                                                            <template v-else>
+                                                                <span class="badge d-inline-flex align-items-center gap-1 px-2 py-1"
+                                                                      style="background:rgba(148,163,184,0.1);color:#64748b;border:1px solid rgba(148,163,184,0.3);border-radius:8px;font-size:11px;white-space:nowrap;">
+                                                                    <iconify-icon icon="solar:lock-keyhole-unlocked-bold-duotone" class="fs-6"></iconify-icon>
+                                                                    Não assinado
+                                                                </span>
+                                                            </template>
+                                                        </td>
+
+                                                        <!-- Coluna: Integridade -->
+                                                        <td style="text-align: center;">
+                                                            <template v-if="doc.assinatura_hash || doc.assinatura_prof_hash">
+                                                                <span class="badge d-inline-flex align-items-center gap-1 px-2 py-1"
+                                                                      style="background:rgba(34,197,94,0.1);color:#15803d;border:1px solid rgba(34,197,94,0.3);border-radius:8px;font-size:11px;white-space:nowrap;">
+                                                                    <iconify-icon icon="solar:shield-check-bold-duotone" class="fs-6" style="color:#16a34a;"></iconify-icon>
+                                                                    Hash OK
+                                                                </span>
+                                                            </template>
+                                                            <template v-else>
+                                                                <span class="badge d-inline-flex align-items-center gap-1 px-2 py-1"
+                                                                      style="background:rgba(251,191,36,0.1);color:#b45309;border:1px solid rgba(251,191,36,0.3);border-radius:8px;font-size:11px;white-space:nowrap;">
+                                                                    <iconify-icon icon="solar:shield-warning-bold-duotone" class="fs-6"></iconify-icon>
+                                                                    Sem hash
+                                                                </span>
+                                                            </template>
+                                                        </td>
+
+                                                        <!-- Coluna: Opções -->
                                                         <td>
                                                         <div class="dropdown">
                                                             <button class="btn  bg-transparent text-primary  d-inline-flex align-items-center justify-content-center" type="button" :id="'dropdownMenu-' + doc.id" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                <i class="fas fa-bars"></i>
+                                                                <iconify-icon icon="solar:menu-dots-bold" class="fs-7"></iconify-icon>
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end" :aria-labelledby="'dropdownMenu-' + doc.id">
                                                                 <li class="dropdown-item">
                                                                     <a :href="`<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'imprimir'], ['fullBase' => true]) ?>/${doc.id}`"  target="_blank" class="link-state link-primary2" title="Imprimir documento">
                                                                         <iconify-icon icon="solar:printer-bold-duotone" class="fs-7"></iconify-icon>Imprimir documento
+                                                                    </a>
+                                                                </li>
+                                                                <li><hr class="dropdown-divider"></li>
+                                                                <li class="dropdown-item">
+                                                                    <a href="#" class="link-state link-info2" title="Visualizar registros de log" @click.stop="abrirLogsDocumento(doc)">
+                                                                        <iconify-icon icon="solar:document-text-bold-duotone" class="fs-7"></iconify-icon> Visualizar registros
                                                                     </a>
                                                                 </li>
                                                                 <li><hr class="dropdown-divider"></li>
@@ -263,11 +333,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                 </tbody>
                                                 <tbody v-else>
                                                     <tr>
-                                                        <td colspan="4" class="text-center text-muted">Nenhum registro</td>
+                                                        <td colspan="7" class="text-center text-muted">Nenhum registro</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
                                         </div>
+
 
                                         <div class="tab-pane fade" :id="'laudo-' + item.id" role="tabpanel" style="max-height: 50vh; min-height:200px; overflow-y: auto;">
                                             <!--- laudo --->
@@ -825,6 +896,80 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
             </div>
         </div>
     </div>
+
+    <!-- Modal de Logs do Documento -->
+    <div class="modal fade" id="bs-modal-logs-documento" tabindex="-1" aria-labelledby="bs-modal-logs-documento" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="p-2 bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center">
+                            <iconify-icon icon="solar:history-bold-duotone" class="fs-7 text-primary"></iconify-icon>
+                        </div>
+                        <div>
+                            <h5 class="modal-title fw-bold mb-0">Registros do Documento</h5>
+                            <p class="text-muted mb-0" style="font-size: 12px;" v-if="logsModal.doc">
+                                Histórico de ações e trilha de auditoria
+                            </p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <div v-if="logsModal.loading" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Carregando...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Buscando registros...</p>
+                    </div>
+                    <div v-else>
+                        <div v-if="logsModal.logs && logsModal.logs.length" class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="border-0 rounded-start" style="font-size: 12px; font-weight: 600;">Ação</th>
+                                        <th class="border-0" style="font-size: 12px; font-weight: 600;">Usuário</th>
+                                        <th class="border-0" style="font-size: 12px; font-weight: 600; text-align: center;">IP</th>
+                                        <th class="border-0 rounded-end" style="font-size: 12px; font-weight: 600; text-align: center;">Data/Hora</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="log in logsModal.logs" :key="log.id">
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <span class="fw-semibold text-dark">{{ log.acao }}</span>
+                                                <small v-if="log.detalhes" class="text-muted" style="font-size: 10px;">{{ log.detalhes }}</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted" style="font-size: 13px;">{{ log.usuario }}</span>
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <span class="badge bg-light text-dark fw-normal" style="font-size: 11px;">{{ log.ip }}</span>
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <span class="text-muted" style="font-size: 12px;">{{ log.created }}</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div v-else class="text-center py-5">
+                            <iconify-icon icon="solar:document-medicine-bold-duotone" class="fs-10 text-muted opacity-50 mb-3"></iconify-icon>
+                            <p class="text-muted">Nenhum registro encontrado para este documento.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <a v-if="logsModal.doc" :href="`<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'downloadLogs'], ['fullBase' => true]) ?>/${logsModal.doc.id}`" class="btn btn-outline-primary d-inline-flex align-items-center gap-2" target="_blank">
+                        <iconify-icon icon="solar:download-bold-duotone" class="fs-5"></iconify-icon>
+                        Download CSV
+                    </a>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
 </div>
 
@@ -998,6 +1143,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     titulo:null,
                     tipo: 'documento',
                     salvando:false
+                },
+                logsModal: {
+                    show: false,
+                    loading: false,
+                    doc: null,
+                    logs: []
                 },
 
             money : {
@@ -1726,6 +1877,29 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
                 modalDocumento.show();
             },
+
+            abrirLogsDocumento(doc) {
+                this.logsModal.doc = doc;
+                this.logsModal.logs = [];
+                this.logsModal.loading = true;
+                this.logsModal.show = true;
+
+                const modal = new bootstrap.Modal(document.getElementById('bs-modal-logs-documento'));
+                modal.show();
+
+                axios.get(`<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'getLogs'], ['fullBase' => true]) ?>/${doc.id}`, {
+                    headers: { 'X-CSRF-Token': '<?= $this->request->getAttribute('csrfToken') ?>' }
+                }).then(response => {
+                    if (response.data.ok) {
+                        this.logsModal.logs = response.data.logs;
+                    }
+                }).catch(() => {
+                    this.logsModal.logs = [];
+                }).finally(() => {
+                    this.logsModal.loading = false;
+                });
+            },
+
             abrirModalAnamnese(item) {
                 this.carregarModelosAnamnese();
                 this.itemAnamnese = item;

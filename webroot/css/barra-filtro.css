@@ -50,12 +50,12 @@
 }
 
 
-/* ── Select genérico ── */
 .select-situacao,
 .select-filtro {
     height: 48px;
     border-radius: 50rem !important;
     font-size: 0.875rem;
+    color: #495057;
     border-color: #ced4da;
     padding: 0 1.25rem;
 }
@@ -66,20 +66,44 @@
     border-color: #86b7fe;
 }
 
-/* ── Input genérico ── */
 .input-filtro,
-.input-date-filtro {
-    height: 48px;
+.input-date-filtro,
+.form-control.rounded-pill {
+    height: 48px !important;
     border-radius: 50rem !important;
-    font-size: 0.875rem;
-    border-color: #ced4da;
-    padding: 0 1.25rem;
+    font-size: 0.875rem !important;
+    border-color: #ced4da !important;
+    padding: 0 1.25rem !important;
+}
+
+.form-control.rounded-pill.ps-5 {
+    padding-left: 3rem !important;
 }
 
 .input-filtro:focus,
-.input-date-filtro:focus {
-    box-shadow: none;
-    border-color: #86b7fe;
+.input-date-filtro:focus,
+.form-control.rounded-pill:focus {
+    box-shadow: none !important;
+    border-color: #86b7fe !important;
+}
+
+/* Estilo consistente para placeholders */
+::placeholder {
+    color: #adb5bd !important;
+    opacity: 1 !important;
+    font-size: 0.875rem !important;
+}
+
+::-webkit-input-placeholder {
+    color: #adb5bd !important;
+}
+
+:-ms-input-placeholder {
+    color: #adb5bd !important;
+}
+
+::-ms-input-placeholder {
+    color: #adb5bd !important;
 }
 
 /* ── Label do filtro ── */
@@ -122,21 +146,25 @@
     color: #343a40;
 }
 
-/* ── Botão limpar todos ── */
+/* ── Botão limpar filtros (ícone) ── */
 .btn-limpar-todos {
-    border: 1px solid #fa5252;
-    color: #fa5252;
+    border: 1px solid #dee2e6;
+    color: #868e96;
     background: transparent;
     border-radius: 50rem;
-    padding: 0.35rem 1.1rem;
-    font-size: 0.85rem;
-    font-weight: 500;
-    white-space: nowrap;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    flex-shrink: 0;
 }
 
 .btn-limpar-todos:hover {
-    background: #fa5252;
-    color: #fff;
+    background: #fff0f0;
+    color: #fa5252;
+    border-color: #fa5252;
 }

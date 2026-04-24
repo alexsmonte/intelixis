@@ -13,6 +13,17 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
 
 <?= $this->Flash->render() ?>
 
+<!-- Assets para Autocomplete e Selectpicker (Padrão Agendamentos) -->
+<?= $this->Html->css([
+    'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.14.1/themes/base/jquery-ui.min.css',
+    'plugins/bootstrap-select.css',
+    'barra-filtro'
+]) ?>
+<?= $this->Html->script([
+    'https://code.jquery.com/ui/1.14.1/jquery-ui.min.js',
+    'plugins/bootstrap-select-min.js'
+]) ?>
+
 <style>
     /* ESTILOS PARA SELEÇÃO */
     .select-checkbox {
@@ -99,26 +110,48 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
         cursor: not-allowed;
     }
 
-    tr.selected td {
-        background-color: #f0f9ff !important;
+    /* Garantir que o Select2 apareça sobre o modal */
+    .select2-container--open {
+        z-index: 9999 !important;
     }
 
-    /* Destaque para linhas já baixadas */
-    tr td:first-child input:disabled~* {
-        opacity: 0.7;
+    /* Estilos para Autocomplete (Padrão Agendamentos) */
+    .ui-autocomplete {
+        z-index: 9999 !important;
+        max-height: 350px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        border: 1px solid #dee2e6;
+        background: #fff;
+    }
+
+    .ui-menu-item {
+        border-bottom: 1px solid #f1f1f1;
+    }
+
+    .ui-menu-item:last-child {
+        border-bottom: none;
+    }
+
+    .ui-menu-item .ui-state-active {
+        background-color: #007bff !important;
+        color: #fff !important;
+        border: none !important;
+        margin: 0 !important;
     }
 </style>
 
-<div id="app" v-cloak
-    data-csrf="<?= $this->request->getAttribute('csrfToken'); ?>"
-    data-entity-name="o Lançamento"
+<div id="app" v-cloak data-csrf="<?= $this->request->getAttribute('csrfToken'); ?>" data-entity-name="o Lançamento"
     data-routes='<?= json_encode([
-        'search'             => $this->Url->build(['controller' => 'Financas', 'action' => 'search']),
-        'delete'             => $this->Url->build(['controller' => 'Financas', 'action' => 'delete']),
-        'novo'               => $this->Url->build(['controller' => 'Financas', 'action' => 'novo']),
-        'editar'             => $this->Url->build(['controller' => 'Financas', 'action' => 'editar']),
-        'getCategorias'      => $this->Url->build(['controller' => 'Financas', 'action' => 'getCategorias']),
-        'baixarLancamentos'  => $this->Url->build(['controller' => 'Financas', 'action' => 'baixarLancamentos'])
+        'search' => $this->Url->build(['controller' => 'Financas', 'action' => 'search']),
+        'delete' => $this->Url->build(['controller' => 'Financas', 'action' => 'delete']),
+        'novo' => $this->Url->build(['controller' => 'Financas', 'action' => 'novo']),
+        'editar' => $this->Url->build(['controller' => 'Financas', 'action' => 'editar']),
+        'estornar' => $this->Url->build(['controller' => 'Financas', 'action' => 'estornar']),
+        'getCategorias' => $this->Url->build(['controller' => 'Financas', 'action' => 'getCategorias']),
+        'baixarLancamentos' => $this->Url->build(['controller' => 'Financas', 'action' => 'baixarLancamentos'])
     ], JSON_HEX_APOS | JSON_HEX_QUOT) ?>'>
 
     <!-- CARD PRINCIPAL (Unificado conforme rule-index) -->
@@ -131,133 +164,65 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                     <h4 class="card-title mb-0">Lançamentos Financeiros</h4>
                 </div>
 
-                <!-- LINHA DE FILTROS -->
+                <!-- ── Linha de filtros ── -->
                 <div class="row align-items-center g-2 mb-2">
-                <!-- BUSCA TEXTUAL -->
-                <div class="col-xl-4 col-lg-3 col-md-6 mb-2 mb-md-0">
-                    <div class="position-relative">
-                        <input v-model="query" type="text" class="form-control form-control-lg rounded-pill ps-5"
-                            placeholder="Buscar..." @input="debouncedSearch">
-                        <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
-                            <i class="ti ti-search"></i>
-                        </span>
+
+                    <!-- Descrição -->
+                    <div class="col-xl-3 col-lg-3 col-md-6">
+                        <filtro-busca v-model="query" @search="debouncedSearch"></filtro-busca>
+                    </div>
+
+                    <!-- Período de baixa -->
+                    <div class="col-xl-4 col-lg-4 col-md-6">
+                        <filtro-periodo v-model:inicio="dataInicio" v-model:fim="dataFim" @change="aplicarFiltros"></filtro-periodo>
+                    </div>
+
+                    <!-- Categoria -->
+                    <div class="col-xl-3 col-lg-3 col-md-6"
+                        v-if="abaAtivaTipo === 'despesas' && modalCategorias.length > 0">
+                        <select v-model="categoriaFiltroId" class="form-select form-select-lg rounded-pill w-100"
+                            @change="aplicarFiltros">
+                            <option value="" disabled selected>Categoria...</option>
+                            <option v-for="cat in modalCategorias" :key="cat.id" :value="cat.id">
+                                {{ cat.name }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Situação -->
+                    <div class="col-xl-2 col-lg-2 col-md-6">
+                        <select v-model="situacaoFiltro" class="form-select form-select-lg rounded-pill w-100"
+                            @change="aplicarFiltros">
+                            <option value="" disabled selected>Situação...</option>
+                            <option value="aberto">Em aberto</option>
+                            <option value="pago">Pago</option>
+                            <option value="vencido">Vencido</option>
+                        </select>
                     </div>
                 </div>
 
-                <div class="col-xl-4 col-lg-4 col-md-6 mb-2 mb-md-0 grupo-datas-container">
-                    <div class="grupo-datas">
-                        <!-- Data Início -->
-                        <div class="data-input">
-                            <input v-model="dataInicio" type="date"
-                                class="form-control form-control-lg rounded-start-pill" placeholder="Início"
-                                @change="aplicarFiltros">
-                        </div>
-
-                        <!-- Separador "até" -->
-                        <div class="separador-ate">
-                            <span>até</span>
-                        </div>
-
-                        <!-- Data Fim -->
-                        <div class="data-input">
-                            <input v-model="dataFim" type="date" class="form-control form-control-lg rounded-end-pill"
-                                placeholder="Fim" @change="aplicarFiltros">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Categoria (reduzida) -->
-                <div class="col-xl-2 col-lg-2 col-md-6 mb-2 mb-md-0"
-                    v-if="abaAtivaTipo === 'despesas' && modalCategorias.length > 0">
-                    <select v-model="categoriaFiltroId" class="form-select form-select-lg rounded-pill h-100 w-100"
-                        @change="aplicarFiltros">
-                        <option value="">Todas categorias</option>
-                        <option v-for="cat in modalCategorias" :key="cat.id" :value="cat.id">
-                            {{ cat.name }}
-                        </option>
-                    </select>
-                </div>
-
-                <!-- Situação (reduzida) -->
-                <div class="col-xl-2 col-lg-2 col-md-6 mb-2 mb-md-0">
-                    <select v-model="situacaoFiltro" class="form-select form-select-lg rounded-pill h-100 w-100"
-                        @change="aplicarFiltros">
-                        <option value="">Todas situações</option>
-                        <option value="aberto">Em aberto</option>
-                        <option value="pago">Pago</option>
-                        <option value="vencido">Vencido</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- LINHA DE FILTROS ATIVOS (RESTAURADA) -->
-            <div v-if="temFiltrosAtivos" class="mt-4 pt-3 border-top">
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
-                    <!-- FILTROS ATIVOS -->
-                    <div class="d-flex flex-wrap gap-2 align-items-center">
-                        <small class="text-muted me-2">Filtros ativos:</small>
-
-                        <!-- TEXTO -->
-                        <div v-if="query"
-                            class="badge bg-light text-dark border d-flex align-items-center gap-1 py-2 px-3">
-                            <i class="ti ti-search fs-6"></i>
-                            <span class="ms-1">{{ query.length > 15 ? query.substring(0, 15) + '...' : query }}</span>
-                            <button type="button" class="btn-close btn-close-sm ms-2" @click="removerFiltro('texto')"
-                                style="width: 0.2rem; height: 0.2rem;">
-                            </button>
-                        </div>
-
-                        <!-- DATAS -->
-                        <div v-if="dataInicio || dataFim"
-                            class="badge bg-light text-dark border d-flex align-items-center gap-1 py-2 px-3">
-                            <i class="ti ti-calendar fs-6"></i>
-                            <span class="ms-1">
-                                {{ dataInicio ? formatarDataSimples(dataInicio) : 'Início' }}
-                                {{ dataInicio && dataFim ? '-' : '' }}
-                                {{ dataFim ? formatarDataSimples(dataFim) : 'Fim' }}
-                            </span>
-                            <button type="button" class="btn-close btn-close-sm ms-2" @click="removerFiltro('data')"
-                                style="width: 0.5rem; height: 0.5rem;">
-                            </button>
-                        </div>
-
-                        <!-- CATEGORIA -->
-                        <div v-if="categoriaFiltroId"
-                            class="badge bg-light text-dark border d-flex align-items-center gap-1 py-2 px-3">
-                            <i class="ti ti-category fs-6"></i>
-                            <span class="ms-1">{{ nomeCategoriaSelecionada }}</span>
-                            <button type="button" class="btn-close btn-close-sm ms-2"
-                                @click="removerFiltro('categoriaFiltroId')" style="width: 0.5rem; height: 0.5rem;">
-                            </button>
-                        </div>
-
-                        <!-- SITUAÇÃO -->
-                        <div v-if="situacaoFiltro"
-                            class="badge bg-light text-dark border d-flex align-items-center gap-1 py-2 px-3">
-                            <i class="ti ti-cash fs-6"></i>
-                            <span class="ms-1">{{ textoSituacao }}</span>
-                            <button type="button" class="btn-close btn-close-sm ms-2" @click="removerFiltro('situacao')"
-                                style="width: 0.5rem; height: 0.5rem;">
-                            </button>
-                        </div>
+                <!-- ── Filtros ativos ── -->
+                <filtro-badges :query="query" :data-inicio="dataInicio" :data-fim="dataFim" 
+                    :tem-filtros-ativos="temFiltrosAtivos" @remover-filtro="removerFiltro" @limpar-filtros="limparFiltros">
+                    
+                    <!-- Categoria (Badge Extra) -->
+                    <div v-if="categoriaFiltroId" class="filtro-badge">
+                        <i class="ti ti-category" style="font-size:0.8rem;"></i>
+                        <span>{{ nomeCategoriaSelecionada }}</span>
+                        <button class="btn-remover" @click="removerFiltro('categoriaFiltroId')">✕</button>
                     </div>
 
-                    <!-- BOTÃO LIMPAR TODOS (RESTAURADO) -->
-                    <button @click="limparTodosFiltros"
-                        class="btn btn-outline-danger d-flex align-items-center gap-2 mt-2 mt-md-0"
-                        style="height: 38px;">
-                        <i class="ti ti-filter-x"></i>
-                        <span>Limpar todos</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+                    <!-- Situação (Badge Extra) -->
+                    <div v-if="situacaoFiltro" class="filtro-badge">
+                        <i class="ti ti-cash" style="font-size:0.8rem;"></i>
+                        <span>{{ textoSituacao }}</span>
+                        <button class="btn-remover" @click="removerFiltro('situacao')">✕</button>
+                    </div>
+                </filtro-badges>
 
-    <div class="card w-100 position-relative">
-        <div class="px-4 py-3 border-bottom">
-            <div class="card-body p-4">
-                <div class="container mt-4">
+                <hr class="my-4">
+
+                <div class="mt-2">
 
                     <!-- NAV TABS -->
                     <ul class="nav nav-tabs" id="financasTab" role="tablist">
@@ -361,16 +326,22 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                                                         </button>
                                                         <ul class="dropdown-menu dropdown-menu-end"
                                                             :aria-labelledby="'dropdownMenu-' + lan.id">
-                                                            <li>
+                                                            <li v-if="!lan.data_baixa">
                                                                 <button type="button" class="dropdown-item"
                                                                     @click="editarLancamento(lan)">
                                                                     <i class="ti ti-edit me-2"></i> Editar
                                                                 </button>
                                                             </li>
+                                                            <li v-if="lan.data_baixa">
+                                                                <button type="button" class="dropdown-item text-warning"
+                                                                    @click="confirmarEstorno(lan)">
+                                                                    <i class="ti ti-arrow-back-up me-2"></i> Estornar
+                                                                </button>
+                                                            </li>
                                                             <li>
                                                                 <hr class="dropdown-divider">
                                                             </li>
-                                                            <li>
+                                                            <li v-if="!lan.data_baixa">
                                                                 <button type="button" class="dropdown-item text-danger"
                                                                     @click="confirmarExclusao(lan)">
                                                                     <i class="ti ti-trash me-2"></i> Excluir
@@ -384,9 +355,11 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                                     </table>
                                 </div>
 
-                               
+
                                 <!-- PAGINAÇÃO PADRÃO -->
-                                <vue_pagination :pagination="pagination" @carregar-pagina="carregarPagina"></vue_pagination>
+                                <div class="p-3">
+                                    <?= $this->element('vue_pagination') ?>
+                                </div>
                             </div>
 
                             <!-- Quando não tem resultados -->
@@ -473,27 +446,21 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                             </div>
 
                             <div class="col-md-4 mb-3" v-if="abaAtivaTipo === 'despesas'">
-                                <label for="profissional_id" class="form-label">Pago para</label>
-                                <select class="form-control" id="profissional_id" name="profissional_id"
-                                    v-model="form.profissional_id" :class="{'is-invalid': erros.profissional_id}">
-                                    <option value="">Selecione...</option>
-                                    <option v-for="(nome, id) in profissionaisList" :key="id" :value="id">
-                                        {{ nome }}
-                                    </option>
-                                </select>
+                                <label for="profissional_nome" class="form-label">Pago para</label>
+                                <input type="text" class="form-control" id="profissional_nome"
+                                    placeholder="Buscar Fornecedor..." autocomplete="off"
+                                    :class="{'is-invalid': erros.profissional_id}">
+                                <input type="hidden" v-model="form.profissional_id">
                                 <div class="invalid-feedback" v-if="erros.profissional_id">{{ erros.profissional_id }}
                                 </div>
                             </div>
 
                             <div class="col-md-4 mb-3" v-if="abaAtivaTipo === 'receitas'">
-                                <label for="cliente_id" class="form-label">Recebido de</label>
-                                <select class="form-control" id="cliente_id" name="cliente_id" v-model="form.cliente_id"
+                                <label for="cliente_nome" class="form-label">Recebido de</label>
+                                <input type="text" class="form-control" id="cliente_nome"
+                                    placeholder="Buscar cliente..." autocomplete="off"
                                     :class="{'is-invalid': erros.cliente_id}">
-                                    <option value="">Selecione...</option>
-                                    <option v-for="(nome, id) in clientesList" :key="id" :value="id">
-                                        {{ nome }}
-                                    </option>
-                                </select>
+                                <input type="hidden" v-model="form.cliente_id">
                                 <div class="invalid-feedback" v-if="erros.cliente_id">{{ erros.cliente_id }}</div>
                             </div>
 
@@ -551,10 +518,11 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                                 <div class="invalid-feedback" v-if="erros.valor_recebido">{{ erros.valor_recebido }}
                                 </div>
                             </div>
-                            
+
                             <div class="col-md-12 my-2 border-top pt-3" v-if="!editando">
                                 <div class="form-check form-switch mb-3">
-                                    <input class="form-check-input" type="checkbox" id="repetir_lancamento" v-model="form.repetir_lancamento" @change="gerarRecorrencias">
+                                    <input class="form-check-input" type="checkbox" id="repetir_lancamento"
+                                        v-model="form.repetir_lancamento" @change="gerarRecorrencias">
                                     <label class="form-check-label" for="repetir_lancamento">Repetir lançamento?</label>
                                 </div>
                             </div>
@@ -562,7 +530,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                             <template v-if="form.repetir_lancamento && !editando">
                                 <div class="col-md-3 mb-3">
                                     <label for="periodo_recorrencia" class="form-label">Período</label>
-                                    <select class="form-select" id="periodo_recorrencia" name="periodo_recorrencia" v-model="form.periodo_recorrencia" @change="gerarRecorrencias">
+                                    <select class="form-select" id="periodo_recorrencia" name="periodo_recorrencia"
+                                        v-model="form.periodo_recorrencia" @change="gerarRecorrencias">
                                         <option value="semanal">Semanalmente</option>
                                         <option value="quinzenal">Quinzenalmente</option>
                                         <option value="mensal">Mensalmente</option>
@@ -573,7 +542,9 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <label for="ocorrencia_recorrencia" class="form-label">Ocorrência</label>
-                                    <input type="number" class="form-control" id="ocorrencia_recorrencia" name="ocorrencia_recorrencia" v-model.number="form.ocorrencia_recorrencia" min="1" @input="gerarRecorrencias" placeholder="Quantidade">
+                                    <input type="number" class="form-control" id="ocorrencia_recorrencia"
+                                        name="ocorrencia_recorrencia" v-model.number="form.ocorrencia_recorrencia"
+                                        min="1" @input="gerarRecorrencias" placeholder="Quantidade">
                                 </div>
 
                                 <div class="col-md-12 mb-3" v-if="listaRecorrencias.length > 0">
@@ -591,13 +562,17 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                                             <tbody>
                                                 <tr v-for="(rec, index) in listaRecorrencias" :key="index">
                                                     <td>{{ index + 1 }}</td>
-                                                    <td><input type="text" class="form-control form-control-sm" v-model="rec.descricao"></td>
-                                                    <td><input type="date" class="form-control form-control-sm" v-model="rec.data_vencimento"></td>
+                                                    <td><input type="text" class="form-control form-control-sm"
+                                                            v-model="rec.descricao"></td>
+                                                    <td><input type="date" class="form-control form-control-sm"
+                                                            v-model="rec.data_vencimento"></td>
                                                     <td>
-                                                        <input type="text" class="form-control form-control-sm text-end" v-model="rec.valor" 
+                                                        <input type="text" class="form-control form-control-sm text-end"
+                                                            v-model="rec.valor"
                                                             @focus="prepararParaEdicao('valor', $event, 'recorrencia', rec)"
                                                             @blur="finalizarFormatacao('valor', 'recorrencia', rec)"
-                                                            @input="formatarCampoMonetario('valor', $event, 'recorrencia', rec)" placeholder="0,00" disabled>
+                                                            @input="formatarCampoMonetario('valor', $event, 'recorrencia', rec)"
+                                                            placeholder="0,00" disabled>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -774,13 +749,31 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
     const URLS = {
         salvarLancamento: '<?= $this->Url->build("/financas/novo") ?>',
         editarBase: '<?= $this->Url->build("/financas/editar") ?>',
+        estornarBase: '<?= $this->Url->build("/financas/estornar") ?>',
         categoriasBase: '<?= $this->Url->build("/financas/getCategorias") ?>',
         baixaLancamentos: '<?= $this->Url->build("/financas/baixarLancamentos") ?>'
     };
 
     const TODAY = new Date().toISOString().split('T')[0];
 
+    const SelectpickerDirective = {
+        mounted(el) {
+            $(el).selectpicker().on('change', function () {
+                el.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+        },
+        updated(el) {
+            $(el).selectpicker('refresh');
+        },
+        unmounted(el) {
+            $(el).selectpicker('destroy');
+        }
+    };
+
     createVueIndex({
+        directives: {
+            'selectpicker': SelectpickerDirective
+        },
         customFilters: {
             categoriaFiltroId: 'categoria_id'
         },
@@ -795,7 +788,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                 abasDespesas: <?= json_encode($abasDespesas ?? []) ?>,
                 clientesList: <?= json_encode($clientes ?? []) ?>,
                 profissionaisList: <?= json_encode($profissionais ?? []) ?>,
-                
+
                 modalAbaNome: '',
                 modalCategorias: [],
                 editando: false,
@@ -852,9 +845,9 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
         },
 
         watch: {
-            'form.valor': function() { if (this.form.repetir_lancamento && !this.editando) this.gerarRecorrencias(); },
-            'form.data_vencimento': function() { if (this.form.repetir_lancamento && !this.editando) this.gerarRecorrencias(); },
-            'form.descricao': function() { if (this.form.repetir_lancamento && !this.editando) this.gerarRecorrencias(); }
+            'form.valor': function () { if (this.form.repetir_lancamento && !this.editando) this.gerarRecorrencias(); },
+            'form.data_vencimento': function () { if (this.form.repetir_lancamento && !this.editando) this.gerarRecorrencias(); },
+            'form.descricao': function () { if (this.form.repetir_lancamento && !this.editando) this.gerarRecorrencias(); }
         },
 
         onMounted() {
@@ -872,6 +865,67 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
         methods: {
             formatarValor(v) { return typeof this.formatarMoeda === 'function' ? this.formatarMoeda(v) : v; },
             formatarData(d) { return typeof this.formatarDataBR === 'function' ? this.formatarDataBR(d) : d; },
+
+            initAutocomplete() {
+                this.$nextTick(() => {
+                    const self = this;
+                    const ac_config = {
+                        source: function (request, response) {
+                            const url = "<?= $this->Url->build(['controller' => 'Clientes', 'action' => 'localizar'], ['fullBase' => true]); ?>?termo=" + request.term;
+                            $.getJSON(url, function (data) {
+                                response($.map(data, function (value) {
+                                    return { id: value.id, label: value.label, avatar: value.avatar };
+                                }));
+                            });
+                        },
+                        select: function (event, ui) {
+                            self.form.cliente_id = ui.item.id;
+                            $('#cliente_nome').val(ui.item.label);
+                            return false;
+                        },
+                        autoFocus: true,
+                        minLength: 1
+                    };
+
+                    const renderItemFn = function (ul, item) {
+                        var avatar = '<?= $this->Url->build('/img/profile/', ['fullBase' => true]); ?>usuario-padrao.png';
+                        if (item.avatar) avatar = '<?= $this->Url->build('/img/', ['fullBase' => true]); ?>' + item.avatar;
+                        return $("<li></li>")
+                            .append("<div class='d-flex align-items-center p-2'><img class='rounded-circle me-2' width='40' height='40' src='" + avatar + "'><span>" + item.label + "</span></div>")
+                            .appendTo(ul);
+                    };
+
+                    const $el = $("#cliente_nome");
+                    if ($el.length) {
+                        if ($el.data("ui-autocomplete")) $el.autocomplete("destroy");
+                        $el.autocomplete(ac_config).data("ui-autocomplete")._renderItem = renderItemFn;
+                    }
+
+                    const ac_config_prof = {
+                        source: function (request, response) {
+                            const url = "<?= $this->Url->build(['controller' => 'Profissionais', 'action' => 'localizar'], ['fullBase' => true]); ?>?termo=" + request.term;
+                            $.getJSON(url, function (data) {
+                                response($.map(data, function (value) {
+                                    return { id: value.id, label: value.label, avatar: value.avatar };
+                                }));
+                            });
+                        },
+                        select: function (event, ui) {
+                            self.form.profissional_id = ui.item.id;
+                            $('#profissional_nome').val(ui.item.label);
+                            return false;
+                        },
+                        autoFocus: true,
+                        minLength: 1
+                    };
+
+                    const $elProf = $("#profissional_nome");
+                    if ($elProf.length) {
+                        if ($elProf.data("ui-autocomplete")) $elProf.autocomplete("destroy");
+                        $elProf.autocomplete(ac_config_prof).data("ui-autocomplete")._renderItem = renderItemFn;
+                    }
+                });
+            },
 
             buildSearchParams() {
                 return `&tipo=${this.abaAtivaTipo}&aba_id=${this.abaAtivaId}`;
@@ -903,7 +957,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                             this.modalCategorias = Object.entries(data).map(([id, name]) => ({ id: parseInt(id), name }));
                         }
                     }
-                } catch(e) { console.error('Erro categorias:', e); this.modalCategorias = []; }
+                } catch (e) { console.error('Erro categorias:', e); this.modalCategorias = []; }
             },
 
             async abrirModal() {
@@ -920,7 +974,10 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                     repetir_lancamento: false, periodo_recorrencia: 'mensal', ocorrencia_recorrencia: 1
                 };
                 this.erros = {};
+                $('#cliente_nome').val('');
+                $('#profissional_nome').val('');
                 if (this.modalInstance) this.modalInstance.show();
+                this.initAutocomplete();
             },
 
             async editarLancamento(lan) {
@@ -947,11 +1004,17 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                 };
                 this.listaRecorrencias = [];
                 this.erros = {};
+                const clienteNome = lan.cliente ? lan.cliente.nome : '';
+                $('#cliente_nome').val(clienteNome);
+                const profissionalNome = lan.profissional ? lan.profissional.nome : '';
+                $('#profissional_nome').val(profissionalNome);
+
                 if (this.modalInstance) this.modalInstance.show();
+                this.initAutocomplete();
             },
 
             async salvarLancamento(e) {
-                if(e) e.preventDefault();
+                if (e) e.preventDefault();
                 this.erros = {};
                 if (this.form.categoria_id) this.form.ccustos_id = this.form.categoria_id;
                 else if (this.abaAtivaTipo === 'receitas') this.form.ccustos_id = 1;
@@ -991,7 +1054,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                             } else throw new Error(result.message || 'Erro ao salvar');
                         }
                     } else throw new Error(`HTTP Error ${response.status}`);
-                } catch(err) {
+                } catch (err) {
                     console.error('Erro:', err);
                     if (typeof Swal !== 'undefined') Swal.fire({ title: 'Ooops!', text: 'Erro interno ao salvar.', icon: 'error', timer: 3000 });
                 } finally { this.salvando = false; }
@@ -1006,11 +1069,11 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                 for (let i = 1; i <= this.form.ocorrencia_recorrencia; i++) {
                     let novaData = new Date(dataBase);
                     const per = this.form.periodo_recorrencia;
-                    if (per === 'semanal') novaData.setDate(novaData.getDate() + (7*i));
-                    else if (per === 'quinzenal') novaData.setDate(novaData.getDate() + (14*i));
+                    if (per === 'semanal') novaData.setDate(novaData.getDate() + (7 * i));
+                    else if (per === 'quinzenal') novaData.setDate(novaData.getDate() + (14 * i));
                     else if (per === 'mensal') novaData.setMonth(novaData.getMonth() + i);
-                    else if (per === 'trimestral') novaData.setMonth(novaData.getMonth() + (3*i));
-                    else if (per === 'semestral') novaData.setMonth(novaData.getMonth() + (6*i));
+                    else if (per === 'trimestral') novaData.setMonth(novaData.getMonth() + (3 * i));
+                    else if (per === 'semestral') novaData.setMonth(novaData.getMonth() + (6 * i));
                     else if (per === 'anual') novaData.setFullYear(novaData.getFullYear() + i);
                     this.listaRecorrencias.push({ descricao: this.form.descricao, data_vencimento: novaData.toISOString().split('T')[0], valor: this.form.valor });
                 }
@@ -1084,56 +1147,111 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                     formData.append('_csrfToken', this.csrfToken);
                     formData.append('lancamentos', JSON.stringify(payload));
 
-                    const resp = await fetch(URLS.baixaLancamentos, { method: 'POST', body: formData, headers: {'X-Requested-With': 'XMLHttpRequest'} });
+                    const resp = await fetch(URLS.baixaLancamentos, { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
                     if (resp.ok) {
                         const data = await resp.json();
                         if (data.success) {
                             if (this.modalBaixaInstance) this.modalBaixaInstance.hide();
                             this.limparSelecao();
                             await this.carregarDados();
-                            if(typeof Swal !== 'undefined') Swal.fire({title: 'Sucesso!', text: `Baixa realizada para ${data.processados} lançamento(s).`, icon: 'success'});
+                            if (typeof Swal !== 'undefined') Swal.fire({ title: 'Sucesso!', text: `Baixa realizada para ${data.processados} lançamento(s).`, icon: 'success' });
                         } else throw new Error(data.message || 'Erro');
                     } else throw new Error('Falha na requisição');
-                } catch(e) { console.error(e); alert('Erro: ' + e.message); }
+                } catch (e) { console.error(e); alert('Erro: ' + e.message); }
                 finally { this.processandoBaixa = false; }
             },
 
-            formatarCampoMonetario(campo, evento, contexto='form', item=null) {
-                let v = evento.target.value.replace(/[^\d]/g, '');
-                if(v === '') {
-                    if(contexto==='form') this.form[campo] = '0,00';
-                    else if(item) item[campo] = '0,00';
-                    if(contexto==='baixa') this.calcularTotalBaixa(); return;
+            async confirmarEstorno(lan) {
+                if (typeof Swal !== 'undefined') {
+                    const result = await Swal.fire({
+                        title: 'Confirmar Estorno',
+                        text: `Tem certeza que deseja estornar a finança "${lan.descricao}"?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#f39c12',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Sim, estornar!',
+                        cancelButtonText: 'Cancelar'
+                    });
+
+                    if (result.isConfirmed) {
+                        this.realizarEstorno(lan.id);
+                    }
+                } else {
+                    if (confirm(`Tem certeza que deseja estornar a finança "${lan.descricao}"?`)) {
+                        this.realizarEstorno(lan.id);
+                    }
                 }
-                while(v.length < 3) v = '0' + v;
+            },
+
+            async realizarEstorno(id) {
+                try {
+                    const formData = new FormData();
+                    if (this.csrfToken) {
+                        formData.append('_csrfToken', this.csrfToken);
+                    } else if (document.querySelector('input[name="_csrfToken"]')) {
+                        formData.append('_csrfToken', document.querySelector('input[name="_csrfToken"]').value);
+                    } else if (document.querySelector('meta[name="csrfToken"]')) {
+                        formData.append('_csrfToken', document.querySelector('meta[name="csrfToken"]').getAttribute('content'));
+                    }
+
+                    const url = `${URLS.estornarBase}/${id}`;
+                    const resp = await fetch(url, { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        if (data.success) {
+                            if (typeof Swal !== 'undefined') Swal.fire({ title: 'Estornado!', text: data.message, icon: 'success' });
+                            await this.carregarDados();
+                        } else {
+                            throw new Error(data.message || 'Erro ao realizar estorno.');
+                        }
+                    } else {
+                        throw new Error('Falha na requisição');
+                    }
+                } catch (e) {
+                    console.error(e);
+                    if (typeof Swal !== 'undefined') Swal.fire({ title: 'Erro!', text: e.message, icon: 'error' });
+                    else alert('Erro: ' + e.message);
+                }
+            },
+
+            formatarCampoMonetario(campo, evento, contexto = 'form', item = null) {
+                let v = evento.target.value.replace(/[^\d]/g, '');
+                if (v === '') {
+                    if (contexto === 'form') this.form[campo] = '0,00';
+                    else if (item) item[campo] = '0,00';
+                    if (contexto === 'baixa') this.calcularTotalBaixa(); return;
+                }
+                while (v.length < 3) v = '0' + v;
                 let c = v.slice(-2);
                 let i = v.slice(0, -2).replace(/^0+/g, '') || '0';
-                if(i.length > 3) i = i.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                if (i.length > 3) i = i.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
                 let vf = i + ',' + c;
-                if(contexto==='form') this.form[campo] = vf;
-                else if(item) item[campo] = vf;
-                if(contexto==='baixa') this.calcularTotalBaixa();
+                if (contexto === 'form') this.form[campo] = vf;
+                else if (item) item[campo] = vf;
+                if (contexto === 'baixa') this.calcularTotalBaixa();
             },
-            prepararParaEdicao(campo, evento, contexto='form', item=null) {
-                let v = (contexto==='form') ? (this.form[campo]||'0,00') : (item[campo]||'0,00');
-                if(contexto==='form') this.form[campo] = v.replace(/\./g, '');
+            prepararParaEdicao(campo, evento, contexto = 'form', item = null) {
+                let v = (contexto === 'form') ? (this.form[campo] || '0,00') : (item[campo] || '0,00');
+                if (contexto === 'form') this.form[campo] = v.replace(/\./g, '');
                 else item[campo] = v.replace(/\./g, '');
                 setTimeout(() => evento.target.select(), 10);
             },
-            finalizarFormatacao(campo, contexto='form', item=null) {
-                let v = (contexto==='form') ? (this.form[campo]||'0,00') : ((item) ? (item[campo]||'0,00') : null);
-                if(!v) return;
-                if(!v.includes(',')) v += ',00';
-                if(contexto==='form') this.form[campo] = v; else item[campo] = v;
-                if(contexto==='baixa') this.calcularTotalBaixa();
+            finalizarFormatacao(campo, contexto = 'form', item = null) {
+                let v = (contexto === 'form') ? (this.form[campo] || '0,00') : ((item) ? (item[campo] || '0,00') : null);
+                if (!v) return;
+                if (!v.includes(',')) v += ',00';
+                if (contexto === 'form') this.form[campo] = v; else item[campo] = v;
+                if (contexto === 'baixa') this.calcularTotalBaixa();
             },
-            prepararValorParaEnvio(vf) { return (!vf||vf==='') ? '0,00' : vf.toString().replace(/\./g, ''); },
+            prepararValorParaEnvio(vf) { return (!vf || vf === '') ? '0,00' : vf.toString().replace(/\./g, ''); },
             converterParaBrasileiro(vd) {
                 let n = parseFloat(vd);
-                return (!vd || isNaN(n)) ? '0,00' : n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+                return (!vd || isNaN(n)) ? '0,00' : n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             },
             formatarDataParaInput(d) {
-                try { return (!d) ? '' : new Date(d).toISOString().split('T')[0]; } catch(e) { return ''; }
+                try { return (!d) ? '' : new Date(d).toISOString().split('T')[0]; } catch (e) { return ''; }
             }
         }
     });

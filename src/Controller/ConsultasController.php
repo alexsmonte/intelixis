@@ -224,7 +224,11 @@ class ConsultasController extends AppController
         ];
 
 
-        return $this->doAdvancedSearch($this->Consultas, $allowedFilters, ['Consultas.created' => 'DESC'], ['Estabelecimentos','Clientes']);
+        return $this->doAdvancedSearch($this->Consultas, $allowedFilters, ['Consultas.created' => 'DESC'], [
+            'Estabelecimentos',
+            'Clientes',
+            'Procedimentos' => ['Profissionais']
+        ]);
     }
 
     public function imprimir($id)
