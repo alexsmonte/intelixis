@@ -756,6 +756,14 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                       <input class="form-check-input" type="checkbox" value="1" id="checkCabecalhoChecked" v-model="modelo.cabecalho">
                       <label class="form-check-label" for="checkCabecalhoChecked">Incluir dados do paciente no cabeçalho</label>
                     </div>
+                    <div class="py-2">
+                      <input class="form-check-input" type="checkbox" value="1" id="checkExigirAssinaturaPacienteChecked" v-model="modelo.exigir_assinatura_paciente">
+                      <label class="form-check-label" for="checkExigirAssinaturaPacienteChecked">Este documento exige a assinatura digital do cliente</label>
+                    </div>
+                    <div class="py-2">
+                      <input class="form-check-input" type="checkbox" value="1" id="checkExigirAssinaturaProfissionalChecked" v-model="modelo.exigir_assinatura_profissional">
+                      <label class="form-check-label" for="checkExigirAssinaturaProfissionalChecked">Este documento exige a assinatura do profissional</label>
+                    </div>
                 </div>
             </div>
 
@@ -1092,7 +1100,9 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     titulo: '',
                     nome: '',
                     descricao: '',
-                    cabecalho:false, 
+                    cabecalho:false,
+                    exigir_assinatura_paciente:false,
+                    exigir_assinatura_profissional:false, 
                     salvando: false
                 },
                 anotacao: {

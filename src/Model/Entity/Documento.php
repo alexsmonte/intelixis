@@ -64,5 +64,7 @@ class Documento extends Entity
         'usuario' => true,
         'profissional' => true,
         'url' => true,
+        'exigir_assinatura_paciente' => true, 
+	    'exigir_assinatura_profissional' => true,
     ];
 }

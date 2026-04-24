@@ -38,6 +38,8 @@ class Modelo extends Entity
         'nome' => true,
         'cabecalho' =>true,
         'descricao' => true,
+        'exigir_assinatura_paciente' => true, 
+	    'exigir_assinatura_profissional' => true,
         'created' => true,
         'modified' => true,
         'estabelecimento' => true,
