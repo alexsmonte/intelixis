@@ -82,6 +82,7 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/documentos/gerar-link-teste/{id}', ['controller' => 'Documentos','action' => 'gerarLinkTeste'])->setPass(['id']);
         $builder->connect('/documentos/gerar_link_teste/{id}', ['controller' => 'Documentos','action' => 'gerarLinkTeste'])->setPass(['id']);
         $builder->connect('/assinar/{codigo}', ['controller' => 'Documentos', 'action' => 'publicSign'])->setPass(['codigo']);
+        $builder->post('/assinar/{codigo}/verificar', ['controller' => 'Documentos', 'action' => 'verificarAcesso'])->setPass(['codigo']);
         // Tela de assinatura do profissional
         $builder->connect('/documentos/assinar-profissional/{id}', ['controller' => 'Documentos', 'action' => 'assinarProfissional'])->setPass(['id']);
         $builder->get('/documentos/get-logs/{id}', ['controller' => 'Documentos', 'action' => 'getLogs'])->setPass(['id']);

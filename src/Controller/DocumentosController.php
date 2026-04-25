@@ -24,7 +24,7 @@ class DocumentosController extends AppController
     public function beforeFilter(\Cake\Event\EventInterface $event): void
     {
         parent::beforeFilter($event);
-        $this->Authentication->addUnauthenticatedActions(['validar', 'publicSign', 'logLeitura', 'publicPdf']);
+        $this->Authentication->addUnauthenticatedActions(['validar', 'publicSign', 'verificarAcesso', 'logLeitura', 'publicPdf']);
     }
 
 
@@ -96,7 +96,8 @@ class DocumentosController extends AppController
 
         // Cabeçalho/rodapé via dados da sessão (disponíveis no contexto autenticado)
         $est = $documento->estabelecimento;
-        $mPdf = $this->_criarMpdf($est, $urlValidacao, $qrBase64, $documento->titulo ?? '');
+        $dataGeracao = $documento->created ? $documento->created->format('d/m/Y H:i') : null;
+        $mPdf = $this->_criarMpdf($est, $urlValidacao, $qrBase64, $documento->titulo ?? '', null, null, null, null, $dataGeracao);
         $mPdf->WriteHTML($html);
 
         $pdf = $mPdf->Output('', 'S');
@@ -131,16 +132,77 @@ class DocumentosController extends AppController
             throw new \Cake\Http\Exception\NotFoundException('Documento não encontrado.');
         }
 
+        // ----- Barreira de segurança: verifica se já passou pelo gate de data de nascimento -----
+        $sessionKey = 'acesso_doc_' . md5($codigo);
+        $acessoVerificado = $this->request->getSession()->read($sessionKey);
+
+        if (!$acessoVerificado) {
+            $pacienteNome    = $documento->procedimento->consulta->cliente->nome ?? '';
+            $estabelecimento = $documento->estabelecimento->nome_fantasia ?? $documento->estabelecimento->razao_social ?? '';
+            $docTitulo       = $documento->titulo ?? $documento->tipo ?? 'Documento';
+            $this->set(compact('documento', 'pacienteNome', 'estabelecimento', 'docTitulo', 'codigo'));
+            return $this->render('public_gate');
+        }
+
         if ($this->request->is('post')) {
             $this->disableAutoRender();
             return $this->_processarAssinatura($documento);
         }
 
-        // Registra visualização
         $this->_log($documento->id, 'visualizado', $documento->assinatura_hash, null, $this->_getRealIp(), [], $this->Authentication->getIdentity()->id ?? null);
 
         $jaAssinado = !empty($documento->assinatura_hash);
         $this->set(compact('documento', 'jaAssinado'));
+        return $this->render('public_sign');
+    }
+
+    /**
+     * Verifica a data de nascimento do paciente e libera o acesso via sessão.
+     */
+    public function verificarAcesso($codigo = null)
+    {
+        $this->disableAutoRender();
+        $this->request->allowMethod(['post']);
+
+        $documento = $this->Documentos->find()
+            ->where(['codigo_validacao' => $codigo])
+            ->contain(['Procedimentos' => ['Consultas' => ['Clientes']]])
+            ->first();
+
+        if (!$documento) {
+            return $this->_jsonResponse(false, 'Documento não encontrado.');
+        }
+
+        $dataNascimentoInformada = $this->request->getData('data_nascimento'); // formato: YYYY-MM-DD (input type=date)
+        $dataNascimentoPaciente  = $documento->procedimento->consulta->cliente->data_nascimento ?? null;
+
+        if (!$dataNascimentoPaciente || !$dataNascimentoInformada) {
+            return $this->_jsonResponse(false, 'Não foi possível verificar os dados. Tente novamente.');
+        }
+
+        // Normaliza ambas as datas para comparar apenas d/m/a
+        $informada = \Cake\I18n\Date::parseDate($dataNascimentoInformada, 'yyyy-MM-dd');
+        $cadastrada = $dataNascimentoPaciente;
+
+        if (!$informada || $informada->format('Y-m-d') !== $cadastrada->format('Y-m-d')) {
+            // Log de tentativa falha (auditoria de segurança)
+            $this->_log($documento->id, 'acesso_negado', null, null, $this->_getRealIp(), [
+                'motivo'     => 'Data de nascimento incorreta',
+                'user_agent' => $this->request->getHeaderLine('User-Agent'),
+            ]);
+            return $this->_jsonResponse(false, 'Data de nascimento incorreta. Verifique e tente novamente.');
+        }
+
+        // Sucesso: grava na sessão por 2 horas
+        $sessionKey = 'acesso_doc_' . md5($codigo);
+        $this->request->getSession()->write($sessionKey, true);
+        $this->request->getSession()->write($sessionKey . '_exp', time() + 7200);
+
+        $this->_log($documento->id, 'acesso_verificado', null, null, $this->_getRealIp(), [
+            'user_agent' => $this->request->getHeaderLine('User-Agent'),
+        ]);
+
+        return $this->_jsonResponse(true, 'Acesso liberado.');
     }
 
     public function logLeitura($codigo = null)
@@ -248,22 +310,6 @@ class DocumentosController extends AppController
 
         $pdfPath = $this->_getStorageDir($documento) . DS . $documento->id . '.pdf';
 
-        if (!file_exists($pdfPath) || (empty($documento->assinatura_hash) && empty($documento->assinatura_prof_hash))) {
-            // Gera fisicamente o PDF caso ainda não exista ou não esteja trancado por assinatura
-            // Isso garante que se o médico mudar algo no texto ANTES de assinar, o PDF atualize
-            $urlValidacao = \Cake\Routing\Router::url(['controller' => 'Documentos', 'action' => 'validar', 'codigo' => $documento->codigo_validacao], true);
-            $qrBase64 = $this->_gerarQrBase64($urlValidacao);
-            $html = $this->_renderDocumentoHtml($documento);
-
-            $mPdf = $this->_criarMpdf($documento->estabelecimento, $urlValidacao, $qrBase64, $documento->titulo ?? '');
-            $mPdf->WriteHTML($html);
-
-            $pdfContent = $mPdf->Output('', 'S');
-            $this->_salvarPdfEmDisco($documento, $pdfContent);
-        }
-
-        $preparedPdfPath = $this->_getStorageDir($documento) . DS . $documento->id . '_prepared.pdf';
-
         // Nome extraído do certificado pelo browser (ou fallback para o profissional do banco)
         $signerName = $this->request->getData('certificate_name');
         if (empty($signerName)) {
@@ -272,6 +318,75 @@ class DocumentosController extends AppController
 
         // Limpa o nome (pode vir no formato "NOME COMPLETO:12345678" do agente local)
         $signerName = explode(':', $signerName)[0];
+
+        // Sempre regenera o PDF se ainda não foi assinado pelo profissional para garantir que os selos apareçam
+        if (empty($documento->assinatura_prof_hash)) {
+            $urlValidacao = \Cake\Routing\Router::url(['controller' => 'Documentos', 'action' => 'validar', 'codigo' => $documento->codigo_validacao], true);
+            $qrBase64 = $this->_gerarQrBase64($urlValidacao);
+            $html = $this->_renderDocumentoHtml($documento);
+
+            // Tenta obter o nome do paciente/signatário para o rodapé
+            $pacienteNomeStr = null;
+            if (!empty($documento->assinatura_hash)) {
+                $details = $documento->assinatura_details;
+                if (is_string($details)) { $details = json_decode($details, true); }
+                
+                if (!empty($details['responsavel_legal']['nome'])) {
+                    $pacienteNomeStr = $details['responsavel_legal']['nome'];
+                    if (!empty($details['responsavel_legal']['cpf'])) {
+                        $cpf = $details['responsavel_legal']['cpf'];
+                        $pacienteNomeStr .= ' (CPF: ***.' . substr($cpf, 3, 3) . '.' . substr($cpf, 6, 3) . '-**)';
+                    }
+                    $pacienteNomeStr .= ' - Rep. Legal de ' . ($documento->procedimento->consulta->cliente->nome ?? 'Paciente');
+                } else {
+                    $pacienteNomeStr = $documento->procedimento->consulta->cliente->nome ?? 'Paciente';
+                    $cpf = $documento->procedimento->consulta->cliente->documento ?? '';
+                    if (!empty($cpf) && strlen($cpf) >= 11) {
+                        $pacienteNomeStr .= ' (CPF: ***.' . substr($cpf, 3, 3) . '.' . substr($cpf, 6, 3) . '-**)';
+                    }
+                }
+            }
+
+            // Datas reais de assinatura preservadas do banco
+            $dataPac = null;
+            if (!empty($documento->assinatura_data)) {
+                $dataPac = $documento->assinatura_data->format('d/m/Y H:i');
+            } elseif (!empty($details['data_hora'])) {
+                $dataPac = substr($details['data_hora'], 0, 16);
+            }
+            $dataProf = date('d/m/Y H:i');
+            $dataGeracao = $documento->created ? $documento->created->format('d/m/Y H:i') : null;
+
+            $mPdf = $this->_criarMpdf($documento->estabelecimento, $urlValidacao, $qrBase64, $documento->titulo ?? '', $pacienteNomeStr, $signerName, $dataPac, $dataProf, $dataGeracao);
+            $mPdf->WriteHTML($html);
+
+            // Se o paciente já assinou, precisamos reinserir a página de protocolo
+            if (!empty($documento->assinatura_hash) && !empty($documento->assinatura_details)) {
+                $details = $documento->assinatura_details;
+                if (is_string($details)) { $details = json_decode($details, true); }
+                $ip = $documento->assinatura_ip ?? ($details['ip'] ?? '');
+                $geo = $details['geolocalizacao'] ?? 'Indisponível';
+                $htmlProtocolo = $this->_buildProtocoloHtml(
+                    $documento, 
+                    '', 
+                    $details['assinatura_b64'] ?? '',
+                    $ip,
+                    $geo,
+                    $details['hash_original'] ?? '',
+                    ['eh_responsavel' => !empty($details['responsavel_nome']), 'nome' => $details['responsavel_nome'] ?? '', 'cpf' => $details['responsavel_cpf'] ?? '']
+                );
+
+                $mPdf->AddPage('P', 'A4');
+                $mPdf->SetHTMLHeader('');
+                $mPdf->SetHTMLFooter('');
+                $mPdf->WriteHTML($htmlProtocolo, HTMLParserMode::HTML_BODY);
+            }
+
+            $pdfContent = $mPdf->Output('', 'S');
+            $this->_salvarPdfEmDisco($documento, $pdfContent);
+        }
+
+        $preparedPdfPath = $this->_getStorageDir($documento) . DS . $documento->id . '_prepared.pdf';
 
         // 1. Prepara o Envelope vazio (PAdES placeholder) + Selo Visual e calcula o Hash de ByteRange
         $cmd = escapeshellcmd("python3 " . ROOT . "/bin/pades_linker.py prepare")
@@ -409,6 +524,9 @@ class DocumentosController extends AppController
 
             if ($this->Documentos->save($documento)) {
                 $this->_log($documento->id, 'assinatura_prof_concluida', $hashAntes, $hashDepois, $this->_getRealIp(), ['p7s' => $p7sPath], $this->Authentication->getIdentity()->id ?? null);
+                
+                // Remove o arquivo .p7s residual pois a assinatura já está embutida no PDF
+                @unlink($p7sPath);
 
                 $urlPdf = \Cake\Routing\Router::url(['action' => 'imprimir', $documento->id]);
 
@@ -626,8 +744,17 @@ class DocumentosController extends AppController
     /**
      * Cria e configura uma instância mPDF com cabeçalho/rodapé da clínica.
      */
-    private function _criarMpdf(Estabelecimento $est, string $urlValidacao, string $qrBase64, string $tituloDoc, ?string $assinaturaPaciente = null): Mpdf
-    {
+    private function _criarMpdf(
+        Estabelecimento $est, 
+        string $urlValidacao, 
+        string $qrBase64, 
+        string $tituloDoc, 
+        ?string $assinaturaPaciente = null, 
+        ?string $assinaturaProf = null,
+        ?string $dataPac = null,
+        ?string $dataProf = null,
+        ?string $dataGeracao = null
+    ): Mpdf {
         $mPdf = new Mpdf([
             'tempDir' => ROOT . DS . 'tmp',
             'format' => 'A4',
@@ -671,15 +798,51 @@ class DocumentosController extends AppController
         if (!empty($est->celular))
             $footer .= ' Celular: ' . h($est->celular);
 
-        $seloHtml = '';
-        if ($assinaturaPaciente) {
-            $seloSvgBase64 = 'PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjMzM0MTU1Ij48cGF0aCBkPSJNMTIgMkM2LjQ4IDIgMiA2LjQ4IDIgMTJzNC40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnptLTIgMTVsLTUtNSAxLjQxLTEuNDFMMTAgMTQuMTdsNy41OS03LjU5TDE5IDhsLTkgOXoiLz48L3N2Zz4=';
-            $seloHtml = '<table style="border-collapse:collapse;margin-top:6px;border:1px solid #cbd5e1;width:100%;"><tr>'
-                . '<td style="padding:4px 6px;color:#334155;font-size:6.5pt;text-align:left;">'
-                . '<img src="data:image/svg+xml;base64,' . $seloSvgBase64 . '" width="10" height="10" style="vertical-align:middle;margin-right:4px;"> '
-                . '<b>DOCUMENTO ASSINADO DIGITALMENTE POR:</b> ' . h(mb_strtoupper($assinaturaPaciente))
-                . '</td></tr></table><br>';
+        // ── Selos de assinatura (Imagens SVG) ──────────────────────────────────
+        $imgDir = ROOT . DS . 'storage' . DS . 'imagens' . DS;
+        
+        $seloQualContent = @file_get_contents($imgDir . 'selo-qualificada.png');
+        $seloQualBase64 = $seloQualContent !== false ? base64_encode($seloQualContent) : null;
+        
+        $seloAvContent = @file_get_contents($imgDir . 'selo-avancada.png');
+        $seloAvBase64 = $seloAvContent !== false ? base64_encode($seloAvContent) : null;
+
+        $seloHtml = "";
+
+        // 1. Selo Profissional (Qualificada)
+        if ($assinaturaProf && $seloQualBase64) {
+            $dataAssinatura = $dataProf ?: date('d/m/Y H:i');
+            $seloHtml .= '<table style="border-collapse:collapse;margin-top:2px;border:1px solid #cbd5e1;width:100%;background:#f8fafc;">'
+                . '<tr>'
+                . '<td style="padding:2px 5px;width:65px;vertical-align:middle;">'
+                . '<img src="data:image/png;base64,' . $seloQualBase64 . '" height="32" style="display:block;">'
+                . '</td>'
+                . '<td style="padding:2px 5px;font-size:5.5pt;color:#334155;vertical-align:middle;">'
+                . 'Documento assinado digitalmente por <b>' . h($assinaturaProf) . '</b> em ' . $dataAssinatura . ', conforme MP nº 2.200-2/2001 e Lei 14.063/20.<br>'
+                . 'A assinatura pode ser validada em: <b>https://validar.iti.gov.br</b>'
+                . '</td>'
+                . '</tr></table>';
         }
+
+        // 2. Selo Paciente (Avançada)
+        if ($assinaturaPaciente && $seloAvBase64) {
+            $dataAssinaturaPac = $dataPac ?: date('d/m/Y H:i');
+            $seloHtml .= '<table style="border-collapse:collapse;margin-top:2px;border:1px solid #cbd5e1;width:100%;background:#f8fafc;">'
+                . '<tr>'
+                . '<td style="padding:2px 5px;width:65px;vertical-align:middle;">'
+                . '<img src="data:image/png;base64,' . $seloAvBase64 . '" height="32" style="display:block;">'
+                . '</td>'
+                . '<td style="padding:2px 5px;font-size:5.5pt;color:#334155;vertical-align:middle;">'
+                . 'Documento assinado digitalmente por: <b>' . h($assinaturaPaciente) . '</b> em ' . $dataAssinaturaPac . ', conforme MP nº 2.200-2/2001 e Lei 14.063/20.'
+                . '</td>'
+                . '</tr></table>';
+        }
+
+        if ($seloHtml) {
+            $seloHtml .= "<br>";
+        }
+
+        $dataGeracaoStr = $dataGeracao ?: date('d/m/Y H:i');
 
         $mPdf->SetHTMLFooter(
             '<table width="100%" style="font-size:7pt;border:0;">'
@@ -689,7 +852,7 @@ class DocumentosController extends AppController
             . '<br><br>'
             . $seloHtml
             . '<span style="font-size:6.5pt;">Acesse para validar: ' . $urlValidacao . '</span><br>'
-            . '<span style="font-size:6pt;color:#64748b;">Gerado eletronicamente em: ' . date('d/m/Y H:i') . '</span>'
+            . '<span style="font-size:6pt;color:#64748b;">Gerado eletronicamente em: ' . $dataGeracaoStr . '</span>'
             . '<br><br><br><br>'
             . '</td>'
             . '<td width="30%" style="text-align:right;vertical-align:bottom;">'
@@ -702,6 +865,7 @@ class DocumentosController extends AppController
 
         return $mPdf;
     }
+
 
     /**
      * Retorna o diretório de storage para um documento.
@@ -782,6 +946,7 @@ class DocumentosController extends AppController
                 'geolocalizacao' => $geo,
                 'data_hora' => date('d/m/Y H:i:s'),
                 'timestamp' => time(),
+                'assinatura_b64' => $assinaturaB64,
             ];
             if (!empty($responsavel['eh_responsavel'])) {
                 $detalhes['responsavel_legal'] = [
@@ -837,8 +1002,17 @@ class DocumentosController extends AppController
         $qrBase64 = $this->_gerarQrBase64($urlValidacao);
         $htmlOrig = $this->_renderDocumentoHtml($documento);
 
+        // Datas reais de assinatura
+        $dataAgora = date('d/m/Y \à\s H:i:s') . " (Timestamp: " . time() . ")";
+        
+        // Preserva a data da assinatura do paciente se já existir
+        $dataPac = $documento->assinatura_data ? $documento->assinatura_data->format('d/m/Y H:i') : date('d/m/Y H:i');
+        
+        $dataProf = $documento->assinatura_prof_data ? $documento->assinatura_prof_data->format('d/m/Y H:i') : null;
+        $dataGeracao = $documento->created ? $documento->created->format('d/m/Y H:i') : null;
+
         // 4. HTML da página de protocolo
-        $htmlProtocolo = $this->_buildProtocoloHtml($documento, $selfieB64, $assinaturaB64, $ip, $geo, $hashOriginal, $responsavel);
+        $htmlProtocolo = $this->_buildProtocoloHtml($documento, $selfieB64, $assinaturaB64, $ip, $geo, $hashOriginal, $responsavel, $dataAgora);
 
         // 5. Criar mPDF com cabeçalho/rodapé da clínica para o doc original e adicionar SELO
         $est = $documento->estabelecimento;
@@ -857,12 +1031,26 @@ class DocumentosController extends AppController
             $signatarioStr = $pacienteNome . ($pacienteCpfMasked ? ' (CPF: ' . $pacienteCpfMasked . ')' : '');
         }
 
-        $mPdf = $this->_criarMpdf($est, $urlValidacao, $qrBase64, $documento->titulo ?? '', $signatarioStr);
+        // Se o profissional já assinou, pega o nome dele para exibir o selo no rodapé
+        $profNomeStr = null;
+        if (!empty($documento->assinatura_prof_detalhes)) {
+            $profDetails = $documento->assinatura_prof_detalhes;
+            if (is_string($profDetails)) {
+                $profDetails = json_decode($profDetails, true);
+            }
+            $profNomeStr = $profDetails['signatario'] ?? null;
+        }
+        if (!$profNomeStr && !empty($documento->assinatura_prof_hash)) {
+            $profNomeStr = $documento->profissional->nome ?? ($documento->usuario->nome ?? 'Profissional');
+        }
+
+        $mPdf = $this->_criarMpdf($est, $urlValidacao, $qrBase64, $documento->titulo ?? '', $signatarioStr, $profNomeStr, $dataPac, $dataProf, $dataGeracao);
         $mPdf->WriteHTML($htmlOrig);
 
-        // 6. Limpar cabeçalho (manter o rodapé com o selo) e adicionar página de protocolo
-        $mPdf->SetHTMLHeader('');
+        // 6. Adiciona página de protocolo e limpa cabeçalho/rodapé APENAS para ela
         $mPdf->AddPage('P', 'A4');
+        $mPdf->SetHTMLHeader('');
+        $mPdf->SetHTMLFooter('');
         $mPdf->WriteHTML($htmlProtocolo, HTMLParserMode::HTML_BODY);
 
         // 7. Salvar substituindo o original
@@ -888,7 +1076,8 @@ class DocumentosController extends AppController
         string $ip,
         string $geo,
         string $hashOriginal,
-        ?array $responsavel = null
+        ?array $responsavel = null,
+        ?string $dataHoraAgora = null
     ): string {
         $pacienteNome = h($documento->procedimento->consulta->cliente->nome ?? '-');
         $pacienteCpfRaw = $documento->procedimento->consulta->cliente->documento ?? '';
@@ -921,19 +1110,48 @@ class DocumentosController extends AppController
         $docTitulo = h($documento->titulo ?? $documento->tipo ?? '-');
         $profNome = h($documento->profissional->nome ?? '-');
 
-        $timestamp = time();
-        $dataHora = date('d/m/Y \à\s H:i:s') . " (Timestamp: {$timestamp})";
+        $dataHora = 'Não disponível';
+        if ($documento->assinatura_data) {
+            $dataHora = $documento->assinatura_data->format('d/m/Y \à\s H:i:s');
+            $timestamp = $documento->assinatura_data->getTimestamp();
+            $dataHora .= " (Timestamp: {$timestamp})";
+        } elseif ($dataHoraAgora) {
+            $dataHora = $dataHoraAgora;
+        } elseif (!empty($details['data_hora'])) {
+            $dataHora = $details['data_hora'] . " (Timestamp: " . ($details['timestamp'] ?? '-') . ")";
+        }
 
         $codValidacao = h($documento->codigo_validacao);
         $urlValidar = Router::url('/assinar/' . $documento->codigo_validacao, true);
 
+        // Tenta carregar selfie do disco se o b64 vier vazio (comum na regeneração pelo profissional)
+        if (empty($selfieB64)) {
+            $dir = $this->_getStorageDir($documento);
+            $selfieFile = $dir . DS . 'selfie_' . $documento->id . '.jpg';
+            if (file_exists($selfieFile)) {
+                $selfieB64 = 'data:image/jpeg;base64,' . base64_encode(file_get_contents($selfieFile));
+            }
+        }
+
+        // Tenta carregar assinatura do banco se o b64 vier vazio
+        if (empty($assinaturaB64) && !empty($documento->assinatura_details)) {
+            $details = $documento->assinatura_details;
+            if (is_string($details)) { $details = json_decode($details, true); }
+            $assinaturaB64 = $details['assinatura_b64'] ?? '';
+        }
+
         // Garantir que selfie tenha prefixo data URI
-        if (!str_starts_with($selfieB64, 'data:')) {
+        if (!empty($selfieB64) && !str_starts_with($selfieB64, 'data:')) {
             $selfieB64 = 'data:image/jpeg;base64,' . $selfieB64;
         }
-        if (!str_starts_with($assinaturaB64, 'data:')) {
+        // Garantir que assinatura tenha prefixo data URI
+        if (!empty($assinaturaB64) && !str_starts_with($assinaturaB64, 'data:')) {
             $assinaturaB64 = 'data:image/png;base64,' . $assinaturaB64;
         }
+
+        // Fallback para não exibir erro X
+        $selfieImgTag = !empty($selfieB64) ? '<img src="' . $selfieB64 . '" style="max-width:190px;max-height:150px;border:1px solid #e2e8f0;">' : '<div style="font-size:7pt;color:#94a3b8;margin-top:20px;">Selfie não disponível</div>';
+        $assinaturaImgTag = !empty($assinaturaB64) ? '<img src="' . $assinaturaB64 . '" style="max-width:190px;max-height:150px;">' : '<div style="font-size:7pt;color:#94a3b8;margin-top:20px;">Assinatura não disponível</div>';
 
         return <<<HTML
 <div style="font-family:Helvetica,Arial,sans-serif;font-size:9pt;color:#1e293b;">
@@ -978,12 +1196,12 @@ class DocumentosController extends AppController
     <tr>
       <td style="width:48%;border:1px solid #e2e8f0;text-align:center;vertical-align:top;padding:12px;background:#f8fafc;">
         <span style="font-weight:bold;font-size:9pt;color:#2563eb;">📷 Selfie do Signatário</span><br><br>
-        <img src="$selfieB64" style="max-width:190px;max-height:150px;border:1px solid #e2e8f0;">
+        $selfieImgTag
       </td>
       <td style="width:4%;"></td>
       <td style="width:48%;border:1px solid #e2e8f0;text-align:center;vertical-align:top;padding:12px;background:#f8fafc;">
         <span style="font-weight:bold;font-size:9pt;color:#2563eb;">✍️ Assinatura Manuscrita</span><br><br>
-        <img src="$assinaturaB64" style="max-width:190px;max-height:150px;">
+        $assinaturaImgTag
       </td>
     </tr>
   </table>

@@ -82,44 +82,44 @@ async def prepare_pdf(input_path: str, output_path: str, signer_name: str = ''):
         with open(input_path, 'rb+') as f:
             w = IncrementalPdfFileWriter(f)
 
-            # Local da imagem de autenticidade (Caminho relativo para funcionar em qualquer container/host)
+            # Imagem do Selo ICP-Brasil Qualificada
             base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            img_path = os.path.join(base_dir, 'storage', 'authenticity.png')
-            
+            img_path = os.path.join(base_dir, 'storage', 'imagens', 'selo-qualificada-icp.png')
+
             bg_img = None
             if os.path.exists(img_path):
-                # Utiliza PIL para criar um canvas transparente que posiciona a imagem na esquerda
                 try:
                     from PIL import Image
                     logo = Image.open(img_path).convert('RGBA')
-                    
-                    # Como a box é (40, 5, 300, 35), a proporção é de ~8.6 para 1 (260 largura / 30 altura) 
-                    # Criamos um canvas nessa proporção exata para que ao ser escalado pelo PyHanko, não distorça
-                    # e jogue a logo na ponta esquerda.
+
+                    # box=(40, 5, 300, 35) → altura útil ≈ 30pt, largura ≈ 260pt
+                    # Mantemos a proporção real da imagem para não distorcer
+                    orig_w, orig_h = logo.size
                     target_h = 100
-                    target_w = int(target_h * (260 / 30.0))
-                    
-                    # Resize logo para caber na altura
-                    logo = logo.resize((target_h, target_h), Image.Resampling.LANCZOS)
-                    
-                    canvas = Image.new('RGBA', (target_w, target_h), (255, 0, 0, 0))
+                    target_w = int(target_h * (260 / 30.0))  # canvas na proporção da box
+
+                    # Redimensiona o logo mantendo aspecto
+                    logo_h = target_h
+                    logo_w = int(logo_h * orig_w / orig_h)
+                    logo = logo.resize((logo_w, logo_h), Image.Resampling.LANCZOS)
+
+                    canvas = Image.new('RGBA', (target_w, target_h), (255, 255, 255, 0))
                     canvas.paste(logo, (0, 0), logo)
-                    
+
                     temp_img_path = '/tmp/pades_seal_padded.png'
                     canvas.save(temp_img_path)
-                    
+
                     bg_img = PdfImage(temp_img_path)
-                except Exception as e:
-                    # Fallback caso PIL falhe
-                    pass
+                except Exception:
+                    pass  # Fallback sem imagem
 
             # Estilo: Sem borda, com logo posicionada à esquerda via Canvas Transparente
             style = TextStampStyle(
-                stamp_text="ASSINATURA DIGITAL ICP-Brasil\n%(signer)s\n%(ts)s",
+                stamp_text="ASSINATURA DIGITAL ICP-Brasil\n%(signer)s\n%(ts)s\nValide em: https://validar.iti.gov.br",
                 border_width=0,
                 background=bg_img,
                 background_opacity=1.0,
-                text_box_style=TextBoxStyle(font_size=7)
+                text_box_style=TextBoxStyle(font_size=6)
             )
 
             meta = PdfSignatureMetadata(
@@ -130,17 +130,7 @@ async def prepare_pdf(input_path: str, output_path: str, signer_name: str = ''):
                 location='Brasil'
             )
 
-            # Posição: RODAPÉ ABSOLUTO
-            # A margem do mPDF termina na altura 35. Isso garante que a caixa fique
-            # restrita ao espaço Y de 5 até 30, sendo impossível sobrepor qualquer texto original.
-            field_spec = fields.SigFieldSpec(
-                sig_field_name='SignatureProfessional',
-                on_page=0,
-                box=(40, 5, 300, 35) # Reduzido a largura para evitar que a imagem de fundo fique esticada/distorcida
-            )
-            fields.append_signature_field(w, field_spec)
-
-            signer = PdfSigner(meta, signer=MockSigner(), stamp_style=style)
+            signer = PdfSigner(meta, signer=MockSigner())
 
             with open(output_path, 'wb') as outf:
                 prep_digest, _, _ = await signer.async_digest_doc_for_signing(

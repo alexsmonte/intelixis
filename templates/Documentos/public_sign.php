@@ -107,8 +107,8 @@ $csrfToken = $this->request->getAttribute('csrfToken') ?? '';
                         <h4 class="mb-1 text-white"><?= $docTitulo ?></h4>
                         <div class="small opacity-75 mt-1"><?= $pacienteNome ?></div>
                     </div>
-                    <div class="card-body p-5 text-center">
-                        <iconify-icon icon="solar:check-circle-bold" class="text-success mb-3" style="font-size: 5rem;"></iconify-icon>
+                    <div class="card-body p-5 text-center d-flex flex-column align-items-center">   
+                        <iconify-icon icon="mingcute:lock-fill" class="text-success mb-3" style="font-size: 5rem;"></iconify-icon>
                         
                         <div class="badge bg-success-subtle text-success rounded-pill px-3 py-2 mb-3 fs-6">
                             <iconify-icon icon="solar:check-read-linear" class="align-middle me-1"></iconify-icon> Documento assinado
@@ -240,7 +240,7 @@ $csrfToken = $this->request->getAttribute('csrfToken') ?? '';
 
                 <!-- Tela de sucesso (hidden) -->
                 <div class="card w-100 position-relative overflow-hidden mt-2 shadow-sm border-0 d-none" id="telaSucesso">
-                    <div class="card-body p-5 text-center">
+                   <div class="card-body p-5 text-center d-flex flex-column align-items-center">
                         <iconify-icon icon="solar:check-circle-bold" class="text-success mb-3" style="font-size: 5rem;"></iconify-icon>
                         <h3 class="text-success mb-3 fw-bold">Documento assinado!</h3>
                         <p class="text-muted mb-4">

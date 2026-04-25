@@ -69,22 +69,42 @@ $jaAssinado = !empty($documento->assinatura_hash);
                     </div>
                 </div>
                 
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control font-monospace bg-light"
-                           id="urlCurta" value="<?= h($urlCurta) ?>" readonly>
-                    <button class="btn btn-primary fw-bold" type="button" onclick="copiarUrl('urlCurta', this)">
-                        <iconify-icon icon="solar:copy-bold" class="fs-5 align-middle me-1"></iconify-icon> Copiar
-                    </button>
-                </div>
+                <button class="btn btn-link p-0 text-secondary" type="button" 
+        onclick="copiarUrl('urlCurta', this)"
+        data-bs-toggle="tooltip" data-bs-placement="top" title="Copiar link">
+    <span class="nav-icon-hover-bg rounded-circle p-1">
+        <iconify-icon icon="flowbite:link-outline" class="fs-7 align-middle"></iconify-icon>
+    </span>
+</button>
 
-                <div class="d-grid gap-2 d-md-flex mt-3">
-                    <a href="<?= $urlCurta ?>" target="_blank" class="btn btn-primary rounded-pill flex-fill">
-                        <iconify-icon icon="solar:eye-bold" class="fs-5 align-middle me-1"></iconify-icon> Abrir Link
-                    </a>
-                    <button type="button" disabled class="btn btn-success rounded-pill flex-fill" onclick="gerarWhatsApp()">
-                        <iconify-icon icon="ic:baseline-whatsapp" class="fs-5 align-middle me-1"></iconify-icon> Enviar via WhatsApp
-                    </button>
-                </div>
+<input type="text" id="urlCurta" value="<?= h($urlCurta) ?>" class="d-none" readonly>
+
+<button type="button" disabled 
+        class="btn btn-link p-0 text-success" 
+        onclick="gerarWhatsApp()"
+        data-bs-toggle="tooltip" data-bs-placement="top" title="Enviar via WhatsApp">
+    <span class="nav-icon-hover-bg rounded-circle p-1">
+        <iconify-icon icon="ic:baseline-whatsapp" class="fs-7 align-middle"></iconify-icon>
+    </span>
+</button>
+
+<button type="button" disabled 
+        class="btn btn-link p-0 text-dark" 
+        onclick="enviarEmail()"
+        data-bs-toggle="tooltip" data-bs-placement="top" title="Enviar via Email">
+    <span class="nav-icon-hover-bg rounded-circle p-1">
+        <iconify-icon icon="streamline:send-email-remix" class="fs-7 align-middle"></iconify-icon>
+    </span>
+</button>
+
+<a href="<?= $urlCurta ?>" target="_blank" 
+   class="btn btn-link p-0 text-primary"
+   data-bs-toggle="tooltip" data-bs-placement="top" title="Abrir link para assinatura">
+    <span class="nav-icon-hover-bg rounded-circle p-1">
+        <iconify-icon icon="streamline-plump:web" class="fs-7 align-middle"></iconify-icon>
+    </span>
+</a>
+
 
 
 
@@ -95,12 +115,11 @@ $jaAssinado = !empty($documento->assinatura_hash);
                     </div>
                 </div>
 
-                <!-- Voltar -->
-                <div class="mt-4 text-center">
-                    <a href="<?= $this->Url->build(['controller' => 'Consultas', 'action' => 'editar', $documento->procedimento->consulta_id ?? '']) ?>" class="btn bg-danger-subtle text-danger rounded-pill fw-bold px-4">
-                        Fechar e Voltar
-                    </a>
-                </div>
+            <div class="mt-4">
+                <a href="<?= $this->Url->build(['controller' => 'Consultas', 'action' => 'editar', $documento->procedimento->consulta_id ?? '']) ?>" class="btn bg-danger-subtle text-danger rounded-pill fw-bold w-100">
+                    Fechar e Voltar
+                </a>
+            </div>
 
 
             </div>

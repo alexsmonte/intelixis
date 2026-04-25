@@ -229,7 +229,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                     Aguardando Profissional
                                                                 </span>
                                                             </template>
-                                                            <template v-else-if="anamnese.assinatura_hash">
+                                                            <template v-else-if="anamnese.assinatura_hash && anamnese.exigir_assinatura_paciente">
                                                                 <iconify-icon icon="solar:lock-keyhole-bold-duotone"
                                                                     class="fs-7 text-success cursor-pointer"
                                                                     @click="abrirLogsDocumento(anamnese)"
@@ -256,16 +256,20 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                 <ul class="dropdown-menu dropdown-menu-end"
                                                                     :aria-labelledby="'dropdownMenu-' + anamnese.id">
                                                                     <!-- Assinar Paciente -->
-                                                                    <li class="dropdown-item" v-if="!anamnese.assinatura_hash">
+                                                                    <li class="dropdown-item"
+                                                                        v-if="!anamnese.assinatura_hash">
                                                                         <a :href="`<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'assinarPaciente'], ['fullBase' => true]) ?>/${anamnese.id}`"
                                                                             class="link-state link-success2 d-flex align-items-center gap-2"
                                                                             title="Gerar link de assinatura do paciente">
-                                                                            <iconify-icon icon="solar:user-hand-up-bold-duotone" class="fs-7"></iconify-icon> Assinar Paciente
+                                                                            <iconify-icon
+                                                                                icon="solar:user-hand-up-bold-duotone"
+                                                                                class="fs-7"></iconify-icon> Assinar
+                                                                            Paciente
                                                                         </a>
                                                                     </li>
                                                                     <!-- Assinar Profissional -->
                                                                     <li class="dropdown-item"
-                                                                        v-if="!anamnese.assinatura_prof_hash && anamnese.exigir_assinatura_profissional"
+                                                                        v-if="!anamnese.assinatura_prof_hash"
                                                                         :class="{ 'disabled opacity-50': anamnese.exigir_assinatura_paciente && !anamnese.assinatura_hash }">
                                                                         <a :href="anamnese.exigir_assinatura_paciente && !anamnese.assinatura_hash ? 'javascript:void(0)' : `<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'assinarProfissional'], ['fullBase' => true]) ?>/${anamnese.id}`"
                                                                             class="link-state link-primary2 d-flex align-items-center gap-2"
@@ -277,7 +281,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                         </a>
                                                                     </li>
                                                                     <li
-                                                                        v-if="!anamnese.assinatura_prof_hash && anamnese.exigir_assinatura_profissional">
+                                                                        v-if="!anamnese.assinatura_prof_hash">
                                                                         <hr class="dropdown-divider">
                                                                     </li>
 
@@ -303,10 +307,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                                 class="fs-7"></iconify-icon> Detalhes
                                                                         </a>
                                                                     </li>
-                                                                    <li v-if="!anamnese.assinatura_prof_hash && !anamnese.assinatura_hash">
+                                                                    <li
+                                                                        v-if="!anamnese.assinatura_prof_hash && !anamnese.assinatura_hash">
                                                                         <hr class="dropdown-divider">
                                                                     </li>
-                                                                    <li class="dropdown-item" v-if="!anamnese.assinatura_prof_hash && !anamnese.assinatura_hash">
+                                                                    <li class="dropdown-item"
+                                                                        v-if="!anamnese.assinatura_prof_hash && !anamnese.assinatura_hash">
                                                                         <a :href="`#anamnese-${anamnese.id}`"
                                                                             class="link-state link-danger2"
                                                                             title="Excluir documento"
@@ -389,7 +395,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                     Aguardando Profissional
                                                                 </span>
                                                             </template>
-                                                            <template v-else-if="anotacao.assinatura_hash">
+                                                            <template v-else-if="anotacao.assinatura_hash && anotacao.exigir_assinatura_paciente">
                                                                 <iconify-icon icon="solar:lock-keyhole-bold-duotone"
                                                                     class="fs-7 text-success cursor-pointer"
                                                                     @click="abrirLogsDocumento(anotacao)"
@@ -416,16 +422,20 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                 <ul class="dropdown-menu dropdown-menu-end"
                                                                     :aria-labelledby="'dropdownMenu-' + anotacao.id">
                                                                     <!-- Assinar Paciente -->
-                                                                    <li class="dropdown-item" v-if="!anotacao.assinatura_hash">
+                                                                    <li class="dropdown-item"
+                                                                        v-if="!anotacao.assinatura_hash">
                                                                         <a :href="`<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'assinarPaciente'], ['fullBase' => true]) ?>/${anotacao.id}`"
                                                                             class="link-state link-success2 d-flex align-items-center gap-2"
                                                                             title="Gerar link de assinatura do paciente">
-                                                                            <iconify-icon icon="solar:user-hand-up-bold-duotone" class="fs-7"></iconify-icon> Assinar Paciente
+                                                                            <iconify-icon
+                                                                                icon="solar:user-hand-up-bold-duotone"
+                                                                                class="fs-7"></iconify-icon> Assinar
+                                                                            Paciente
                                                                         </a>
                                                                     </li>
                                                                     <!-- Assinar Profissional -->
                                                                     <li class="dropdown-item"
-                                                                        v-if="!anotacao.assinatura_prof_hash && anotacao.exigir_assinatura_profissional"
+                                                                        v-if="!anotacao.assinatura_prof_hash"
                                                                         :class="{ 'disabled opacity-50': anotacao.exigir_assinatura_paciente && !anotacao.assinatura_hash }">
                                                                         <a :href="anotacao.exigir_assinatura_paciente && !anotacao.assinatura_hash ? 'javascript:void(0)' : `<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'assinarProfissional'], ['fullBase' => true]) ?>/${anotacao.id}`"
                                                                             class="link-state link-primary2 d-flex align-items-center gap-2"
@@ -437,7 +447,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                         </a>
                                                                     </li>
                                                                     <li
-                                                                        v-if="!anotacao.assinatura_prof_hash && anotacao.exigir_assinatura_profissional">
+                                                                        v-if="!anotacao.assinatura_prof_hash">
                                                                         <hr class="dropdown-divider">
                                                                     </li>
 
@@ -463,10 +473,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                                 class="fs-7"></iconify-icon> Detalhes
                                                                         </a>
                                                                     </li>
-                                                                    <li v-if="!anotacao.assinatura_prof_hash && !anotacao.assinatura_hash">
+                                                                    <li
+                                                                        v-if="!anotacao.assinatura_prof_hash && !anotacao.assinatura_hash">
                                                                         <hr class="dropdown-divider">
                                                                     </li>
-                                                                    <li class="dropdown-item" v-if="!anotacao.assinatura_prof_hash && !anotacao.assinatura_hash">
+                                                                    <li class="dropdown-item"
+                                                                        v-if="!anotacao.assinatura_prof_hash && !anotacao.assinatura_hash">
                                                                         <a :href="`#anotacao-${anotacao.id}`"
                                                                             class="link-state link-danger2"
                                                                             title="Excluir documento"
@@ -561,7 +573,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
                                                             <!-- Caso 4: Concluído (Paciente ou Profissional) -->
                                                             <template
-                                                                v-else-if="doc.assinatura_prof_hash || doc.assinatura_hash">
+                                                                v-else-if="doc.assinatura_hash && doc.exigir_assinatura_paciente">
                                                                 <iconify-icon icon="solar:lock-keyhole-bold-duotone"
                                                                     class="fs-7 text-success cursor-pointer"
                                                                     @click="abrirLogsDocumento(doc)"
@@ -593,16 +605,20 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                 <ul class="dropdown-menu dropdown-menu-end"
                                                                     :aria-labelledby="'dropdownMenu-' + doc.id">
                                                                     <!-- Assinar Paciente -->
-                                                                    <li class="dropdown-item" v-if="!doc.assinatura_hash">
+                                                                    <li class="dropdown-item"
+                                                                        v-if="!doc.assinatura_hash">
                                                                         <a :href="`<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'assinarPaciente'], ['fullBase' => true]) ?>/${doc.id}`"
                                                                             class="link-state link-success2 d-flex align-items-center gap-2"
                                                                             title="Gerar link de assinatura do paciente">
-                                                                            <iconify-icon icon="solar:user-hand-up-bold-duotone" class="fs-7"></iconify-icon> Assinar Paciente
+                                                                            <iconify-icon
+                                                                                icon="solar:user-hand-up-bold-duotone"
+                                                                                class="fs-7"></iconify-icon> Assinar
+                                                                            Paciente
                                                                         </a>
                                                                     </li>
                                                                     <!-- Ação: Assinar Profissional com Precedência -->
                                                                     <li class="dropdown-item"
-                                                                        v-if="!doc.assinatura_prof_hash && doc.exigir_assinatura_profissional"
+                                                                        v-if="!doc.assinatura_prof_hash"
                                                                         :class="{ 'disabled opacity-50': doc.exigir_assinatura_paciente && !doc.assinatura_hash }">
                                                                         <a :href="doc.exigir_assinatura_paciente && !doc.assinatura_hash ? 'javascript:void(0)' : `<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'assinarProfissional'], ['fullBase' => true]) ?>/${doc.id}`"
                                                                             class="link-state link-primary2 d-flex align-items-center gap-2"
@@ -614,7 +630,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                         </a>
                                                                     </li>
                                                                     <li
-                                                                        v-if="!doc.assinatura_prof_hash && doc.exigir_assinatura_profissional">
+                                                                        v-if="!doc.assinatura_prof_hash">
                                                                         <hr class="dropdown-divider">
                                                                     </li>
 
@@ -642,10 +658,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                             Documento
                                                                         </a>
                                                                     </li>
-                                                                    <li v-if="!doc.assinatura_prof_hash && !doc.assinatura_hash">
+                                                                    <li
+                                                                        v-if="!doc.assinatura_prof_hash && !doc.assinatura_hash">
                                                                         <hr class="dropdown-divider">
                                                                     </li>
-                                                                    <li class="dropdown-item" v-if="!doc.assinatura_prof_hash && !doc.assinatura_hash">
+                                                                    <li class="dropdown-item"
+                                                                        v-if="!doc.assinatura_prof_hash && !doc.assinatura_hash">
                                                                         <a :href="`#documento-${doc.id}`"
                                                                             class="link-state link-danger2"
                                                                             title="Excluir documento"
@@ -727,7 +745,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                     Aguardando Profissional
                                                                 </span>
                                                             </template>
-                                                            <template v-else-if="laudo.assinatura_hash">
+                                                            <template v-else-if="laudo.assinatura_hash && laudo.exigir_assinatura_paciente">
                                                                 <iconify-icon icon="solar:lock-keyhole-bold-duotone"
                                                                     class="fs-7 text-success cursor-pointer"
                                                                     @click="abrirLogsDocumento(laudo)"
@@ -754,16 +772,20 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                 <ul class="dropdown-menu dropdown-menu-end"
                                                                     :aria-labelledby="'dropdownMenu-' + laudo.id">
                                                                     <!-- Assinar Paciente -->
-                                                                    <li class="dropdown-item" v-if="!laudo.assinatura_hash">
+                                                                    <li class="dropdown-item"
+                                                                        v-if="!laudo.assinatura_hash">
                                                                         <a :href="`<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'assinarPaciente'], ['fullBase' => true]) ?>/${laudo.id}`"
                                                                             class="link-state link-success2 d-flex align-items-center gap-2"
                                                                             title="Gerar link de assinatura do paciente">
-                                                                            <iconify-icon icon="solar:user-hand-up-bold-duotone" class="fs-7"></iconify-icon> Assinar Paciente
+                                                                            <iconify-icon
+                                                                                icon="solar:user-hand-up-bold-duotone"
+                                                                                class="fs-7"></iconify-icon> Assinar
+                                                                            Paciente
                                                                         </a>
                                                                     </li>
                                                                     <!-- Assinar Profissional -->
                                                                     <li class="dropdown-item"
-                                                                        v-if="!laudo.assinatura_prof_hash && laudo.exigir_assinatura_profissional"
+                                                                        v-if="!laudo.assinatura_prof_hash"
                                                                         :class="{ 'disabled opacity-50': laudo.exigir_assinatura_paciente && !laudo.assinatura_hash }">
                                                                         <a :href="laudo.exigir_assinatura_paciente && !laudo.assinatura_hash ? 'javascript:void(0)' : `<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'assinarProfissional'], ['fullBase' => true]) ?>/${laudo.id}`"
                                                                             class="link-state link-primary2 d-flex align-items-center gap-2"
@@ -775,7 +797,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                         </a>
                                                                     </li>
                                                                     <li
-                                                                        v-if="!laudo.assinatura_prof_hash && laudo.exigir_assinatura_profissional">
+                                                                        v-if="!laudo.assinatura_prof_hash">
                                                                         <hr class="dropdown-divider">
                                                                     </li>
 
@@ -801,10 +823,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                                 class="fs-7"></iconify-icon> Detalhes
                                                                         </a>
                                                                     </li>
-                                                                    <li v-if="!laudo.assinatura_prof_hash && !laudo.assinatura_hash">
+                                                                    <li
+                                                                        v-if="!laudo.assinatura_prof_hash && !laudo.assinatura_hash">
                                                                         <hr class="dropdown-divider">
                                                                     </li>
-                                                                    <li class="dropdown-item" v-if="!laudo.assinatura_prof_hash && !laudo.assinatura_hash">
+                                                                    <li class="dropdown-item"
+                                                                        v-if="!laudo.assinatura_prof_hash && !laudo.assinatura_hash">
                                                                         <a :href="`#laudo-${laudo.id}`"
                                                                             class="link-state link-danger2"
                                                                             title="Excluir documento"
@@ -897,7 +921,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                     Aguardando Profissional
                                                                 </span>
                                                             </template>
-                                                            <template v-else-if="receita.assinatura_hash">
+                                                            <template v-else-if="receita.assinatura_hash && receita.exigir_assinatura_paciente">
                                                                 <iconify-icon icon="solar:lock-keyhole-bold-duotone"
                                                                     class="fs-7 text-success cursor-pointer"
                                                                     @click="abrirLogsDocumento(receita)"
@@ -925,16 +949,20 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                 <ul class="dropdown-menu dropdown-menu-end"
                                                                     :aria-labelledby="'dropdownMenu-' + receita.id">
                                                                     <!-- Assinar Paciente -->
-                                                                    <li class="dropdown-item" v-if="!receita.assinatura_hash">
+                                                                    <li class="dropdown-item"
+                                                                        v-if="!receita.assinatura_hash">
                                                                         <a :href="`<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'assinarPaciente'], ['fullBase' => true]) ?>/${receita.id}`"
                                                                             class="link-state link-success2 d-flex align-items-center gap-2"
                                                                             title="Gerar link de assinatura do paciente">
-                                                                            <iconify-icon icon="solar:user-hand-up-bold-duotone" class="fs-7"></iconify-icon> Assinar Paciente
+                                                                            <iconify-icon
+                                                                                icon="solar:user-hand-up-bold-duotone"
+                                                                                class="fs-7"></iconify-icon> Assinar
+                                                                            Paciente
                                                                         </a>
                                                                     </li>
                                                                     <!-- Assinar Profissional -->
                                                                     <li class="dropdown-item"
-                                                                        v-if="!receita.assinatura_prof_hash && receita.exigir_assinatura_profissional"
+                                                                        v-if="!receita.assinatura_prof_hash"
                                                                         :class="{ 'disabled opacity-50': receita.exigir_assinatura_paciente && !receita.assinatura_hash }">
                                                                         <a :href="receita.exigir_assinatura_paciente && !receita.assinatura_hash ? 'javascript:void(0)' : `<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'assinarProfissional'], ['fullBase' => true]) ?>/${receita.id}`"
                                                                             class="link-state link-primary2 d-flex align-items-center gap-2"
@@ -946,7 +974,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                         </a>
                                                                     </li>
                                                                     <li
-                                                                        v-if="!receita.assinatura_prof_hash && receita.exigir_assinatura_profissional">
+                                                                        v-if="!receita.assinatura_prof_hash">
                                                                         <hr class="dropdown-divider">
                                                                     </li>
 
@@ -972,10 +1000,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                                 class="fs-7"></iconify-icon> Detalhes
                                                                         </a>
                                                                     </li>
-                                                                    <li v-if="!receita.assinatura_prof_hash && !receita.assinatura_hash">
+                                                                    <li
+                                                                        v-if="!receita.assinatura_prof_hash && !receita.assinatura_hash">
                                                                         <hr class="dropdown-divider">
                                                                     </li>
-                                                                    <li class="dropdown-item" v-if="!receita.assinatura_prof_hash && !receita.assinatura_hash">
+                                                                    <li class="dropdown-item"
+                                                                        v-if="!receita.assinatura_prof_hash && !receita.assinatura_hash">
                                                                         <a :href="`#receita-${receita.id}`"
                                                                             class="link-state link-danger2"
                                                                             title="Excluir receita"
