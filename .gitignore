@@ -18,7 +18,9 @@
 /logs/*
 !/logs/empty
 
-
+storage/*
+!storage/.gitkeep
+!storage/anexos/
 storage/anexos/*
 !storage/anexos/.gitkeep
 
@@ -95,3 +97,4 @@ config/app.php
 config/app.php.PGBKP
 *.BKP
 
+storage/
