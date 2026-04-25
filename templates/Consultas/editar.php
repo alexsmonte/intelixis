@@ -229,7 +229,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                     Aguardando Profissional
                                                                 </span>
                                                             </template>
-                                                            <template v-else-if="anamnese.assinatura_hash && anamnese.exigir_assinatura_paciente">
+                                                            <template
+                                                                v-else-if="anamnese.assinatura_hash && anamnese.exigir_assinatura_paciente">
                                                                 <iconify-icon icon="solar:lock-keyhole-bold-duotone"
                                                                     class="fs-7 text-success cursor-pointer"
                                                                     @click="abrirLogsDocumento(anamnese)"
@@ -280,14 +281,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                             Profissional
                                                                         </a>
                                                                     </li>
-                                                                    <li
-                                                                        v-if="!anamnese.assinatura_prof_hash">
+                                                                    <li v-if="!anamnese.assinatura_prof_hash">
                                                                         <hr class="dropdown-divider">
                                                                     </li>
 
                                                                     <li class="dropdown-item">
-                                                                        <a :href="`<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'imprimir'], ['fullBase' => true]) ?>/${anamnese.id}`"
-                                                                            target="_blank"
+                                                                        <a href="javascript:void(0)"
+                                                                            @click.stop="imprimirDocumento(anamnese)"
                                                                             class="link-state link-primary2"
                                                                             title="Imprimir documento">
                                                                             <iconify-icon
@@ -395,7 +395,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                     Aguardando Profissional
                                                                 </span>
                                                             </template>
-                                                            <template v-else-if="anotacao.assinatura_hash && anotacao.exigir_assinatura_paciente">
+                                                            <template
+                                                                v-else-if="anotacao.assinatura_hash && anotacao.exigir_assinatura_paciente">
                                                                 <iconify-icon icon="solar:lock-keyhole-bold-duotone"
                                                                     class="fs-7 text-success cursor-pointer"
                                                                     @click="abrirLogsDocumento(anotacao)"
@@ -446,14 +447,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                             Profissional
                                                                         </a>
                                                                     </li>
-                                                                    <li
-                                                                        v-if="!anotacao.assinatura_prof_hash">
+                                                                    <li v-if="!anotacao.assinatura_prof_hash">
                                                                         <hr class="dropdown-divider">
                                                                     </li>
 
                                                                     <li class="dropdown-item">
-                                                                        <a :href="`<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'imprimir'], ['fullBase' => true]) ?>/${anotacao.id}`"
-                                                                            target="_blank"
+                                                                        <a href="javascript:void(0)"
+                                                                            @click.stop="imprimirDocumento(anotacao)"
                                                                             class="link-state link-primary2"
                                                                             title="Imprimir documento">
                                                                             <iconify-icon
@@ -629,14 +629,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                             Profissional
                                                                         </a>
                                                                     </li>
-                                                                    <li
-                                                                        v-if="!doc.assinatura_prof_hash">
+                                                                    <li v-if="!doc.assinatura_prof_hash">
                                                                         <hr class="dropdown-divider">
                                                                     </li>
 
                                                                     <li class="dropdown-item">
-                                                                        <a :href="`<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'imprimir'], ['fullBase' => true]) ?>/${doc.id}`"
-                                                                            target="_blank"
+                                                                        <a href="javascript:void(0)"
+                                                                            @click.stop="imprimirDocumento(doc)"
                                                                             class="link-state link-primary2"
                                                                             title="Imprimir documento">
                                                                             <iconify-icon
@@ -745,7 +744,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                     Aguardando Profissional
                                                                 </span>
                                                             </template>
-                                                            <template v-else-if="laudo.assinatura_hash && laudo.exigir_assinatura_paciente">
+                                                            <template
+                                                                v-else-if="laudo.assinatura_hash && laudo.exigir_assinatura_paciente">
                                                                 <iconify-icon icon="solar:lock-keyhole-bold-duotone"
                                                                     class="fs-7 text-success cursor-pointer"
                                                                     @click="abrirLogsDocumento(laudo)"
@@ -796,14 +796,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                             Profissional
                                                                         </a>
                                                                     </li>
-                                                                    <li
-                                                                        v-if="!laudo.assinatura_prof_hash">
+                                                                    <li v-if="!laudo.assinatura_prof_hash">
                                                                         <hr class="dropdown-divider">
                                                                     </li>
 
                                                                     <li class="dropdown-item">
-                                                                        <a :href="`<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'imprimir'], ['fullBase' => true]) ?>/${laudo.id}`"
-                                                                            target="_blank"
+                                                                        <a href="javascript:void(0)"
+                                                                            @click.stop="imprimirDocumento(laudo)"
                                                                             class="link-state link-primary2"
                                                                             title="Imprimir documento">
                                                                             <iconify-icon
@@ -921,7 +920,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                     Aguardando Profissional
                                                                 </span>
                                                             </template>
-                                                            <template v-else-if="receita.assinatura_hash && receita.exigir_assinatura_paciente">
+                                                            <template
+                                                                v-else-if="receita.assinatura_hash && receita.exigir_assinatura_paciente">
                                                                 <iconify-icon icon="solar:lock-keyhole-bold-duotone"
                                                                     class="fs-7 text-success cursor-pointer"
                                                                     @click="abrirLogsDocumento(receita)"
@@ -973,14 +973,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                             Profissional
                                                                         </a>
                                                                     </li>
-                                                                    <li
-                                                                        v-if="!receita.assinatura_prof_hash">
+                                                                    <li v-if="!receita.assinatura_prof_hash">
                                                                         <hr class="dropdown-divider">
                                                                     </li>
 
                                                                     <li class="dropdown-item">
-                                                                        <a :href="`<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'imprimir'], ['fullBase' => true]) ?>/${receita.id}`"
-                                                                            target="_blank"
+                                                                        <a href="javascript:void(0)"
+                                                                            @click.stop="imprimirDocumento(receita)"
                                                                             class="link-state link-primary2"
                                                                             title="Imprimir receita">
                                                                             <iconify-icon
@@ -1844,7 +1843,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
 </script>
 
-<?= $this->Html->script(['vue/v-money.2.x.js', 'plugins/bootstrap-select.js', 'vue/select2-vue.js']); ?>
+<?= $this->Html->script(['vue/v-money.2.x.js', 'plugins/bootstrap-select.js', 'vue/select2-vue.js', 'vue/swal-utils.js']); ?>
 <?= $this->Html->css(['plugins/bootstrap-select.css']); ?>
 <style>
     .accordion-body {
@@ -1991,13 +1990,9 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
         methods: {
             excluirModelo(modelo, tipo) {
-                Swal.fire({
+                AppAlerts.confirm({
                     title: 'Tem certeza?',
-                    text: 'Esse modelo será excluído permanentemente.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Sim, excluir',
-                    cancelButtonText: 'Cancelar'
+                    text: 'Esse modelo será excluído permanentemente.'
                 }).then((result) => {
 
                     if (!result.isConfirmed) return;
@@ -2023,21 +2018,15 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                 if (tipo == 'documento')
                                     this.carregarModelosDocumento();
 
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Excluído!',
-                                    text: 'Modelo removido com sucesso',
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                });
+                                AppAlerts.toast('Modelo removido com sucesso');
 
                             } else {
-                                Swal.fire('Erro', 'Não foi possível excluir', 'error');
+                                AppAlerts.error('Erro', 'Não foi possível excluir');
                             }
 
                         })
                         .catch(() => {
-                            Swal.fire('Erro', 'Falha na requisição', 'error');
+                            AppAlerts.error('Erro', 'Falha na requisição');
                         });
 
                 });
@@ -2073,11 +2062,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                 const item = mapa[tipo];
 
                 if (!item || !item.texto) {
-                    Swal.fire({
-                        title: 'Atenção',
-                        text: 'Não há conteúdo para transformar em modelo.',
-                        icon: 'warning'
-                    });
+                    AppAlerts.warning('Atenção', 'Não há conteúdo para transformar em modelo.');
                     return;
                 }
 
@@ -2112,23 +2097,44 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
                 return textoLimpo;
             },
+            imprimirDocumento(doc) {
+                if (!doc || !doc.id) return;
+
+                const url = "<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'imprimir'], ['fullBase' => true]) ?>/" + doc.id;
+
+                AppAlerts.loading('Processando...', 'Aguarde enquanto preparamos o documento para impressão.');
+
+                fetch(url)
+                    .then(async response => {
+                        const contentType = response.headers.get('content-type');
+
+                        // Se for erro ou se for JSON (mesmo com status 200, pode ser um erro encapsulado)
+                        if (!response.ok || (contentType && contentType.includes('application/json'))) {
+                            const data = await response.json().catch(() => ({ message: 'Erro ao processar o arquivo.' }));
+                            AppAlerts.warning('Atenção', data.message || 'O documento não pôde ser gerado no momento.');
+                            return;
+                        }
+
+                        // Se chegou aqui, é o PDF (ou outro binário)
+                        const blob = await response.blob();
+                        AppAlerts.close();
+                        const fileURL = URL.createObjectURL(blob);
+                        window.open(fileURL, '_blank');
+                    })
+                    .catch(error => {
+                        console.error('Erro ao imprimir:', error);
+                        AppAlerts.error('Erro', 'Ocorreu uma falha na comunicação com o servidor.');
+                    });
+            },
             salvarModelo() {
 
                 if (!this.modelo.titulo) {
-                    Swal.fire({
-                        title: 'Atenção',
-                        text: 'Informe o título do modelo.',
-                        icon: 'warning'
-                    });
+                    AppAlerts.warning('Atenção', 'Informe o título do modelo.');
                     return;
                 }
 
                 if (!this.modelo.nome) {
-                    Swal.fire({
-                        title: 'Atenção',
-                        text: 'Informe o nome do modelo.',
-                        icon: 'warning'
-                    });
+                    AppAlerts.warning('Atenção', 'Informe o nome do modelo.');
                     return;
                 }
 
@@ -2157,11 +2163,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                         if (this.modelo.tipo == 'documento')
                             this.carregarModelosDocumento()
 
-                        Swal.fire({
-                            title: 'Sucesso',
-                            text: 'Modelo salvo com sucesso!',
-                            icon: 'success'
-                        });
+                        AppAlerts.success('Sucesso', 'Modelo salvo com sucesso!');
 
                         // fecha modal
                         bootstrap.Modal
@@ -2176,20 +2178,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                         this.modelo.exigir_assinatura_profissional = false;
 
                     } else {
-                        Swal.fire({
-                            title: 'Erro',
-                            text: 'Ocorreu um erro ao salvar o modelo',
-                            icon: 'error'
-                        });
+                        AppAlerts.error('Erro', 'Ocorreu um erro ao salvar o modelo');
                     }
 
                 }).catch(() => {
 
-                    Swal.fire({
-                        title: 'Erro',
-                        text: 'Erro ao salvar modelo.',
-                        icon: 'error'
-                    });
+                    AppAlerts.error('Erro', 'Erro ao salvar modelo.');
 
                 }).finally(() => {
                     this.modelo.salvando = false;
@@ -2200,11 +2194,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                 if (this.documento.salvando) return;
 
                 if (!this.documento.texto) {
-                    Swal.fire({
-                        title: 'Atenção',
-                        text: 'Informe o texto do documento',
-                        icon: 'warning'
-                    });
+                    AppAlerts.warning('Atenção', 'Informe o texto do documento');
                     return;
                 }
 
@@ -2230,11 +2220,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
                         this.itemDocumento.docs.unshift(novoDocumento);
 
-                        Swal.fire({
-                            title: 'Sucesso',
-                            text: 'Documento salvo com sucesso',
-                            icon: 'success'
-                        });
+                        AppAlerts.success('Sucesso', 'Documento salvo com sucesso');
 
                         bootstrap.Modal
                             .getInstance(document.getElementById('bs-modal-documento'))
@@ -2247,20 +2233,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                             this.documento.procedimento_id = null;
 
                     } else {
-                        Swal.fire({
-                            title: 'Erro',
-                            text: 'Ocorreu um erro ao salvar o documento',
-                            icon: 'error'
-                        });
+                        AppAlerts.error('Erro', 'Ocorreu um erro ao salvar o documento');
                     }
 
                 }).catch(() => {
 
-                    Swal.fire({
-                        title: 'Erro',
-                        text: 'Erro ao salvar o documento',
-                        icon: 'error'
-                    });
+                    AppAlerts.error('Erro', 'Erro ao salvar o documento');
 
                 }).finally(() => {
 
@@ -2274,11 +2252,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                 if (this.laudo.salvando) return;
 
                 if (!this.laudo.texto) {
-                    Swal.fire({
-                        title: 'Atenção',
-                        text: 'Informe o texto da laudo',
-                        icon: 'warning'
-                    });
+                    AppAlerts.warning('Atenção', 'Informe o texto da laudo');
                     return;
                 }
 
@@ -2304,11 +2278,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
                         this.itemLaudo.laudos.unshift(novoDocumento);
 
-                        Swal.fire({
-                            title: 'Sucesso',
-                            text: 'Laudo salvo com sucesso',
-                            icon: 'success'
-                        });
+                        AppAlerts.success('Sucesso', 'Laudo salvo com sucesso');
 
                         bootstrap.Modal
                             .getInstance(document.getElementById('bs-modal-laudo'))
@@ -2320,20 +2290,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                         this.laudo.procedimento_id = null;
 
                     } else {
-                        Swal.fire({
-                            title: 'Erro',
-                            text: 'Ocorreu um erro ao salvar o laudo',
-                            icon: 'error'
-                        });
+                        AppAlerts.error('Erro', 'Ocorreu um erro ao salvar o laudo');
                     }
 
                 }).catch(() => {
 
-                    Swal.fire({
-                        title: 'Erro',
-                        text: 'Erro ao salvar o laudo.',
-                        icon: 'error'
-                    });
+                    AppAlerts.error('Erro', 'Erro ao salvar o laudo');
 
                 }).finally(() => {
 
@@ -2347,11 +2309,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                 if (this.anamnese.salvando) return;
 
                 if (!this.anamnese.texto) {
-                    Swal.fire({
-                        title: 'Atenção',
-                        text: 'Informe o texto da anamnese',
-                        icon: 'warning'
-                    });
+                    AppAlerts.warning('Atenção', 'Informe o texto da anamnese');
                     return;
                 }
 
@@ -2377,11 +2335,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
                         this.itemAnamnese.anamneses.unshift(novoDocumento);
 
-                        Swal.fire({
-                            title: 'Sucesso',
-                            text: 'Anamnese salva com sucesso',
-                            icon: 'success'
-                        });
+                        AppAlerts.success('Sucesso', 'Anamnese salva com sucesso');
 
                         bootstrap.Modal
                             .getInstance(document.getElementById('bs-modal-anamnese'))
@@ -2393,20 +2347,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                         this.anamnese.procedimento_id = null;
 
                     } else {
-                        Swal.fire({
-                            title: 'Erro',
-                            text: 'Ocorreu um erro ao salvar anamnese',
-                            icon: 'error'
-                        });
+                        AppAlerts.error('Erro', 'Ocorreu um erro ao salvar anamnese');
                     }
 
                 }).catch(() => {
 
-                    Swal.fire({
-                        title: 'Erro',
-                        text: 'Erro ao salvar anamnese.',
-                        icon: 'error'
-                    });
+                    AppAlerts.error('Erro', 'Erro ao salvar anamnese.');
 
                 }).finally(() => {
 
@@ -2434,11 +2380,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     .trim();
 
                 if (!textoLimpo) {
-                    Swal.fire({
-                        title: 'Atenção',
-                        text: 'Informe o texto da receita',
-                        icon: 'warning'
-                    });
+                    AppAlerts.warning('Atenção', 'Informe o texto da receita');
                     return;
                 }
 
@@ -2467,11 +2409,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                             // adiciona receita no início da lista
                             this.itemReceita.receitas.unshift(novaReceita);
 
-                            Swal.fire({
-                                title: 'Sucesso',
-                                text: 'Receita foi salva com sucesso',
-                                icon: 'success'
-                            });
+                            AppAlerts.success('Sucesso', 'Receita salva com sucesso');
 
                             // fecha modal
                             const modal = bootstrap.Modal.getInstance(
@@ -2498,22 +2436,14 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
                         } else {
 
-                            Swal.fire({
-                                title: 'Erro',
-                                text: 'Ocorreu um erro na tentativa de salvar a receita',
-                                icon: 'error'
-                            });
+                            AppAlerts.error('Erro', 'Ocorreu um erro na tentativa de salvar a receita');
 
                         }
 
                     })
                     .catch(() => {
 
-                        Swal.fire({
-                            title: 'Erro',
-                            text: 'Erro ao salvar receita',
-                            icon: 'error'
-                        });
+                        AppAlerts.error('Erro', 'Erro ao salvar receita');
 
                     })
                     .finally(() => {
@@ -2533,11 +2463,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     return;
                 this.anotacao.salvando = true;
                 if (!this.anotacao.texto) {
-                    Swal.fire({
-                        title: 'Atenção',
-                        text: 'Informe o texto da evolução clínica',
-                        icon: 'warning'
-                    });
+                    AppAlerts.warning('Atenção', 'Informe o texto da evolução clínica');
                     return;
                 }
 
@@ -2565,11 +2491,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                         // adiciona a nova anotação na lista
                         this.itemAnotacao.anotacoes.unshift(novaAnotacao);
 
-                        Swal.fire({
-                            title: 'Sucesso',
-                            text: 'Evolução clínica salva com sucesso',
-                            icon: 'success'
-                        });
+                        AppAlerts.success('Sucesso', 'Evolução clínica salva com sucesso');
 
                         // fecha o modal
                         bootstrap.Modal
@@ -2582,19 +2504,11 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                         this.anotacao.procedimento_id = null;
 
                     } else {
-                        Swal.fire({
-                            title: 'Erro',
-                            text: 'Ocorreu um erro na tentativa de salvar a evolução clínica',
-                            icon: 'error'
-                        });
+                        AppAlerts.error('Erro', 'Ocorreu um erro na tentativa de salvar a evolução clínica');
                     }
 
                 }).catch(() => {
-                    Swal.fire({
-                        title: 'Erro',
-                        text: 'Erro ao salvar a evolução clínica',
-                        icon: 'error'
-                    });
+                    AppAlerts.error('Erro', 'Erro ao salvar a evolução clínica');
                 }).finally(() => {
                     // Libera o botão em QUALQUER cenário
 
@@ -2810,13 +2724,10 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
             },
             removerAnexo(item, anexo, index) {
 
-                Swal.fire({
+                AppAlerts.confirm({
                     title: "Excluir anexo?",
                     text: "Este arquivo será removido permanentemente.",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonText: "Sim, excluir",
-                    cancelButtonText: "Cancelar",
+                    confirmButtonText: "Sim, excluir"
                 }).then(result => {
 
                     if (!result.isConfirmed)
@@ -2835,27 +2746,15 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                             // remove do array SEM reload
                             item.anexos.splice(index, 1);
 
-                            Swal.fire({
-                                title: "Removido!",
-                                text: response.data.message,
-                                icon: "success"
-                            });
+                            AppAlerts.success("Removido!", response.data.message);
 
                         } else {
-                            Swal.fire({
-                                title: "Erro",
-                                text: response.data.message,
-                                icon: "warning"
-                            });
+                            AppAlerts.warning("Erro", response.data.message);
                         }
 
                     }).
                         catch(() => {
-                            Swal.fire({
-                                title: "Erro",
-                                text: "Erro ao remover o anexo.",
-                                icon: "error"
-                            });
+                            AppAlerts.error("Erro", "Erro ao remover o anexo.");
                         });
 
                 });
@@ -2879,11 +2778,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
             abrirImpressao: function () {
 
                 if (this.filaImpressao.length === 0) {
-                    Swal.fire({
-                        title: "Erro",
-                        text: "Selecione pelo menos um procedimento",
-                        icon: "error"
-                    });
+                    AppAlerts.error("Erro", "Selecione pelo menos um procedimento");
 
                     return;
                 }
@@ -2911,23 +2806,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     formData.append('arquivos[]', file);
                 });
 
-                Swal.fire({
-                    title: 'Enviando arquivos...',
-                    html: `
-            <div style="width:100%; background:#eee; border-radius:4px; overflow:hidden;">
-                <div id="upload-progress-bar"
-                     style="width:0%; height:14px; background:#3085d6; transition: width .2s;"></div>
-            </div>
-            <p style="margin-top:10px;">
-                <strong id="upload-progress-text">0%</strong>
-            </p>`,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    showConfirmButton: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
+                AppAlerts.loading('Enviando arquivos...', 'Aguarde...');
 
                 axios.post(
                     "<?= $this->Url->build(['controller' => 'Anexos', 'action' => 'upload', '_ext' => 'json'], ['fullBase' => true]); ?>",
@@ -2935,29 +2814,15 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     headers: {
                         'X-CSRF-Token': "<?= $this->request->getAttribute('csrfToken') ?>",
                         'Content-Type': 'multipart/form-data'
-                    },
-                    onUploadProgress: (progressEvent) => {
-                        if (progressEvent.total) {
-                            const percent = Math.round(
-                                (progressEvent.loaded * 100) / progressEvent.total
-                            );
-
-                            const bar = document.getElementById('upload-progress-bar');
-                            const text = document.getElementById('upload-progress-text');
-
-                            if (bar) bar.style.width = percent + '%';
-                            if (text) text.innerText = percent + '%';
-                        }
                     }
                 }
                 )
                     .
                     then((response) => {
-                        Swal.close();
+                        AppAlerts.close();
 
                         if (response.data.success) {
 
-                            //a AQUI É A CORREÇÃO
                             const index = this.itens.findIndex(i => i.id === this.itemUpload.id);
 
                             if (index !== -1) {
@@ -2965,31 +2830,19 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                 this.$set(this.itens[index], 'anexos', response.data.anexos);
                             }
 
-                            Swal.fire({
-                                title: 'Sucesso',
-                                text: response.data.message,
-                                icon: 'success'
-                            });
+                            AppAlerts.success('Sucesso', response.data.message);
 
                         } else {
-                            Swal.fire({
-                                title: 'Erro',
-                                text: response.data.message,
-                                icon: 'error'
-                            });
+                            AppAlerts.error('Erro', response.data.message);
                         }
                     })
                     .
                     catch((error) => {
-                        Swal.close();
+                        AppAlerts.close();
 
                         console.error('Erro ao enviar arquivos:', error);
 
-                        Swal.fire({
-                            title: 'Erro',
-                            text: 'Falha ao tentar enviar os arquivos. Tente novamente.',
-                            icon: 'error'
-                        });
+                        AppAlerts.error('Erro', 'Falha ao tentar enviar os arquivos. Tente novamente.');
                     });
 
                 event.target.value = '';
@@ -3013,15 +2866,10 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                 }
 
                 // Se estiver DESAPROVANDO (false), pedir confirmação
-                Swal.fire({
+                AppAlerts.confirm({
                     title: "Confirma a ação?",
                     text: "Este procedimento já estava aprovado. Tem certeza que deseja desaprovar?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Sim, confirmo!",
-                    cancelButtonText: "Cancelar",
+                    confirmButtonText: "Sim, confirmo!"
                 }).then((result) => {
 
                     if (result.isConfirmed) {
@@ -3096,20 +2944,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
 
                 if (!item.servico_id) {
-                    Swal.fire({
-                        title: 'Atenção',
-                        text: "Selecione um procedimento antes de salvar.",
-                        icon: "warning"
-                    });
+                    AppAlerts.warning('Atenção', "Selecione um procedimento antes de salvar.");
                     return;
                 }
 
                 if (!item.profissional_id) {
-                    Swal.fire({
-                        title: 'Atenção',
-                        text: "Selecione um profissional antes de salvar.",
-                        icon: "warning"
-                    });
+                    AppAlerts.warning('Atenção', "Selecione um profissional antes de salvar.");
                     return;
                 }
 
@@ -3131,18 +2971,10 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                             //this.itens[index].id = response.data.id;
                             this.$set(this.itens[index], 'id', response.data.id);
 
-                            Swal.fire({
-                                title: 'Sucesso',
-                                text: response.data.message,
-                                icon: "success"
-                            });
+                            AppAlerts.success('Sucesso', response.data.message);
 
                         } else {
-                            Swal.fire({
-                                title: 'Atenção',
-                                text: response.data.message,
-                                icon: "warning"
-                            });
+                            AppAlerts.warning('Atenção', response.data.message);
                         }
 
                     })
@@ -3150,11 +2982,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     catch((error) => {
                         console.error(error);
 
-                        Swal.fire({
-                            title: 'Atenção',
-                            text: "Erro ao salvar o procedimento.",
-                            icon: "warning"
-                        });
+                        AppAlerts.warning('Atenção', "Erro ao salvar o procedimento.");
                     }).finally(() => {
                         // Libera o botão em QUALQUER cenário
                         this.$set(this.itens[index], 'salvando', false);
@@ -3198,24 +3026,16 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
             },
             removerReceita(item, receita, index) {
 
-                Swal.fire({
+                AppAlerts.confirm({
                     title: "Excluir receita?",
                     text: "Esta receita será removida permanentemente.",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonText: "Sim, excluir",
-                    cancelButtonText: "Cancelar"
+                    confirmButtonText: "Sim, excluir"
                 }).then(result => {
 
                     if (!result.isConfirmed)
                         return;
 
-                    Swal.fire({
-                        title: 'Removendo...',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        didOpen: () => Swal.showLoading()
-                    });
+                    AppAlerts.loading('Removendo...');
 
                     axios.delete(
                         "<?= $this->Url->build(['controller' => 'Receitas', 'action' => 'delete'], ['fullBase' => true]); ?>/" + receita.id + ".json",
@@ -3227,40 +3047,28 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     )
                         .then(response => {
 
-                            Swal.close();
+                            AppAlerts.close();
 
                             if (response.data && response.data.success) {
 
                                 item.receitas.splice(index, 1);
 
-                                Swal.fire({
-                                    title: "Removido!",
-                                    text: response.data.message,
-                                    icon: "success"
-                                });
+                                AppAlerts.success("Removido!", response.data.message);
 
                             } else {
 
-                                Swal.fire({
-                                    title: "Erro",
-                                    text: response.data.message || "Erro ao remover receita.",
-                                    icon: "warning"
-                                });
+                                AppAlerts.warning("Erro", response.data.message || "Erro ao remover receita.");
 
                             }
 
                         })
                         .catch((error) => {
 
-                            Swal.close();
+                            AppAlerts.close();
 
                             console.error(error);
 
-                            Swal.fire({
-                                title: "Erro",
-                                text: error.response?.data?.message || "Erro ao remover a receita.",
-                                icon: "error"
-                            });
+                            AppAlerts.error("Erro", error.response?.data?.message || "Erro ao remover a receita.");
 
                         });
 
@@ -3268,32 +3076,20 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
             },
             excluirDocumento(item, documento, index, tipo) {
                 if (documento.assinatura_prof_hash || documento.assinatura_hash) {
-                    Swal.fire({
-                        title: "Não permitido",
-                        text: "Este documento já foi assinado e não pode ser excluído.",
-                        icon: "error"
-                    });
+                    AppAlerts.error("Não permitido", "Este documento já foi assinado e não pode ser excluído.");
                     return;
                 }
 
-                Swal.fire({
+                AppAlerts.confirm({
                     title: "Excluir documento?",
                     text: "Este documento será removido permanentemente.",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonText: "Sim, excluir",
-                    cancelButtonText: "Cancelar"
+                    confirmButtonText: "Sim, excluir"
                 }).then(result => {
 
                     if (!result.isConfirmed)
                         return;
 
-                    Swal.fire({
-                        title: 'Removendo...',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        didOpen: () => Swal.showLoading()
-                    });
+                    AppAlerts.loading('Removendo...');
 
                     axios.delete(
                         "<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'delete'], ['fullBase' => true]); ?>/" + documento.id + ".json",
@@ -3305,7 +3101,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     )
                         .then(response => {
 
-                            Swal.close();
+                            AppAlerts.close();
 
                             if (response.data && response.data.success) {
 
@@ -3314,34 +3110,22 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                     item[tipo].splice(index, 1);
                                 }
 
-                                Swal.fire({
-                                    title: "Removido!",
-                                    text: response.data.message,
-                                    icon: "success"
-                                });
+                                AppAlerts.success("Removido!", response.data.message);
 
                             } else {
 
-                                Swal.fire({
-                                    title: "Erro",
-                                    text: response.data.message || "Erro ao remover documento.",
-                                    icon: "warning"
-                                });
+                                AppAlerts.warning("Erro", response.data.message || "Erro ao remover documento.");
 
                             }
 
                         })
                         .catch((error) => {
 
-                            Swal.close();
+                            AppAlerts.close();
 
                             console.error(error);
 
-                            Swal.fire({
-                                title: "Erro",
-                                text: error.response?.data?.message || "Erro ao remover o documento.",
-                                icon: "error"
-                            });
+                            AppAlerts.error("Erro", error.response?.data?.message || "Erro ao remover o documento.");
 
                         });
 
@@ -3352,12 +3136,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
                 if (item.aprovar == 1) {
 
-                    Swal.fire({
-                        title: "Excluir?",
-                        text: "Este procedimento já esta aprovado!",
-                        icon: "warning",
-                        confirmButtonText: "OK",
-                    });
+                    AppAlerts.warning("Não é possível excluir", "Este procedimento já esta aprovado!");
                     return;
                 }
 
@@ -3367,27 +3146,16 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     return;
                 }
 
-                Swal.fire({
+                AppAlerts.confirm({
                     title: "Excluir?",
                     text: "Deseja remover este procedimento?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonText: "Sim",
-                    cancelButtonText: "Cancelar"
+                    confirmButtonText: "Sim, quero excluir"
                 }).then(result => {
                     if (!result.isConfirmed)
                         return;
 
                     // Abre o alerta de carregamento
-                    Swal.fire({
-                        title: 'Removendo...',
-                        text: 'Aguarde enquanto o procedimento é removido',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
+                    AppAlerts.loading('Removendo...', 'Aguarde enquanto o procedimento é removido');
 
                     axios.delete(
                         "<?= $this->Url->build(['controller' => 'Procedimentos', 'action' => 'delete'], ['fullBase' => true]); ?>/" + item.id + '.json', {
@@ -3400,32 +3168,20 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     }
                     )
                         .then((response) => {
-                            Swal.close(); // fecha o loading
+                            AppAlerts.close(); // fecha o loading
                             if (response.data.success) {
                                 this.itens.splice(index, 1);
 
-                                Swal.fire({
-                                    title: 'Removido!',
-                                    text: response.data.message,
-                                    icon: 'success'
-                                });
+                                AppAlerts.success('Removido!', response.data.message);
                             } else {
-                                Swal.fire({
-                                    title: 'Atenção',
-                                    text: response.data.message,
-                                    icon: 'warning'
-                                });
+                                AppAlerts.warning('Atenção', response.data.message);
                             }
 
                         })
                         .catch(() => {
 
-                            Swal.close();
-                            Swal.fire({
-                                title: 'Erro',
-                                text: 'Erro ao remover o procedimento.',
-                                icon: 'error'
-                            });
+                            AppAlerts.close();
+                            AppAlerts.error('Erro', 'Erro ao remover o procedimento.');
                         });
 
                 });

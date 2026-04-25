@@ -87,6 +87,13 @@ class DocumentosController extends AppController
                     'download' => false,
                     'name' => "documento_assinado_{$documento->id}.pdf"
                 ])->withType('application/pdf');
+            } else {
+                return $this->response->withType('application/json')
+                    ->withStringBody(json_encode([
+                        'success' => false,
+                        'errors' => $documento->getErrors(),
+                        'message' => 'O arquivo não foi encontrado',
+                    ]));
             }
         }
 
@@ -137,9 +144,9 @@ class DocumentosController extends AppController
         $acessoVerificado = $this->request->getSession()->read($sessionKey);
 
         if (!$acessoVerificado) {
-            $pacienteNome    = $documento->procedimento->consulta->cliente->nome ?? '';
+            $pacienteNome = $documento->procedimento->consulta->cliente->nome ?? '';
             $estabelecimento = $documento->estabelecimento->nome_fantasia ?? $documento->estabelecimento->razao_social ?? '';
-            $docTitulo       = $documento->titulo ?? $documento->tipo ?? 'Documento';
+            $docTitulo = $documento->titulo ?? $documento->tipo ?? 'Documento';
             $this->set(compact('documento', 'pacienteNome', 'estabelecimento', 'docTitulo', 'codigo'));
             return $this->render('public_gate');
         }
@@ -174,7 +181,7 @@ class DocumentosController extends AppController
         }
 
         $dataNascimentoInformada = $this->request->getData('data_nascimento'); // formato: YYYY-MM-DD (input type=date)
-        $dataNascimentoPaciente  = $documento->procedimento->consulta->cliente->data_nascimento ?? null;
+        $dataNascimentoPaciente = $documento->procedimento->consulta->cliente->data_nascimento ?? null;
 
         if (!$dataNascimentoPaciente || !$dataNascimentoInformada) {
             return $this->_jsonResponse(false, 'Não foi possível verificar os dados. Tente novamente.');
@@ -187,7 +194,7 @@ class DocumentosController extends AppController
         if (!$informada || $informada->format('Y-m-d') !== $cadastrada->format('Y-m-d')) {
             // Log de tentativa falha (auditoria de segurança)
             $this->_log($documento->id, 'acesso_negado', null, null, $this->_getRealIp(), [
-                'motivo'     => 'Data de nascimento incorreta',
+                'motivo' => 'Data de nascimento incorreta',
                 'user_agent' => $this->request->getHeaderLine('User-Agent'),
             ]);
             return $this->_jsonResponse(false, 'Data de nascimento incorreta. Verifique e tente novamente.');
@@ -219,7 +226,7 @@ class DocumentosController extends AppController
 
         $ip = $this->request->getData('ip_publico') ?: $this->_getRealIp();
         $geo = $this->request->getData('geolocalizacao') ?? 'Indisponível';
-        
+
         $detalhes = [
             'user_agent' => $this->request->getHeaderLine('User-Agent'),
             'ip' => $ip,
@@ -329,8 +336,10 @@ class DocumentosController extends AppController
             $pacienteNomeStr = null;
             if (!empty($documento->assinatura_hash)) {
                 $details = $documento->assinatura_details;
-                if (is_string($details)) { $details = json_decode($details, true); }
-                
+                if (is_string($details)) {
+                    $details = json_decode($details, true);
+                }
+
                 if (!empty($details['responsavel_legal']['nome'])) {
                     $pacienteNomeStr = $details['responsavel_legal']['nome'];
                     if (!empty($details['responsavel_legal']['cpf'])) {
@@ -363,12 +372,14 @@ class DocumentosController extends AppController
             // Se o paciente já assinou, precisamos reinserir a página de protocolo
             if (!empty($documento->assinatura_hash) && !empty($documento->assinatura_details)) {
                 $details = $documento->assinatura_details;
-                if (is_string($details)) { $details = json_decode($details, true); }
+                if (is_string($details)) {
+                    $details = json_decode($details, true);
+                }
                 $ip = $documento->assinatura_ip ?? ($details['ip'] ?? '');
                 $geo = $details['geolocalizacao'] ?? 'Indisponível';
                 $htmlProtocolo = $this->_buildProtocoloHtml(
-                    $documento, 
-                    '', 
+                    $documento,
+                    '',
                     $details['assinatura_b64'] ?? '',
                     $ip,
                     $geo,
@@ -378,7 +389,6 @@ class DocumentosController extends AppController
 
                 $mPdf->AddPage('P', 'A4');
                 $mPdf->SetHTMLHeader('');
-                $mPdf->SetHTMLFooter('');
                 $mPdf->WriteHTML($htmlProtocolo, HTMLParserMode::HTML_BODY);
             }
 
@@ -524,7 +534,7 @@ class DocumentosController extends AppController
 
             if ($this->Documentos->save($documento)) {
                 $this->_log($documento->id, 'assinatura_prof_concluida', $hashAntes, $hashDepois, $this->_getRealIp(), ['p7s' => $p7sPath], $this->Authentication->getIdentity()->id ?? null);
-                
+
                 // Remove o arquivo .p7s residual pois a assinatura já está embutida no PDF
                 @unlink($p7sPath);
 
@@ -699,6 +709,8 @@ class DocumentosController extends AppController
 
     public function validar($codigo = null)
     {
+        $this->viewBuilder()->setLayout('assinar');
+
         $documento = $this->Documentos->find()
             ->where(['codigo_validacao' => $codigo])
             ->contain(['Procedimentos.Consultas.Clientes', 'Estabelecimentos', 'Profissionais'])
@@ -745,11 +757,11 @@ class DocumentosController extends AppController
      * Cria e configura uma instância mPDF com cabeçalho/rodapé da clínica.
      */
     private function _criarMpdf(
-        Estabelecimento $est, 
-        string $urlValidacao, 
-        string $qrBase64, 
-        string $tituloDoc, 
-        ?string $assinaturaPaciente = null, 
+        Estabelecimento $est,
+        string $urlValidacao,
+        string $qrBase64,
+        string $tituloDoc,
+        ?string $assinaturaPaciente = null,
         ?string $assinaturaProf = null,
         ?string $dataPac = null,
         ?string $dataProf = null,
@@ -760,7 +772,7 @@ class DocumentosController extends AppController
             'format' => 'A4',
             'setAutoTopMargin' => 'stretch',
             'autoMarginPadding' => 2,
-            'margin_bottom' => 35,
+            'margin_bottom' => 45,
             'orientation' => 'P',
         ]);
 
@@ -800,10 +812,10 @@ class DocumentosController extends AppController
 
         // ── Selos de assinatura (Imagens SVG) ──────────────────────────────────
         $imgDir = ROOT . DS . 'storage' . DS . 'imagens' . DS;
-        
+
         $seloQualContent = @file_get_contents($imgDir . 'selo-qualificada.png');
         $seloQualBase64 = $seloQualContent !== false ? base64_encode($seloQualContent) : null;
-        
+
         $seloAvContent = @file_get_contents($imgDir . 'selo-avancada.png');
         $seloAvBase64 = $seloAvContent !== false ? base64_encode($seloAvContent) : null;
 
@@ -812,14 +824,14 @@ class DocumentosController extends AppController
         // 1. Selo Profissional (Qualificada)
         if ($assinaturaProf && $seloQualBase64) {
             $dataAssinatura = $dataProf ?: date('d/m/Y H:i');
-            $seloHtml .= '<table style="border-collapse:collapse;margin-top:2px;border:1px solid #cbd5e1;width:100%;background:#f8fafc;">'
+            $seloHtml .= '<table style="border-collapse:collapse;margin-top:2px;border:0;width:100%;">'
                 . '<tr>'
-                . '<td style="padding:2px 5px;width:65px;vertical-align:middle;">'
-                . '<img src="data:image/png;base64,' . $seloQualBase64 . '" height="32" style="display:block;">'
+                . '<td style="padding:1px 0;width:65px;vertical-align:middle;border:0;">'
+                . '<img src="data:image/png;base64,' . $seloQualBase64 . '" height="30" style="display:block;border:0;">'
                 . '</td>'
-                . '<td style="padding:2px 5px;font-size:5.5pt;color:#334155;vertical-align:middle;">'
-                . 'Documento assinado digitalmente por <b>' . h($assinaturaProf) . '</b> em ' . $dataAssinatura . ', conforme MP nº 2.200-2/2001 e Lei 14.063/20.<br>'
-                . 'A assinatura pode ser validada em: <b>https://validar.iti.gov.br</b>'
+                . '<td style="padding:1px 5px;font-size:5.5pt;color:#334155;vertical-align:middle;border:0;line-height:1.1;">'
+                . 'Documento assinado digitalmente por <b>' . h($assinaturaProf) . '</b> em ' . $dataAssinatura . ', conforme MP nº 2.200-2/2001 e Lei 14.063/20. A assinatura pode ser validada em: <b>https://validar.iti.gov.br</b>'
+
                 . '</td>'
                 . '</tr></table>';
         }
@@ -827,12 +839,12 @@ class DocumentosController extends AppController
         // 2. Selo Paciente (Avançada)
         if ($assinaturaPaciente && $seloAvBase64) {
             $dataAssinaturaPac = $dataPac ?: date('d/m/Y H:i');
-            $seloHtml .= '<table style="border-collapse:collapse;margin-top:2px;border:1px solid #cbd5e1;width:100%;background:#f8fafc;">'
+            $seloHtml .= '<table style="border-collapse:collapse;margin-top:2px;border:0;width:100%;">'
                 . '<tr>'
-                . '<td style="padding:2px 5px;width:65px;vertical-align:middle;">'
-                . '<img src="data:image/png;base64,' . $seloAvBase64 . '" height="32" style="display:block;">'
+                . '<td style="padding:1px 0;width:65px;vertical-align:middle;border:0;">'
+                . '<img src="data:image/png;base64,' . $seloAvBase64 . '" height="30" style="display:block;border:0;">'
                 . '</td>'
-                . '<td style="padding:2px 5px;font-size:5.5pt;color:#334155;vertical-align:middle;">'
+                . '<td style="padding:1px 5px;font-size:5.5pt;color:#334155;vertical-align:middle;border:0;line-height:1.1;">'
                 . 'Documento assinado digitalmente por: <b>' . h($assinaturaPaciente) . '</b> em ' . $dataAssinaturaPac . ', conforme MP nº 2.200-2/2001 e Lei 14.063/20.'
                 . '</td>'
                 . '</tr></table>';
@@ -845,20 +857,23 @@ class DocumentosController extends AppController
         $dataGeracaoStr = $dataGeracao ?: date('d/m/Y H:i');
 
         $mPdf->SetHTMLFooter(
-            '<table width="100%" style="font-size:7pt;border:0;">'
+            '<table width="100%" style="font-size:7pt;border:0;border-collapse:collapse;">'
             . '<tr>'
-            . '<td width="70%" style="text-align:left;vertical-align:bottom;">'
-            . $footer
-            . '<br><br>'
-            . $seloHtml
-            . '<span style="font-size:6.5pt;">Acesse para validar: ' . $urlValidacao . '</span><br>'
-            . '<span style="font-size:6pt;color:#64748b;">Gerado eletronicamente em: ' . $dataGeracaoStr . '</span>'
-            . '<br><br><br><br>'
+            . '<td colspan="2" style="color:#64748b;font-size:6.5pt;padding-bottom:4px;border:0;">' . $footer . '</td>'
+            . '</tr>'
+            . '<tr>'
+            . '<td width="80%" style="text-align:left;vertical-align:bottom;border:0;padding:0;">' . $seloHtml . '</td>'
+            . '<td width="20%" style="text-align:right;vertical-align:bottom;border:0;padding:0;">'
+            . '<img src="data:image/png;base64,' . $qrBase64 . '" width="60" style="border:0;display:block;margin-left:auto;">'
             . '</td>'
-            . '<td width="30%" style="text-align:right;vertical-align:bottom;">'
-            . '<img src="data:image/png;base64,' . $qrBase64 . '" width="70"><br>'
-            . '<span style="font-size:6pt;display:block;margin-top:3px;">Validar documento</span>'
-            . '<br><br><br><br>'
+            . '</tr>'
+            . '<tr>'
+            . '<td style="text-align:left;vertical-align:top;border:0;padding-top:0px;line-height:1.0;">'
+            . '<span style="font-size:6pt;">Acesse para validar: <b>' . $urlValidacao . '</b></span><br>'
+            . '<span style="font-size:5.5pt;color:#94a3b8;">Gerado eletronicamente em: ' . $dataGeracaoStr . '</span>'
+            . '</td>'
+            . '<td style="text-align:right;vertical-align:top;border:0;padding-top:0px;">'
+            . '<span style="font-size:5pt;color:#64748b;font-weight:normal;">Validar documento</span>'
             . '</td>'
             . '</tr></table>'
         );
@@ -933,7 +948,7 @@ class DocumentosController extends AppController
         }
 
         try {
-            [$hashFinal, $selfieRelPath] = $this->_carimboPDF($documento, $selfieB64, $assinaturaB64, $ip, $geo, $responsavel);
+            [$hashFinal, $selfieRelPath, $hashOriginal] = $this->_carimboPDF($documento, $selfieB64, $assinaturaB64, $ip, $geo, $responsavel);
 
             $documento->assinatura_hash = $hashFinal;
             $documento->assinatura_ip = $ip;
@@ -947,6 +962,7 @@ class DocumentosController extends AppController
                 'data_hora' => date('d/m/Y H:i:s'),
                 'timestamp' => time(),
                 'assinatura_b64' => $assinaturaB64,
+                'hash_original' => $hashOriginal,
             ];
             if (!empty($responsavel['eh_responsavel'])) {
                 $detalhes['responsavel_legal'] = [
@@ -1004,10 +1020,10 @@ class DocumentosController extends AppController
 
         // Datas reais de assinatura
         $dataAgora = date('d/m/Y \à\s H:i:s') . " (Timestamp: " . time() . ")";
-        
+
         // Preserva a data da assinatura do paciente se já existir
         $dataPac = $documento->assinatura_data ? $documento->assinatura_data->format('d/m/Y H:i') : date('d/m/Y H:i');
-        
+
         $dataProf = $documento->assinatura_prof_data ? $documento->assinatura_prof_data->format('d/m/Y H:i') : null;
         $dataGeracao = $documento->created ? $documento->created->format('d/m/Y H:i') : null;
 
@@ -1050,7 +1066,6 @@ class DocumentosController extends AppController
         // 6. Adiciona página de protocolo e limpa cabeçalho/rodapé APENAS para ela
         $mPdf->AddPage('P', 'A4');
         $mPdf->SetHTMLHeader('');
-        $mPdf->SetHTMLFooter('');
         $mPdf->WriteHTML($htmlProtocolo, HTMLParserMode::HTML_BODY);
 
         // 7. Salvar substituindo o original
@@ -1063,7 +1078,7 @@ class DocumentosController extends AppController
         $procedimentoId = $documento->procedimento_id;
         $selfieRelPath = 'consultas' . DIRECTORY_SEPARATOR . $consultaId . DIRECTORY_SEPARATOR . $procedimentoId . DIRECTORY_SEPARATOR . $selfieFile;
 
-        return [$hashFinal, $selfieRelPath];
+        return [$hashFinal, $selfieRelPath, $hashOriginal];
     }
 
     /**
@@ -1079,6 +1094,12 @@ class DocumentosController extends AppController
         ?array $responsavel = null,
         ?string $dataHoraAgora = null
     ): string {
+        $details = $documento->assinatura_details;
+        if (is_string($details)) {
+            $details = json_decode($details, true);
+        }
+        $details = $details ?: [];
+
         $pacienteNome = h($documento->procedimento->consulta->cliente->nome ?? '-');
         $pacienteCpfRaw = $documento->procedimento->consulta->cliente->documento ?? '';
         $pacienteCpf = 'Não informado';
@@ -1134,9 +1155,7 @@ class DocumentosController extends AppController
         }
 
         // Tenta carregar assinatura do banco se o b64 vier vazio
-        if (empty($assinaturaB64) && !empty($documento->assinatura_details)) {
-            $details = $documento->assinatura_details;
-            if (is_string($details)) { $details = json_decode($details, true); }
+        if (empty($assinaturaB64) && !empty($details)) {
             $assinaturaB64 = $details['assinatura_b64'] ?? '';
         }
 
@@ -1157,7 +1176,7 @@ class DocumentosController extends AppController
 <div style="font-family:Helvetica,Arial,sans-serif;font-size:9pt;color:#1e293b;">
 
   <!-- Cabeçalho azul -->
-  <div style="background:#2563eb;color:#fff;text-align:center;padding:10px 16px;border-radius:4px 4px 0 0;">
+  <div style="background:#001740;color:#fff;text-align:center;padding:10px 16px;border-radius:4px 4px 0 0;">
     <div style="font-size:13pt;font-weight:bold;letter-spacing:.5px;">PROTOCOLO DE ASSINATURA ELETRÔNICA</div>
     <div style="font-size:7.5pt;opacity:.85;margin-top:2px;">Validade jurídica conforme Art. 10 da MP 2.200-2/2001 e Lei 14.063/2020</div>
   </div>
@@ -1183,7 +1202,7 @@ class DocumentosController extends AppController
     </tr>
     <tr>
       <td style="background:#f1f5f9;font-weight:bold;border:1px solid #e2e8f0;padding:5px 7px;">Geolocalização</td>
-      <td style="border:1px solid #e2e8f0;padding:5px 7px;color:#2563eb;font-weight:bold;">$geo</td>
+      <td style="border:1px solid #e2e8f0;padding:5px 7px;color:#001740;font-weight:bold;">$geo</td>
     </tr>
     <tr>
       <td style="background:#f1f5f9;font-weight:bold;border:1px solid #e2e8f0;padding:5px 7px;">Código de Validação</td>
@@ -1195,12 +1214,12 @@ class DocumentosController extends AppController
   <table style="width:100%;border-collapse:collapse;margin-top:12px;">
     <tr>
       <td style="width:48%;border:1px solid #e2e8f0;text-align:center;vertical-align:top;padding:12px;background:#f8fafc;">
-        <span style="font-weight:bold;font-size:9pt;color:#2563eb;">📷 Selfie do Signatário</span><br><br>
+        <span style="font-weight:bold;font-size:9pt;color:#2563eb;">Selfie do Signatário</span><br><br>
         $selfieImgTag
       </td>
       <td style="width:4%;"></td>
       <td style="width:48%;border:1px solid #e2e8f0;text-align:center;vertical-align:top;padding:12px;background:#f8fafc;">
-        <span style="font-weight:bold;font-size:9pt;color:#2563eb;">✍️ Assinatura Manuscrita</span><br><br>
+        <span style="font-weight:bold;font-size:9pt;color:#2563eb;">Assinatura Manuscrita</span><br><br>
         $assinaturaImgTag
       </td>
     </tr>
@@ -1278,7 +1297,7 @@ HTML;
         if (empty($ip)) {
             $ip = $this->request->clientIp();
         }
-        
+
         // Pega o primeiro IP caso venha uma lista (ex: IP_CLIENTE, IP_PROXY1, IP_PROXY2)
         $ipParts = explode(',', $ip);
         return trim($ipParts[0] ?? '0.0.0.0');
