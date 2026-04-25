@@ -32,6 +32,7 @@ class ConsultasController extends AppController
 
         $query = $this->Consultas->find()
             ->contain(['Estabelecimentos', 'Clientes'])
+            ->order(['Consultas.created DESC'])
             ->where(['Consultas.estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')]);
 
         $consultas = $this->paginate($query);
@@ -40,9 +41,11 @@ class ConsultasController extends AppController
 
         $profissionais = $profissionaisTable->find('list')->find('ativar')->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])->all();
 
+        $clientes = $this->Consultas->Clientes->find('list', conditions:['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])->all();
+
         $title  =   'Minhas consultas';
 
-        $this->set(compact('consulta','consultas','title','profissionais'));
+        $this->set(compact('consulta','consultas','title','profissionais','clientes'));
 
     }
 
