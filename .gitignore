@@ -25,6 +25,7 @@ storage/consultas/*
 storage/anexos/*
 !storage/anexos/.gitkeep
 
+
 webroot/img/profile/*
 !webroot/img/profile/.gitkeep
 
@@ -44,3 +45,4 @@ config/app.php
 config/app.php.PGBKP
 *.BKP
 config/app_local.php
+.idea/
