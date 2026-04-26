@@ -18,7 +18,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     <?= $this->Form->control('cliente_id', ['label' => 'Cliente', 'class' => 'form-control', 'options' => $clientes]); ?>
                 </div>
             </div>
-
+            </form>
             <div class="row">
                 <!-- Item original (fixo) - MANTENHA COMO ESTÁ -->
                 <!-- ITENS DINÂMICOS ADICIONADOS VIA VUE -->
@@ -40,7 +40,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
                                     <?= $this->Html->link('<iconify-icon icon="solar:medical-kit-bold-duotone" class="fs-9 aside-icon"></iconify-icon>', ['#'], ['class' => 'sidebar-link primary-hover-bg', 'aria-expanded' => 'false', 'alt' => 'Documentos', 'title' => 'Documentos', 'escape' => false, 'v-show' => 'item.id && item.aprovar == 1', '@click.prevent' => 'abrirModalDocumento(item)']) ?>
 
-                                    <?= $this->Html->link('<iconify-icon icon="solar:microphone-2-bold-duotone" class="fs-9 aside-icon"></iconify-icon>', ['#'], ['class' => 'sidebar-link primary-hover-bg', 'aria-expanded' => 'false', 'alt' => 'Gravar', 'title' => 'Gravar', 'escape' => false, 'v-show' => 'item.id && item.aprovar == 1']) ?>
+                                    <?php  // $this->Html->link('<iconify-icon icon="solar:microphone-2-bold-duotone" class="fs-9 aside-icon"></iconify-icon>', ['#'], ['class' => 'sidebar-link primary-hover-bg', 'aria-expanded' => 'false', 'alt' => 'Gravar', 'title' => 'Gravar', 'escape' => false, 'v-show' => 'item.id && item.aprovar == 1']) ?>
                                     <a href="#" class="sidebar-link primary-hover-bg" @click.prevent="abrirUpload(item)"
                                         v-show="item.id && item.aprovar == 1" title="Enviar arquivo"><iconify-icon
                                             icon="solar:cloud-upload-bold-duotone"
@@ -1450,20 +1450,33 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                         <div class="col-md-4 mb-0">
                             <h4>Modelos de Anamnese</h4>
                             <div class="list-group">
-                                <a href="#" v-for="modelo in modelosAnamnese" :key="modelo.id"
-                                    class="list-group-item d-flex justify-content-between align-items-center adicionarModelo p-3"
-                                    :data-id="modelo.id" :data-tipo="'anamnese'" :data-cabecalho="modelo.cabecalho"
-                                    :data-titulo="modelo.titulo" :data-descricao="encodeURIComponent(modelo.descricao)"
-                                    @click.prevent>
+                                <a href="#" v-for="modelo in modelosAnamnese" :key="modelo.id" class="list-group-item d-flex justify-content-between align-items-center adicionarModelo p-3" :data-id="modelo.id" :data-tipo="'anamnese'":data-cabecalho="modelo.cabecalho" :data-titulo="modelo.titulo" :data-descricao="encodeURIComponent(modelo.descricao)"@click.prevent>
 
-                                    <span>{{ modelo.nome }}</span>
+    <span>{{ modelo.nome }}</span>
 
-                                    <button class="btn btn-sm btn-excluir-modelo p-0" v-show="modelo.estabelecimento_id"
-                                        @click.stop="excluirModelo(modelo, 'anamnese')">
-                                        <iconify-icon icon="solar:trash-bin-minimalistic-bold-duotone"
-                                            class="fs-7 aside-icon"></iconify-icon>
-                                    </button>
-                                </a>
+    <!-- DROPDOWN -->
+    <div class="dropdown" v-show="modelo.estabelecimento_id">
+
+        <button class="btn btn-sm bg-transparent text-primary d-inline-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" @click.stop>
+<i class="fas fa-bars"></i>
+            
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+                <button class="dropdown-item" @click.stop="editarModelo(modelo, 'anamnese')"> <iconify-icon icon="solar:pen-bold-duotone" class="fs-4 aside-icon"></iconify-icon> Editar</button>
+            </li>
+
+            <li>
+                <button class="dropdown-item text-danger" @click.stop="excluirModelo(modelo, 'anamnese')">
+                    <iconify-icon icon="solar:trash-bin-minimalistic-bold-duotone" class="fs-4 aside-icon"></iconify-icon> Excluir
+                </button>
+            </li>
+
+        </ul>
+    </div>
+
+</a>
                             </div>
                         </div>
                     </div>
@@ -1506,20 +1519,34 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                         <div class="col-md-4 mb-0">
                             <h4>Modelos de Laudos</h4>
                             <div class="list-group">
-                                <a href="#" v-for="modelo in modelosLaudo" :key="modelo.id"
-                                    class="list-group-item d-flex justify-content-between align-items-center adicionarModelo p-3"
-                                    :data-id="modelo.id" :data-tipo="'laudo'" :data-cabecalho="modelo.cabecalho"
-                                    :data-cabecalho="modelo.cabecalho" :data-titulo="modelo.titulo"
-                                    :data-descricao="encodeURIComponent(modelo.descricao)" @click.prevent>
+                                <a href="#" v-for="modelo in modelosLaudo" :key="modelo.id" class="list-group-item d-flex justify-content-between align-items-center adicionarModelo p-3" :data-id="modelo.id" :data-tipo="'laudo'":data-cabecalho="modelo.cabecalho" :data-titulo="modelo.titulo" :data-descricao="encodeURIComponent(modelo.descricao)"@click.prevent>
 
-                                    <span>{{ modelo.nome }}</span>
+    <span>{{ modelo.nome }}</span>
 
-                                    <button class="btn btn-sm btn-excluir-modelo p-0" v-show="modelo.estabelecimento_id"
-                                        @click.stop="excluirModelo(modelo, 'laudo')">
-                                        <iconify-icon icon="solar:trash-bin-minimalistic-bold-duotone"
-                                            class="fs-7 aside-icon"></iconify-icon>
-                                    </button>
-                                </a>
+    <!-- DROPDOWN -->
+    <div class="dropdown" v-show="modelo.estabelecimento_id">
+
+        <button class="btn btn-sm bg-transparent text-primary d-inline-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" @click.stop>
+<i class="fas fa-bars"></i>
+            
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+                <button class="dropdown-item" @click.stop="editarModelo(modelo, 'laudo')"> <iconify-icon icon="solar:pen-bold-duotone" class="fs-4 aside-icon"></iconify-icon> Editar</button>
+            </li>
+
+            <li>
+                <button class="dropdown-item text-danger" @click.stop="excluirModelo(modelo, 'laudo')">
+                    <iconify-icon icon="solar:trash-bin-minimalistic-bold-duotone" class="fs-4 aside-icon"></iconify-icon> Excluir
+                </button>
+            </li>
+
+        </ul>
+    </div>
+</a>
+
+
                             </div>
                         </div>
                     </div>
@@ -1562,18 +1589,32 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                         <div class="col-md-4 mb-0">
                             <h4>Modelos de Documentos</h4>
                             <div class="list-group">
-                                <a href="#" v-for="modelo in modelosDocumento" :key="modelo.id"
-                                    class="list-group-item d-flex justify-content-between align-items-center adicionarModelo p-3"
-                                    :data-id="modelo.id" :data-tipo="'documento'" :data-cabecalho="modelo.cabecalho"
-                                    :data-titulo="modelo.titulo" :data-descricao="encodeURIComponent(modelo.descricao)"
-                                    @click.prevent>
-                                    <span>{{ modelo.nome }}</span>
-                                    <button class="btn btn-sm btn-excluir-modelo p-0" v-show="modelo.estabelecimento_id"
-                                        @click.stop="excluirModelo(modelo, 'documento')">
-                                        <iconify-icon icon="solar:trash-bin-minimalistic-bold-duotone"
-                                            class="fs-7 aside-icon"></iconify-icon>
-                                    </button>
-                                </a>
+                            <a href="#" v-for="modelo in modelosDocumento" :key="modelo.id" class="list-group-item d-flex justify-content-between align-items-center adicionarModelo p-3" :data-id="modelo.id" :data-tipo="'documento'":data-cabecalho="modelo.cabecalho" :data-titulo="modelo.titulo" :data-descricao="encodeURIComponent(modelo.descricao)"@click.prevent>
+
+    <span>{{ modelo.nome }}</span>
+
+    <!-- DROPDOWN -->
+    <div class="dropdown" v-show="modelo.estabelecimento_id">
+
+        <button class="btn btn-sm bg-transparent text-primary d-inline-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" @click.stop>
+<i class="fas fa-bars"></i>
+            
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+                <button class="dropdown-item" @click.stop="editarModelo(modelo, 'documento')"> <iconify-icon icon="solar:pen-bold-duotone" class="fs-4 aside-icon"></iconify-icon> Editar</button>
+            </li>
+
+            <li>
+                <button class="dropdown-item text-danger" @click.stop="excluirModelo(modelo, 'documento')">
+                    <iconify-icon icon="solar:trash-bin-minimalistic-bold-duotone" class="fs-4 aside-icon"></iconify-icon> Excluir
+                </button>
+            </li>
+
+        </ul>
+    </div>
+</a>
                             </div>
                         </div>
 
@@ -1775,10 +1816,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
 <script src="https://unpkg.com/vue@2.7.16/dist/vue.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://cdn.tiny.cloud/1/u5fmbus2y1uaztd68og30b8f49lcwdm3j7n444vah8x1pg42/tinymce/8/tinymce.min.js"
-    referrerpolicy="origin" crossorigin="anonymous"></script>
+<?= $this->Html->script(['vue/v-money.2.x.js', 'plugins/bootstrap-select.js', 'vue/select2-vue.js', 'vue/swal-utils.js','tinymce/tinymce.min.js']); ?>
+<?= $this->Html->css(['plugins/bootstrap-select.css']); ?>
+
 <script>
     tinymce.init({
+        license_key: 'gpl',
         selector: '#texto-anotacao',
         menubar: false,
         plugins: 'anchor autolink charmap searchreplace visualblocks wordcount lists',
@@ -1792,6 +1835,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
     });
 
     tinymce.init({
+        license_key: 'gpl',
         selector: '#texto-anamnese',
         menubar: false,
         plugins: 'anchor autolink charmap searchreplace visualblocks wordcount lists',
@@ -1804,6 +1848,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
     });
 
     tinymce.init({
+        license_key: 'gpl',
         selector: '#texto-receita',
         menubar: false,
         plugins: 'anchor autolink charmap searchreplace visualblocks wordcount lists',
@@ -1816,6 +1861,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
     });
 
     tinymce.init({
+        license_key: 'gpl',
         selector: '#texto-laudo',
         menubar: false,
         plugins: 'anchor autolink charmap searchreplace visualblocks wordcount lists',
@@ -1829,6 +1875,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
     });
 
     tinymce.init({
+        license_key: 'gpl',
         selector: '#texto-documento',
         menubar: false,
         plugins: 'anchor autolink charmap searchreplace visualblocks wordcount lists',
@@ -1843,8 +1890,6 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
 </script>
 
-<?= $this->Html->script(['vue/v-money.2.x.js', 'plugins/bootstrap-select.js', 'vue/select2-vue.js', 'vue/swal-utils.js']); ?>
-<?= $this->Html->css(['plugins/bootstrap-select.css']); ?>
 <style>
     .accordion-body {
         padding: var(--bs-accordion-body-padding-y) 1rem;
@@ -1889,6 +1934,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                 itens: <?= json_encode($consulta->procedimentos); ?>,
                 servicosRaw: <?= json_encode($servicos); ?>,
                 modelo: {
+                    id: null,
                     tipo: null,
                     titulo: '',
                     nome: '',
@@ -2069,9 +2115,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                 // preenche dados
                 this.modelo.tipo = tipo;
                 this.modelo.descricao = item.texto;
-                this.modelo.titulo = '';
-                this.modelo.cabecalho = false;
-                this.modelo.nome = '';
+
+                if (!this.modelo.id) {
+                    this.modelo.titulo = '';
+                    this.modelo.cabecalho = false;
+                    this.modelo.nome = '';
+                }
 
                 // abre modal
                 new bootstrap.Modal(document.getElementById('bs-modal-modelo')).show();
@@ -2125,6 +2174,37 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                         console.error('Erro ao imprimir:', error);
                         AppAlerts.error('Erro', 'Ocorreu uma falha na comunicação com o servidor.');
                     });
+            }
+            ,editarModelo(modeloSelecionado, tipo) {
+
+                // mantém isso
+                this.modelo = {
+                    id: modeloSelecionado.id,
+                    tipo: tipo,
+                    titulo: modeloSelecionado.titulo || '',
+                    nome: modeloSelecionado.nome || '',
+                    descricao: modeloSelecionado.descricao || '',
+                    cabecalho: modeloSelecionado.cabecalho == 1,
+                    exigir_assinatura_paciente: modeloSelecionado.exigir_assinatura_paciente == 1,
+                    exigir_assinatura_profissional: modeloSelecionado.exigir_assinatura_profissional == 1,
+                    salvando: false
+                };
+
+                const vm = appConsulta;
+
+                vm.selecionados[tipo] = [{
+                    id: modeloSelecionado.id,
+                    descricao: modeloSelecionado.descricao,
+                    titulo: modeloSelecionado.titulo,
+                    cabecalho: modeloSelecionado.cabecalho
+                }];
+
+                atualizarEditor(tipo, vm);
+
+                // mantém título igual ao clique normal
+                vm[tipo].titulo = modeloSelecionado.titulo;
+                vm[tipo].cabecalho = modeloSelecionado.cabecalho;
+
             },
             salvarModelo() {
 

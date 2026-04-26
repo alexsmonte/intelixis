@@ -50,7 +50,7 @@ $statusOrcamento    =   ['aberto' => 'Aberto', 'NAprovado' => 'Não aprovado','a
             </div>
 
             <!-- TABELA -->
-            <div class="table-responsive mb-4 border rounded-1">
+            <div class="table-responsive mb-4 border rounded-1" style="min-height: 250px;">
                 <table class="table table-striped text-nowrap mb-0 align-middle">
                     <thead>
                         <tr>

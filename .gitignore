@@ -3,6 +3,7 @@
 /vendor/*
 /config/app.php
 
+/tmp/*
 /tmp/cache/models/*
 !/tmp/cache/models/empty
 /tmp/cache/persistent/*
@@ -17,6 +18,7 @@
 /logs/*
 !/logs/empty
 
+/storage/*
 storage/consultas/*
 !storage/.gitkeep
 !storage/anexos/
@@ -41,3 +43,4 @@ webroot/img/logo/*
 config/app.php
 config/app.php.PGBKP
 *.BKP
+config/app_local.php
