@@ -163,6 +163,7 @@ class ConsultasController extends AppController
             ->all();
 
             $categoriasPadrao = [
+                'personalizado',
                 'analgesico',
                 'antibiotico',
                 'antiinflamatorio',
@@ -174,7 +175,8 @@ class ConsultasController extends AppController
                 'gastrointestinal',
                 'respiratorio',
                 'topico',
-                'personalizado'
+                'Uso restrito'
+                
             ];
 
             $agrupados = [];
