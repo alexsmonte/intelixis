@@ -18,6 +18,7 @@
 /logs/*
 !/logs/empty
 
+/storage/
 /storage/*
 storage/consultas/*
 !storage/.gitkeep
