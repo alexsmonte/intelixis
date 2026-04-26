@@ -1023,7 +1023,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
                                                 <tbody v-else>
                                                     <tr>
-                                                        <td colspan="3" class="text-center text-muted">
+                                                        <td colspan="6" class="text-center text-muted">
                                                             Nenhum registro
                                                         </td>
                                                     </tr>
