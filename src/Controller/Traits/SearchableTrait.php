@@ -407,7 +407,13 @@ trait SearchableTrait
         }
 
         /* CAMPOS LOCAIS */
-        if ($operator === 'LIKE') {
+        if ($operator === 'IS NULL') {
+            $extra["$field IS"] = null;
+        }
+        elseif ($operator === 'IS NOT NULL') {
+            $extra["$field IS NOT"] = null;
+        }
+        elseif ($operator === 'LIKE') {
             $extra["$field LIKE"] = "%$value%";
         }
         elseif ($operator === 'IN') {
@@ -525,6 +531,7 @@ trait SearchableTrait
                 'pageCount' => $pageCount
             ]
         ]));
+
 }
 
 
