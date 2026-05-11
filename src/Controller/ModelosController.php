@@ -62,7 +62,7 @@ class ModelosController extends AppController
         } 
 
         $query = $this->Modelos->find()
-            ->select(['id','estabelecimento_id' ,'nome', 'titulo','cabecalho','descricao', 'tipo'])
+            ->select(['id','estabelecimento_id' ,'nome', 'titulo','cabecalho','descricao', 'tipo','exigir_assinatura_profissional','exigir_assinatura_paciente'])
             ->where([
                 'tipo' => $tipo,
                 'OR' => [

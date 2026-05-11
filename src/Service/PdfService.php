@@ -3,7 +3,7 @@
  * Service para geração de PDF utilizando a biblioteca mPDF
  * 
  * @package App\Service
- * @author Seu Nome
+ * @author Alex Monte
  * @version 1.0.0
  * 
  * ============================================================================
@@ -280,22 +280,68 @@ class PdfService
 {
     protected $defaultConfig = [
         'format' => 'A4',
-        'margin_top' => 40,
+        'margin_top' => 20,
+        'margin_bottom' => 45,
         'setAutoTopMargin' => 'stretch',
-        'autoMarginPadding' => 5
+        'autoMarginPadding' => 5,
+        'orientation' => 'P',
+        'tempDir' => ROOT . DS . 'tmp',
     ];
+
+    protected $mpdfConfig = [];
+
+    /**
+     * Construtor
+     * 
+     * @param array $mpdfConfig Configurações personalizadas para o mPDF
+     * 
+     * Exemplo:
+     * $pdfService = new PdfService([
+     *     'margin_top' => 20,
+     *     'margin_bottom' => 30,
+     *     'margin_left' => 15,
+     *     'margin_right' => 15
+     * ]);
+     */
+    public function __construct(array $mpdfConfig = [])
+    {
+        // Mescla as configurações padrão com as personalizadas
+        $this->mpdfConfig = array_merge($this->defaultConfig, $mpdfConfig);
+    }
+
+    /**
+     * Atualiza a configuração após instanciar o serviço
+     * 
+     * @param array $mpdfConfig
+     * @return self
+     */
+    public function setConfig(array $mpdfConfig): self
+    {
+        $this->mpdfConfig = array_merge($this->mpdfConfig, $mpdfConfig);
+        return $this;
+    }
+
+    /**
+     * Retorna a configuração atual
+     * 
+     * @return array
+     */
+    public function getConfig(): array
+    {
+        return $this->mpdfConfig;
+    }
 
     public function gerar(array $config)
     {
         $config = array_merge([
-            'template' => 'default', // 'default' é o padrão
+            'template' => 'default',
             'dados' => [],
             'header' => null,
             'footer' => null,
             'path' => null,
             'nome' => 'documento',
             'salvar' => false,
-            'tipo' => 'I', // I = browser | F = arquivo
+            'tipo' => 'I',
             'caminho_absoluto' => false
         ], $config);
 
@@ -311,11 +357,8 @@ class PdfService
             ? $this->render($config['footer'], $config['dados'])
             : null;
 
-        // mpdf
-        $mpdf = new Mpdf([
-            'tempDir' => ROOT . DS . 'tmp',
-            ...$this->defaultConfig
-        ]);
+        // Usa a configuração definida no construtor
+        $mpdf = new Mpdf($this->mpdfConfig);
 
         if ($header) {
             $mpdf->SetHTMLHeader($header);
@@ -329,13 +372,9 @@ class PdfService
 
         // salvar arquivo
         if ($config['salvar']) {
-
             $path = $this->montarPath($config['path'], $config['caminho_absoluto']);
-
             $arquivo = $path . DS . $this->sanitize($config['nome']) . '.pdf';
-
             $mpdf->Output($arquivo, 'F');
-
             return $arquivo;
         }
 

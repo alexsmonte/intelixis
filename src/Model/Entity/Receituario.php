@@ -34,6 +34,7 @@ class Receituario extends Entity
         'categoria' => true,
         'titulo' => true,
         'descricao' => true,
+        'uso_restrito' => true,
         'created' => true,
         'modified' => true,
         'estabelecimento' => true,

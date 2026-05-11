@@ -33,10 +33,12 @@ class ReceituariosController extends AppController
      * @return \Cake\Http\Response|null|void Renders view
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function view($id = null)
+    public function listar()
     {
-        $receituario = $this->Receituarios->get($id, contain: ['Estabelecimentos']);
-        $this->set(compact('receituario'));
+        $dadosMedicamento = $this->Receituarios->getAgrupadosPorCategoria($this->getRequest()->getSession()->read('Auth.Estabelecimento.id'));
+            return $this->response->withType('application/json')
+                ->withStringBody(json_encode(['success' => true,'receitas' => $dadosMedicamento,'_serialize' => ['success', 'receitas']]));
+
     }
 
     /**
@@ -60,11 +62,68 @@ class ReceituariosController extends AppController
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('O reconcertório não pôde ser salvo. Por favor, tente novamente.'));
+            $this->Flash->error(__('O receituário não pôde ser salvo. Por favor, tente novamente.'));
         }
 
         $title  =   'Meu receituário';
         $this->set(compact('receituario','title'));
+    }
+
+
+    public function salvar()
+    {
+        $this->request->allowMethod(['post']);
+        $dados = $this->request->getData();
+
+        if(empty($dados["id"]))
+            $receituario = $this->Receituarios->newEmptyEntity();
+        else
+            $receituario = $this->Receituarios->get($dados["id"], contain: []);
+
+        $dados['estabelecimento_id'] = $this->getRequest()->getSession()->read('Auth.Estabelecimento.id');
+
+        $dados['categoria'] = 'personalizado';
+
+        if (!empty($dados['descricao'])) {
+
+            $descricao = $dados['descricao'];
+
+            // remove <p com data-receita> mantendo conteúdo interno
+            $descricao = preg_replace(
+                '/<p[^>]*data-receita="[^"]*"[^>]*>(.*?)<\/p>/is',
+                '$1',
+                $descricao
+            );
+
+            $dados['descricao'] = str_replace("<p>&nbsp;</p>","",$descricao);;
+        }
+
+        $receituario = $this->Receituarios->patchEntity($receituario, $dados);
+
+        if ($this->Receituarios->save($receituario)) {
+
+        return $this->response->withType('application/json')
+                    ->withStringBody(json_encode([
+                        'success' => true,
+                        'receita' => [
+                            'id' => $receituario->id,
+                            'titulo' => $receituario->titulo,
+                            'descricao' => $receituario->descricao,
+                            'categoria' => $receituario->categoria
+                        ],
+                        '_serialize' => ['success', 'receita']
+                    ]));
+            
+        }
+
+        // erro
+        return $this->response->withType('application/json')
+                    ->withStringBody(json_encode([
+                    'success' => false,
+                    'message' => 'O receituário não pôde ser salvo. Tente novamente.',
+                    'errors' => $receituario->getErrors(),
+                    '_serialize' => ['success', 'message', 'errors']
+                ]));
     }
 
     /**
@@ -100,14 +159,39 @@ class ReceituariosController extends AppController
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
-        $receituario = $this->Receituarios->get($id);
-        if ($this->Receituarios->delete($receituario)) {
-            $this->Flash->success(__('The receituario has been deleted.'));
-        } else {
-            $this->Flash->error(__('The receituario could not be deleted. Please, try again.'));
+
+        try {
+
+            $receituario = $this->Receituarios->get($id, [
+                'conditions' => [
+                    'Receituarios.estabelecimento_id' =>
+                        $this->request->getSession()->read('Auth.Estabelecimento.id')
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+
+            return $this->response->withType('application/json')
+                ->withStringBody(json_encode([
+                    'success' => false,
+                    'message' => 'Receituário não encontrado.'
+                ]));
         }
 
-        return $this->redirect(['action' => 'index']);
+        if ($this->Receituarios->delete($receituario)) {
+
+            return $this->response->withType('application/json')
+                ->withStringBody(json_encode([
+                    'success' => true,
+                    'message' => 'Receituário removido com sucesso.'
+                ]));
+        }
+
+        return $this->response->withType('application/json')
+            ->withStringBody(json_encode([
+                'success' => false,
+                'message' => 'Não foi possível remover o receituário.'
+            ]));
     }
 
     public function search()

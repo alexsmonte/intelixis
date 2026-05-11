@@ -107,11 +107,15 @@ class ConsultasController extends AppController
 **/
         $consulta = $this->Consultas->get($id, contain: [
             'Procedimentos' => [
+                'Financas',
                 'Anexos',
-                'Documentos' => ['Profissionais']
+                'Documentos' => [
+                    'Profissionais',
+                    'sort' => ['Documentos.created' => 'DESC']
+                ]
             ]
         ]);
-        
+
         $map = [
             'anamnese' => 'anamneses',
             'anotacao' => 'anotacoes',
@@ -153,50 +157,10 @@ class ConsultasController extends AppController
         $profissionais  = $profissionaisTable->find('list')->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])->all();
 
 
-        $receituarios = $receituariosTable
-            ->find()
-            ->where([ 'OR' =>['Receituarios.estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id'),'Receituarios.estabelecimento_id IS NULL'] ])
-            ->orderBy([
-                'Receituarios.categoria' => 'ASC',
-                'Receituarios.titulo' => 'ASC'
-            ])
-            ->all();
-
-            $categoriasPadrao = [
-                'personalizado',
-                'analgesico',
-                'antibiotico',
-                'antiinflamatorio',
-                'antialergico',
-                'corticoide',
-                'antifungico',
-                'antiviral',
-                'antiparasitario',
-                'gastrointestinal',
-                'respiratorio',
-                'topico',
-                'Uso restrito'
-                
-            ];
-
-            $agrupados = [];
-
-            // Inicializa todas vazias
-            foreach ($categoriasPadrao as $cat)
-                $agrupados[$cat] = [];
-
-
-            // Preenche com dados do banco
-            foreach ($receituarios as $r) {
-                $categoria = strtolower(trim($r->categoria));
-                if (isset($agrupados[$categoria]))
-                    $agrupados[$categoria][] = $r;
-            }
-
-            $this->set(compact('agrupados'));
+        $receituarioMedico = $receituariosTable->getAgrupadosPorCategoria($this->getRequest()->getSession()->read('Auth.Estabelecimento.id'));
 
         $title  =   'Minha consulta';
-        $this->set(compact('consulta', 'clientes', 'profissionais','title', 'servicos', 'agrupados'));
+        $this->set(compact('consulta', 'clientes', 'profissionais','title', 'servicos', 'receituarioMedico','agrupados'));
     }
 
 

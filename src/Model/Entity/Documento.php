@@ -66,5 +66,6 @@ class Documento extends Entity
         'url' => true,
         'exigir_assinatura_paciente' => true, 
 	    'exigir_assinatura_profissional' => true,
+        'uso_restrito'=> true
     ];
 }

@@ -96,4 +96,54 @@ class ReceituariosTable extends Table
 
         return $rules;
     }
+
+    public function getAgrupadosPorCategoria($estabelecimentoId)
+    {
+        $receituarios = $this->find()
+            ->where([
+                'OR' => [
+                    'Receituarios.estabelecimento_id' => $estabelecimentoId,
+                    'Receituarios.estabelecimento_id IS NULL'
+                ]
+            ])
+            ->order([
+                'Receituarios.categoria' => 'ASC',
+                'Receituarios.titulo' => 'ASC'
+            ])
+            ->all();
+
+        $categoriasPadrao = [
+            'personalizado',
+            'analgesico',
+            'antibiotico',
+            'antiinflamatorio',
+            'antialergico',
+            'corticoide',
+            'antifungico',
+            'antiviral',
+            'antiparasitario',
+            'gastrointestinal',
+            'respiratorio',
+            'topico',
+            'uso restrito'
+        ];
+
+        $agrupados = [];
+
+        // Inicializa
+        foreach ($categoriasPadrao as $cat) {
+            $agrupados[$cat] = [];
+        }
+
+        // Preenche
+        foreach ($receituarios as $r) {
+            $categoria = strtolower(trim($r->categoria));
+
+            if (isset($agrupados[$categoria])) {
+                $agrupados[$categoria][] = $r;
+            }
+        }
+
+        return $agrupados;
+    }
 }

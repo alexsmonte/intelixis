@@ -7,6 +7,38 @@ use Authentication\PasswordHasher\DefaultPasswordHasher;
 
 class FinancasController extends AppController
 {
+
+/**
+ * Mapeamento das regras de situação
+ */
+private $situacaoRules = [
+    'pago' => [
+        'field' => 'Financas.data_baixa',
+        'operator' => 'IS NOT NULL',
+        // não precisa de value
+    ],
+    'aberto' => [
+        'field' => 'Financas.data_baixa',
+        'operator' => 'IS NULL',
+        // aberto também precisa verificar data_vencimento >= hoje
+        'extra' => [
+            'field' => 'Financas.data_vencimento',
+            'operator' => '>=',
+            'value' => null // será preenchido com a data atual
+        ]
+    ],
+    'vencido' => [
+        'field' => 'Financas.data_baixa',
+        'operator' => 'IS NULL',
+        'extra' => [
+            'field' => 'Financas.data_vencimento',
+            'operator' => '<',
+            'value' => null // será preenchido com a data atual
+        ]
+    ]
+];
+
+
     public function initialize(): void
     {
         parent::initialize();
@@ -1064,6 +1096,7 @@ public function search()
         'data_inicio' => ['field' => 'Financas.data_vencimento', 'operator' => '>='],
         'data_fim' => ['field' => 'Financas.data_vencimento', 'operator' => '<='],
         'data_vencimento' => ['field' => 'Financas.data_vencimento', 'operator' => '='],
+        'procedimento_id' => ['field' => 'Financas.procedimento_id', 'operator' => '=']
     ];
     
     $defaultOrder = ['Financas.created' => 'DESC'];
@@ -1332,6 +1365,132 @@ private function searchDespesasComHierarquia($q, $abaId, $queryParams, $allowedF
 
 
 
+public function buscaAvancada()
+{
+    $this->request->allowMethod(['get']);
+    
+    $queryParams = $this->request->getQueryParams();
+    $tipo = $queryParams['tipo'] ?? null;
+    $abaId = $queryParams['aba_id'] ?? null;
+    $situacao = $queryParams['situacao'] ?? null;
+    
+    $contain = ['Clientes', 'Ccustos', 'Profissionais'];
+    $sessionEstabelecimentoId = $this->getRequest()->getSession()->read('Auth.Estabelecimento.id');
+    
+    // CONFIGURAÇÃO BASE DOS FILTROS PERMITIDOS
+    $allowedFilters = [
+        'estabelecimento_id' => [
+            'field' => 'Financas.estabelecimento_id',
+            'value' => $sessionEstabelecimentoId,
+            'operator' => '='
+        ],
+        'q' => [
+            'operator' => 'MULTI_LIKE',
+            'fields' => [
+                'Financas.descricao',
+                'Clientes.nome',
+                'Clientes.documento',
+                'Profissionais.nome'
+            ]
+        ],
+        'descricao' => ['field' => 'Financas.descricao', 'operator' => 'LIKE'],
+        'cliente_nome' => ['field' => 'Clientes.nome', 'operator' => 'LIKE'],
+        'cliente_documento' => ['field' => 'Clientes.documento', 'operator' => 'LIKE'],
+        'profissional_nome' => ['field' => 'Profissionais.nome', 'operator' => 'LIKE'],
+        'procedimento_id' => ['field' => 'Financas.procedimento_id', 'operator' => '='],
+        'data_vencimento' => ['field' => 'Financas.data_vencimento', 'operator' => 'DATE'],
+        'data_inicio' => ['field' => 'Financas.data_vencimento', 'operator' => '>='],
+        'data_fim' => ['field' => 'Financas.data_vencimento', 'operator' => '<='],
+        'data_baixa' => ['field' => 'Financas.data_baixa', 'operator' => 'DATE'],
+    ];
+    
+    // ADICIONA O FILTRO DE SITUAÇÃO DINAMICAMENTE
+    if (!empty($situacao) && isset($this->situacaoRules[$situacao])) {
+        $rule = $this->situacaoRules[$situacao];
+        
+        // Adiciona o filtro principal da situação
+        $allowedFilters["situacao_{$situacao}"] = [
+            'field' => $rule['field'],
+            'operator' => $rule['operator']
+        ];
+        
+        // Se tem regra extra (como data_vencimento para aberto/vencido)
+        if (isset($rule['extra'])) {
+            $extra = $rule['extra'];
+            $extra['value'] = date('Y-m-d'); // Preenche com a data atual
+            $allowedFilters["situacao_{$situacao}_extra"] = $extra;
+        }
+    }
+    
+    // ============================================
+    // RECEITAS
+    // ============================================
+    if ($tipo === 'receitas') {
+        $catsReceitas = $this->Financas->Ccustos
+            ->find('list', ['keyField' => 'id', 'valueField' => 'id'])
+            ->where(['parent_id' => 1])
+            ->toArray();
+        
+        $allowedFilters['ccustos_id'] = [
+            'field' => 'Financas.ccustos_id',
+            'operator' => 'IN',
+            'value' => !empty($catsReceitas) ? array_keys($catsReceitas) : [1]
+        ];
+
+        $this->doAdvancedSearch(
+            $this->Financas,
+            $allowedFilters,
+            ['Financas.created' => 'DESC'],
+            $contain
+        );
+        
+        return $this->response;
+    }
+    
+    // ============================================
+    // DESPESAS
+    // ============================================
+    if ($tipo === 'despesas') {
+        $categoriasIds = [];
+        
+        if (!empty($queryParams['categoria_id'])) {
+            $categoriasIds = [(int)$queryParams['categoria_id']];
+        } elseif ($abaId) {
+            $filhos = $this->Financas->Ccustos
+                ->find('list', ['keyField' => 'id', 'valueField' => 'id'])
+                ->where(['parent_id' => $abaId])
+                ->toArray();
+            $categoriasIds = array_merge($filhos, [(int)$abaId]);
+        }
+        
+        if (!empty($categoriasIds)) {
+            $allowedFilters['ccustos_id'] = [
+                'field' => 'Financas.ccustos_id',
+                'operator' => 'IN',
+                'value' => $categoriasIds
+            ];
+        }
+        
+        $this->doAdvancedSearch(
+            $this->Financas,
+            $allowedFilters,
+            ['Financas.created' => 'DESC'],
+            $contain
+        );
+        
+        return $this->response;
+    }
+    
+    // Tipo inválido
+    $this->autoRender = false;
+    return $this->response
+        ->withType('application/json')
+        ->withStringBody(json_encode([
+            'data' => [],
+            'paginator' => ['page' => 1, 'limit' => 50, 'count' => 0, 'total' => 0, 'pageCount' => 1],
+            'message' => 'Tipo inválido. Use: receitas ou despesas'
+        ]));
+}
 
 
 }

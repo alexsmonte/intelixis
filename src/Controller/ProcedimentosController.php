@@ -55,7 +55,7 @@ class ProcedimentosController extends AppController
             if (empty($dadosProcedimento["id"]))
                 $procedimento = $this->Procedimentos->newEmptyEntity();
             else
-                $procedimento = $this->Procedimentos->get($dadosProcedimento["id"]);
+                $procedimento = $this->Procedimentos->get($dadosProcedimento["id"],contain: ['Financas']);
 
             $procedimento = $this->Procedimentos->patchEntity($procedimento, $dadosProcedimento,['associated'=>['Documentos'=> ['accessibleFields' => ['id' => true]]]]);
 

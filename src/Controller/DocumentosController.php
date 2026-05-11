@@ -13,6 +13,7 @@ use Endroid\QrCode\Writer\PngWriter;
 use App\Model\Entity\Documento;
 use App\Model\Entity\Estabelecimento;
 use Cake\Http\Exception\NotFoundException;
+use App\Service\PdfService;
 
 /**
  * Documentos Controller
@@ -69,6 +70,94 @@ class DocumentosController extends AppController
     // =========================================================================
 
     public function imprimir($id = null)
+    {
+        $this->disableAutoRender();
+
+        $documento = $this->Documentos->get($id, [
+            'contain' => ['Profissionais', 'Procedimentos' => ['Consultas' => ['Clientes']], 'Estabelecimentos'],
+            'conditions' => ['Documentos.estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+        ]);
+
+/** 
+Se já foi assinado (ou pelo paciente ou pelo profissional), o documento original
+e o carimbo já estão gravados no disco de forma IMUTÁVEL.
+Devemos servir exatamente esse arquivo físico. 
+**/
+
+        if (!empty($documento->assinatura_hash) || !empty($documento->assinatura_prof_hash)) {
+            $path = $this->_getStorageDir($documento) . DS . $documento->id . '.pdf';
+            if (file_exists($path)) {
+                return $this->response->withFile($path, [
+                    'download' => false,
+                    'name' => "documento_assinado_{$documento->id}.pdf"
+                ])->withType('application/pdf');
+            } else {
+                return $this->response->withType('application/json')
+                    ->withStringBody(json_encode([
+                        'success' => false,
+                        'errors' => $documento->getErrors(),
+                        'message' => 'O arquivo não foi encontrado',
+                    ]));
+            }
+        }
+
+
+        $urlValidacao = Router::url(['controller' => 'Documentos', 'action' => 'validar', 'codigo' => $documento->codigo_validacao], true);
+        $qrBase64 = $this->_gerarQrBase64($urlValidacao);
+
+        // Prepara os dados para o template
+        $dados = [
+            'documento' => $documento,
+            'data_geracao' => $dataGeracao = $documento->created ? $documento->created->format('d/m/Y H:i') : null,
+            'urlValidacao' => $urlValidacao,
+            'qrBase64' => $qrBase64,
+            'assinaturaPaciente' => NULL,
+            'assinaturaProfissional' => NULL,
+            'dataAssinaturaPaciente' => NULL,
+            'dataAssinaturaProfissional' => NULL,
+            'tituloDocumento' =>  null,
+        ];
+
+        $pdf = ['template' => 'default',// Seu template em templates/Pdf/default.php
+        'dados' => $dados,
+        'header' => 'header',// templates/Pdf/header.php
+        'footer' =>  NULL, // templates/Pdf/footer.php
+        'path'=> $this->_getStorageDir($documento),
+        'nome' => $documento->id,
+        'tipo' => 'I', // 'I' = inline (exibe no browser)
+        'salvar' => (empty($documento->assinatura_hash) && empty($documento->assinatura_prof_hash)), // true salva em disco
+        'caminho_absoluto' => true
+        ];
+
+
+        if($documento->tipo == 'receita' && $documento->uso_restrito == true)
+        {
+            $pdf = ['template' => 'receita_controle_especial_2',// Seu template em templates/Pdf/default.php
+            'header' => 'header_uso_restrito',// templates/Pdf/header.php
+            'footer' => 'footer_assinatura', // templates/Pdf/footer.php
+            'path'=> $this->_getStorageDir($documento),
+            'nome' => $documento->id,
+            'dados' => $dados,
+            'tipo' => 'I', // 'I' = inline (exibe no browser)
+            'salvar' => (empty($documento->assinatura_hash) && empty($documento->assinatura_prof_hash)), // true salva em disco
+            'caminho_absoluto' => true
+            ];
+        }
+
+        // Usa o PdfService para gerar o PDF
+        $pdfService = new PdfService(['margin_bottom' => 20,'margin_top' => 20,]);
+        
+        $arquivo = $pdfService->gerar($pdf);
+
+        if(empty($documento->assinatura_hash) && empty($documento->assinatura_prof_hash))
+            $this->_salvarPdfEmDisco($documento, '',  false);
+
+        return $this->response->withFile($arquivo, ['download' => false,'name' => 'documento.pdf'])->withType('application/pdf');
+
+    }
+
+
+    public function imprimir_old($id = null)
     {
         $this->disableAutoRender();
 
@@ -896,17 +985,19 @@ class DocumentosController extends AppController
     /**
      * Salva o PDF em disco e registra log de geração.
      */
-    private function _salvarPdfEmDisco(Documento $documento, string $pdfContent): void
+    private function _salvarPdfEmDisco(Documento $documento, string $pdfContent,  bool $salvar = true): void
     {
-        $dir = $this->_getStorageDir($documento);
-        if (!is_dir($dir)) {
-            @mkdir($dir, 0755, true);
-        }
+        if($salvar){        
+            $dir = $this->_getStorageDir($documento);
+            if (!is_dir($dir)) {
+                @mkdir($dir, 0755, true);
+            }
 
-        if (is_writable(dirname($dir)) || is_writable($dir)) {
-            @file_put_contents($dir . DS . $documento->id . '.pdf', $pdfContent);
-        } else {
-            Log::error("Não foi possível salvar o PDF em disco: diretório {$dir} não tem permissão de escrita.");
+            if (is_writable(dirname($dir)) || is_writable($dir)) {
+                @file_put_contents($dir . DS . $documento->id . '.pdf', $pdfContent);
+            } else {
+                Log::error("Não foi possível salvar o PDF em disco: diretório {$dir} não tem permissão de escrita.");
+            }
         }
 
         $usuarioId = $this->getRequest()->getSession()->read('Auth.Usuario.id');
@@ -1085,7 +1176,7 @@ class DocumentosController extends AppController
      * Gera o HTML da página de protocolo (renderizado pelo mPDF).
      */
     private function _buildProtocoloHtml(
-        Documento $documento,
+        Documento $documento,   
         string $selfieB64,
         string $assinaturaB64,
         string $ip,

@@ -53,10 +53,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                             class="fs-9 aside-icon"></iconify-icon>
                                     </a>
                                     <a href="#" class="sidebar-link primary-hover-bg"
-                                        @click.prevent="item.aberto = !item.aberto" v-show="item.id">
-                                        <iconify-icon
-                                            :icon="item.aberto ? 'solar:minimize-square-bold-duotone':'solar:maximize-square-bold-duotone'"
-                                            class="fs-9 aside-icon"></iconify-icon>
+                                        @click.prevent="item.aberto = !item.aberto" v-show="item.id && item.aprovar == 1">
+                                        <iconify-icon :icon="item.aberto ? 'solar:minimize-square-bold-duotone':'solar:maximize-square-bold-duotone'" class="fs-9 aside-icon"></iconify-icon>
                                     </a>
                                 </div>
                             </div>
@@ -165,7 +163,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                         <li class="nav2-item" role="presentation">
                                             <a class="nav2-link" data-bs-toggle="tab" :href="'#pagamento-' + item.id"
                                                 role="tab" :aria-controls="'pagamento-' + item.id"
-                                                aria-selected="true">Pagamento</a>
+                                                aria-selected="true">Pagamento
+                                                <!-- badge com quantidade -->
+                                                <span v-if="item.financas && item.financas.length > 0"
+                                                    class="badge bg-primary ms-2">
+                                                    {{ item.financas.length }}
+                                                </span>
+                                            </a>
                                         </li>
 
                                     </ul>
@@ -180,13 +184,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                         <th style="width: 30%;">
                                                             <h6 class="fs-4 fw-semibold mb-0">Descrição</h6>
                                                         </th>
-                                                        <th style="width: 15%; text-align: center;">
+                                                        <th style="width: 20%; text-align: center;">
                                                             <h6 class="fs-4 fw-semibold mb-0">Feito em</h6>
                                                         </th>
                                                         <th style="width: 25%; text-align: center;">
                                                             <h6 class="fs-4 fw-semibold mb-0">Assinaturas</h6>
                                                         </th>
-                                                        <th style="width: 15%; text-align: center;">
+                                                        <th style="width: 5%; text-align: center;">
                                                             <h6 class="fs-4 fw-semibold mb-0">Opções</h6>
                                                         </th>
                                                     </tr>
@@ -250,10 +254,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                         <td>
                                                             <div class="dropdown">
                                                                 <button
-                                                                    class="btn  bg-transparent text-primary  d-inline-flex align-items-center justify-content-center"
-                                                                    type="button" :id="'dropdownMenu-' + anamnese.id"
-                                                                    data-bs-toggle="dropdown" aria-expanded="false"><i
-                                                                        class="fas fa-bars"></i></button>
+                                                                    class="btn  bg-transparent text-primary  d-inline-flex align-items-center justify-content-center" type="button" :id="'dropdownMenu-' + anamnese.id" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-bars"></i></button>
                                                                 <ul class="dropdown-menu dropdown-menu-end"
                                                                     :aria-labelledby="'dropdownMenu-' + anamnese.id">
                                                                     <!-- Assinar Paciente -->
@@ -344,13 +345,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                         <th style="width: 30%;">
                                                             <h6 class="fs-4 fw-semibold mb-0">Descrição</h6>
                                                         </th>
-                                                        <th style="width: 15%; text-align: center;">
+                                                        <th style="width: 20%; text-align: center;">
                                                             <h6 class="fs-4 fw-semibold mb-0">Feito em</h6>
                                                         </th>
                                                         <th style="width: 25%; text-align: center;">
                                                             <h6 class="fs-4 fw-semibold mb-0">Assinaturas</h6>
                                                         </th>
-                                                        <th style="width: 15%; text-align: center;">
+                                                        <th style="width: 5%; text-align: center;">
                                                             <h6 class="fs-4 fw-semibold mb-0">Opções</h6>
                                                         </th>
                                                     </tr>
@@ -511,7 +512,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                         <th style="width: 30%;">
                                                             <h6 class="fs-4 fw-semibold mb-0">Descrição</h6>
                                                         </th>
-                                                        <th style="width: 15%; text-align:center;">
+                                                        <th style="width: 25%; text-align:center;">
                                                             <h6 class="fs-4 fw-semibold mb-0">Profissional</h6>
                                                         </th>
                                                         <th style="width: 15%; text-align: center;">
@@ -520,7 +521,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                         <th style="width: 25%; text-align: center;">
                                                             <h6 class="fs-4 fw-semibold mb-0">Assinaturas</h6>
                                                         </th>
-                                                        <th style="width: 15%; text-align: center;">
+                                                        <th style="width: 5%; text-align: center;">
                                                             <h6 class="fs-4 fw-semibold mb-0">Opções</h6>
                                                         </th>
                                                     </tr>
@@ -599,8 +600,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                     class="btn  bg-transparent text-primary  d-inline-flex align-items-center justify-content-center"
                                                                     type="button" :id="'dropdownMenu-' + doc.id"
                                                                     data-bs-toggle="dropdown" aria-expanded="false">
-                                                                    <iconify-icon icon="solar:menu-dots-bold"
-                                                                        class="fs-7"></iconify-icon>
+                                                                    <i class="fas fa-bars"></i>
                                                                 </button>
                                                                 <ul class="dropdown-menu dropdown-menu-end"
                                                                     :aria-labelledby="'dropdownMenu-' + doc.id">
@@ -696,13 +696,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                         <th style="width: 30%;">
                                                             <h6 class="fs-4 fw-semibold mb-0">Descrição</h6>
                                                         </th>
-                                                        <th style="width: 15%; text-align: center;">
+                                                        <th style="width: 20%; text-align: center;">
                                                             <h6 class="fs-4 fw-semibold mb-0">Feito em</h6>
                                                         </th>
                                                         <th style="width: 25%; text-align: center;">
                                                             <h6 class="fs-4 fw-semibold mb-0">Assinaturas</h6>
                                                         </th>
-                                                        <th style="width: 15%; text-align:center;">Opções</th>
+                                                        <th style="width: 5%; text-align:center;">Opções</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody v-if="item.laudos && item.laudos.length">
@@ -861,7 +861,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                         <th style="width: 30%;">
                                                             <h6 class="fs-4 fw-semibold mb-0">Descrição</h6>
                                                         </th>
-                                                        <th style="width: 15%;">
+                                                        <th style="width: 20%;">
                                                             <h6 class="fs-4 fw-semibold mb-0">Profissional</h6>
                                                         </th>
                                                         <th style="width: 15%; text-align:center;">
@@ -870,14 +870,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                         <th style="width: 25%; text-align:center;">
                                                             <h6 class="fs-4 fw-semibold mb-0">Assinaturas</h6>
                                                         </th>
-                                                        <th style="width: 15%; text-align:center;">Opções</th>
+                                                        <th style="width: 5%; text-align:center;">Opções</th>
                                                     </tr>
                                                 </thead>
 
                                                 <tbody v-if="item.receitas && item.receitas.length">
 
-                                                    <tr v-for="(receita, receitasIndex) in item.receitas"
-                                                        :key="receita.id">
+                                                    <tr v-for="(receita, receitasIndex) in item.receitas" :key="receita.id">
 
                                                         <td style="white-space: normal;"
                                                             :title="resumoReceita(receita.texto, 500)">
@@ -1040,13 +1039,32 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                         <h6 class="fs-4 fw-semibold mb-0">Descrição</h6>
                                                     </th>
                                                     <th>
+                                                        <h6 class="fs-4 fw-semibold mb-0">Valor</h6>
+                                                    </th>
+                                                    <th>
+                                                        <h6 class="fs-4 fw-semibold mb-0">Desconto</h6>
+                                                    </th>
+                                                    <th>
                                                         <h6 class="fs-4 fw-semibold mb-0">Vencimento</h6>
+                                                    </th>
+                                                    <th>
+                                                        <h6 class="fs-4 fw-semibold mb-0">Data da baixa</h6>
                                                     </th>
                                                     <th>
                                                         <h6 class="fs-4 fw-semibold mb-0">Valor pago</h6>
                                                     </th>
                                                 </thead>
-                                                <tbody>
+                                                <tbody v-if="item.financas && item.financas.length">
+                                                    <tr v-for="(financa, financasIndex) in item.financas" :key="financa.id">
+                                                        <td>{{financa.descricao}}</td>
+                                                        <td>R$ {{formatarMoeda(financa.valor)}}</td>
+                                                        <td>R$ {{formatarMoeda(financa.desconto)}}</td>
+                                                        <td>{{formatarData(financa.data_vencimento, false)}}</td>
+                                                        <td>{{formatarData(financa.data_baixa, false)}}</td>
+                                                        <td>{{financa.valor_recebido}}</td>
+                                                    </tr>
+                                                </tbody>
+                                                <tbody v-else>
                                                     <tr>
                                                         <td colspan="6" class="text-center text-muted">Nenhum registro
                                                         </td>
@@ -1136,14 +1154,14 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                             </div>
 
                             <div class="row mt-3">
-                                <div class="col-lg-1 col-sm-6" style="height: 70px;">
+                                <div class="col-lg-1 col-sm-4" style="height: 70px;">
                                     <div class="form-check form-switch">
                                         <label class="form-check-label" for="item-aprovar">Aprovar</label>
                                         <input class="form-check-input success" type="checkbox" id="item-aprovar"
-                                            v-model="item.aprovar" @change="aprovarProcedimento(item, index)">
+                                            v-model="item.aprovar" @change="aprovarProcedimento(item, index)"  :disabled="!item.id">
                                     </div>
                                 </div>
-                                <div class="col-lg-1 col-sm-6" style="height: 70px;">
+                                <div class="col-lg-1 col-sm-4" style="height: 70px;">
                                     <div class="form-check form-switch">
                                         <label class="form-check-label" for="item-parcelar">Parcelar</label>
                                         <input class="form-check-input success" type="checkbox" id="item-parcelar"
@@ -1151,18 +1169,18 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                             :disabled="item.aprovar">
                                     </div>
                                 </div>
-                                <div class="col-lg-1 col-sm-6" style="height: 70px;">
+                                <div class="col-lg-1 col-sm-4" style="height: 70px;">
                                     <div class="form-check form-switch">
                                         <label class="form-check-label" for="item-Imprimir">Imprimir</label>
                                         <input class="form-check-input success" type="checkbox" id="item-imprimir"
                                             v-model="filaImpressao" v-bind:value="item.id">
                                     </div>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-2 col-sm-4">
                                     <?= $this->Form->control('desconto', ['label' => 'Desconto', 'class' => 'form-control', 'v-model' => 'item.desconto', 'v-money' => 'money', '@input' => 'atualizarParcelas(item)', ':disabled' => 'item.aprovar']); ?>
                                 </div>
 
-                                <div class="col-lg-1" style="height: 70px;">
+                                <div class="col-lg-1 col-sm-4" style="height: 70px;">
                                     <div class="input mb-3 text" v-show="item.parcelar">
                                         <label for="quantidade">Parcelas</label>
                                         <input type="text" name="parcelas" id="parcelas" class="form-control"
@@ -1171,13 +1189,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                     </div>
                                 </div>
 
-                                <div class="col-lg-2" style="height: 70px;">
+                                <div class="col-lg-2 col-sm-4" style="height: 70px;">
                                     <div class="input mb-3 text" v-show="item.parcelar">
                                         <label for="quantidade">Valor das parcelas</label>
                                         <div class="form-control">{{item.valor_parcela}}</div>
                                     </div>
                                 </div>
-                                <div class="col-lg-2" style="height: 70px;">
+                                <div class="col-lg-2 col-sm-6" style="height: 70px;">
                                     <div class="input mb-3 text">
                                         <label for="quantidade">Subtotal</label>
                                         <div class="form-control">R$ {{ formatarMoeda(calcularSubtotal(item)) }}</div>
@@ -1270,85 +1288,106 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                 relevantes ao longo do acompanhamento.</p>
                             <input type="hidden" name="procedimento_id" id="procedimento-id"
                                 v-model="receita.procedimento_id">
-                            <input type="hidden" name="usuario_id" id="usuario-id" v-model="receita.usuario_id">
+                            <br>
+<input type="hidden" name="usuario_id" id="usuario-id" v-model="receita.usuario_id">
+
                             <?= $this->Form->control('texto', ['label' => '', 'class' => 'form-control', 'type' => 'textarea', 'rows' => 5, 'id' => 'texto-receita']); ?>
+
+<input class="form-check-input" type="checkbox" value="1" id="checkReceitaUsoRestrito" 
+v-model="receita.uso_restrito" :disabled="temUsoRestrito">
+<label class="form-check-label text-danger" for="checkReceitaUsoRestrito">
+    <strong>Esta receita contém medicamento de uso restrito</strong>
+    <span v-if="temUsoRestrito" class="badge bg-danger ms-2">(Obrigatório)</span>
+</label>
                         </div>
                         <div class="col-md-4 mb-0">
                             <div class="receitas-container">
-                                <div class="receitas-busca">
-                                    <input type="text" class="form-control" id="buscarReceita"
-                                        placeholder="Buscar medicamento...">
-                                </div>
+<input type="text" v-model="Busca.termo" class="form-control" placeholder="Buscar medicamento...">
 
-                                <div class="receitas-scroll">
-                                    <div class="accordion" id="accordionReceitas">
+<div class="accordion mt-4" id="accordionReceitas">
 
-                                        <?php
-                                        $i = 0;
+    <div class="accordion-item" v-for="(itens, categoria, index) in receitasIBusca" :key="categoria">
+        <h2 class="accordion-header" :id="'heading' + index">
+            <button class="accordion-button" :class="{'collapsed': !Busca.termo}" type="button"
+                    data-bs-toggle="collapse" :data-bs-target="'#collapse' + index"
+                    :aria-expanded="Busca.termo ? 'true' : 'false'" :aria-controls="'collapse' + index">
+                {{ Busca.labels[categoria] || categoria }}
+                ({{ itens.length }})
+            </button>
 
-                                        $labels = [
-                                            'analgesico' => 'Analgésico',
-                                            'antibiotico' => 'Antibiótico',
-                                            'antiinflamatorio' => 'Anti-inflamatório',
-                                            'antialergico' => 'Antialérgico',
-                                            'corticoide' => 'Corticoide',
-                                            'antifungico' => 'Antifúngico',
-                                            'antiviral' => 'Antiviral',
-                                            'gastrointestinal' => 'Gastrointestinal',
-                                            'respiratorio' => 'Respiratório',
-                                            'topico' => 'Uso tópico',
-                                            'personalizado' => 'Personalizado'
-                                        ];
-                                        ?>
+        </h2>
 
-                                        <?php foreach ($agrupados as $categoria => $itens):
-                                            $i++;
-                                            $label = $labels[$categoria] ?? ucfirst($categoria);
-                                            ?>
+        <div :id="'collapse' + index"
+             class="accordion-collapse collapse"
+             :class="{'show': Busca.termo}"
+             :aria-labelledby="'heading' + index"
+             data-bs-parent="#accordionReceitas">
 
-                                            <div class="accordion-item">
-                                                <h2 class="accordion-header" id="heading<?= $i ?>">
-                                                    <button class="accordion-button <?= $i != 1 ? 'collapsed' : '' ?>"
-                                                        type="button" data-bs-toggle="collapse"
-                                                        data-bs-target="#collapse<?= $i ?>"
-                                                        aria-expanded="<?= $i == 1 ? 'true' : 'false' ?>"
-                                                        aria-controls="collapse<?= $i ?>">
+            <div class="accordion-body">
 
-                                                        <?= h($label) ?> (<?= count($itens) ?>)
+                <div v-for="item in itens" :key="item.id" class="mb-2">
 
-                                                    </button>
-                                                </h2>
+<div class="mb-2 d-flex justify-content-between align-items-center">
 
-                                                <div id="collapse<?= $i ?>"
-                                                    class="accordion-collapse collapse <?= $i == 1 ? 'show' : '' ?>"
-                                                    data-bs-parent="#accordionReceitas">
-                                                    <div class="accordion-body">
-                                                        <?php if (empty($itens)) { ?>
-                                                            <div class="text-muted small">
-                                                                Nenhum medicamento cadastrado.
-                                                            </div>
-                                                        <?php } else { ?>
-                                                            <?php foreach ($itens as $item): ?>
-                                                                <div class="mb-2">
-                                                                    <a href="#"
-                                                                        class="adicionarReceitas d-block text-decoration-none"
-                                                                        data-descricao="<?= htmlspecialchars($item->descricao, ENT_QUOTES, 'UTF-8') ?>"><?= h($item->titulo) ?></a>
-                                                                </div>
-                                                            <?php endforeach; ?>
-                                                        <?php } ?>
-                                                    </div>
-                                                </div>
-                                            </div>
+<a href="#"
+   class="adicionarReceitas text-decoration-none flex-grow-1"
+      :class="{
+       'receita-selecionada': isSelecionado(item),
+       'receita-uso-restrito': item.uso_restrito && isSelecionado(item)
+   }"
+   @click.prevent="toggleReceitaBusca(item)">
+    
+    {{ item.titulo }}
+    
+    <!-- Badge opcional para indicar uso restrito -->
+    <span v-if="item.uso_restrito && isSelecionado(item)" class="badge bg-danger ms-2"style="font-size: 10px;">Restrito</span>
+</a>
 
-                                        <?php endforeach; ?>
-                                    </div>
-                                </div>
-                            </div>
+    <!-- DROPDOWN -->
+    <div v-if="item.estabelecimento_id" class="dropdown ms-2">
+
+        <button class="btn btn-sm bg-transparent text-primary d-inline-flex align-items-center justify-content-centert" data-bs-toggle="dropdown"><i class="fas fa-bars"></i></button>
+
+        <ul class="dropdown-menu dropdown-menu-end">
+
+            <li>
+                <a class="dropdown-item"
+                   href="#"
+                   @click.prevent="editarReceita(item)">
+                    <iconify-icon icon="solar:pen-bold-duotone" class="fs-4 aside-icon"></iconify-icon> Editar
+                </a>
+            </li>
+
+            <li>
+                <a class="dropdown-item text-danger"
+                   href="#"
+                   @click.prevent="excluirReceitaBusca(item)">
+                    <iconify-icon icon="solar:trash-bin-minimalistic-bold-duotone" class="fs-4 aside-icon"></iconify-icon> Excluir
+                </a>
+            </li>
+
+        </ul>
+
+    </div>
+
+</div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</div>
                         </div>
                     </div>
 
                 </div>
                 <div class="modal-footer pt-0">
+                    <button type="button" class="btn btn-info waves-effect text-start" @click="abrirModalReceitaPersonalizada">
+Receita Personalizada</button>
                     <button type="button" class="btn bg-danger-subtle text-danger  waves-effect text-start"
                         data-bs-dismiss="modal">Fechar</button>
                     <button type="button" class="btn bg-info-subtle text-info"
@@ -1424,6 +1463,48 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
         </div>
     </div>
 
+
+<!-- Modal Receita Personalizada -->
+<div class="modal fade" id="bs-modal-receita-personalizada" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Personalizar Receita</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Título da Receita</label>
+                    <input type="text" class="form-control" v-model="receitaPersonalizada.titulo" 
+                           placeholder="Ex: Nome do medicamento OU Pós-operatório">
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Conteúdo Personalizado</label>
+                    <textarea class="form-control" rows="8" id="texto-receita-personalizada" placeholder="Digite sua receita personalizada aqui..."></textarea>
+                    <small class="text-muted">Use este campo para criar uma receita livre, com formatação simples.</small>
+                </div>
+
+                <div class="mb-3">
+                    <div class="py-2">
+                        <input class="form-check-input" type="checkbox" value="1" id="checkReceitaUsoRestritoModal" 
+                               v-model="receitaPersonalizada.uso_restrito">
+                        <label class="form-check-label text-danger" for="checkReceitaUsoRestritoModal">
+                            <strong>Esse medicamento é de uso restrito</strong>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-success" @click="salvarReceitaPersonalizada" :disabled="receitaPersonalizada.salvando">
+                    <span v-if="receitaPersonalizada.salvando">Salvando...</span>
+                    <span v-else>Salvar Receita</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!---- modal anamneses ------>
     <div class="modal fade" id="bs-modal-anamnese" tabindex="-1" aria-labelledby="bs-modal-anamnese" aria-hidden="true">
@@ -1585,33 +1666,53 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                 v-model="documento.procedimento_id">
                             <input type="hidden" name="usuario_id" id="usuario-id" v-model="documento.usuario_id">
                             <?= $this->Form->control('texto', ['label' => '', 'class' => 'form-control', 'type' => 'textarea', 'rows' => 5, 'id' => 'texto-documento']); ?>
+<input class="form-check-input" type="checkbox" value="1" id="checkDocumentoExigirAssinaturaPaciente" 
+v-model="documento.exigir_assinatura_paciente">
+<label class="form-check-label" for="checkDocumentoExigirAssinaturaPaciente">
+    <strong>Solicitar assinatura do paciente</strong>
+</label>
+&nbsp;&nbsp;
+<input class="form-check-input" type="checkbox" value="1" id="checkDocumentoExigirAssinaturaProfissional" 
+v-model="documento.exigir_assinatura_profissional">
+<label class="form-check-label" for="checkDocumentoExigirAssinaturaProfissional">
+    <strong>Solicitar assinatura do profissional</strong>
+</label>
                         </div>
                         <div class="col-md-4 mb-0">
                             <h4>Modelos de Documentos</h4>
                             <div class="list-group">
-                            <a href="#" v-for="modelo in modelosDocumento" :key="modelo.id" class="list-group-item d-flex justify-content-between align-items-center adicionarModelo p-3" :data-id="modelo.id" :data-tipo="'documento'":data-cabecalho="modelo.cabecalho" :data-titulo="modelo.titulo" :data-descricao="encodeURIComponent(modelo.descricao)"@click.prevent>
+                            <a href="#" 
+   v-for="modelo in modelosDocumento" 
+   :key="modelo.id" 
+   class="list-group-item d-flex justify-content-between align-items-center adicionarModelo p-3" 
+   :data-id="modelo.id" 
+   :data-tipo="'documento'"
+   :data-cabecalho="modelo.cabecalho" 
+   :data-titulo="modelo.titulo" 
+   :data-descricao="encodeURIComponent(modelo.descricao)"
+   :data-exigir-assinatura-paciente="modelo.exigir_assinatura_paciente"
+   :data-exigir-assinatura-profissional="modelo.exigir_assinatura_profissional"
+   @click.prevent>
 
     <span>{{ modelo.nome }}</span>
 
     <!-- DROPDOWN -->
     <div class="dropdown" v-show="modelo.estabelecimento_id">
-
-        <button class="btn btn-sm bg-transparent text-primary d-inline-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" @click.stop>
-<i class="fas fa-bars"></i>
-            
+        <button class="btn btn-sm bg-transparent text-primary d-inline-flex align-items-center justify-content-center" 
+                type="button" data-bs-toggle="dropdown" @click.stop>
+            <i class="fas fa-bars"></i>
         </button>
-
         <ul class="dropdown-menu dropdown-menu-end">
             <li>
-                <button class="dropdown-item" @click.stop="editarModelo(modelo, 'documento')"> <iconify-icon icon="solar:pen-bold-duotone" class="fs-4 aside-icon"></iconify-icon> Editar</button>
+                <button class="dropdown-item" @click.stop="editarModelo(modelo, 'documento')"> 
+                    <iconify-icon icon="solar:pen-bold-duotone" class="fs-4 aside-icon"></iconify-icon> Editar
+                </button>
             </li>
-
             <li>
                 <button class="dropdown-item text-danger" @click.stop="excluirModelo(modelo, 'documento')">
                     <iconify-icon icon="solar:trash-bin-minimalistic-bold-duotone" class="fs-4 aside-icon"></iconify-icon> Excluir
                 </button>
             </li>
-
         </ul>
     </div>
 </a>
@@ -1888,6 +1989,19 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
         }
     });
 
+    tinymce.init({
+        license_key: 'gpl',
+        selector: '#texto-receita-personalizada',
+        menubar: false,
+        plugins: 'anchor autolink charmap searchreplace visualblocks wordcount lists',
+        toolbar: 'undo redo | bold italic underline strikethrough | align lineheight | numlist bullist indent outdent',
+        setup: function (editor) {
+            editor.on('keyup change paste undo redo', function () {
+                appConsulta.receitaPersonalizada.texto = editor.getContent();
+            });
+        }
+    });
+
 </script>
 
 <style>
@@ -1915,6 +2029,32 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
         data() {
             return {
+                Busca: {
+                    termo: '',
+                    selecionados: [],
+                    receitas: <?= json_encode($receituarioMedico) ?>,
+                    labels: {
+                        analgesico: 'Analgésico',
+                        antibiotico: 'Antibiótico',
+                        antiinflamatorio: 'Anti-inflamatório',
+                        antialergico: 'Antialérgico',
+                        corticoide: 'Corticoide',
+                        antifungico: 'Antifúngico',
+                        antiviral: 'Antiviral',
+                        gastrointestinal: 'Gastrointestinal',
+                        respiratorio: 'Respiratório',
+                        topico: 'Uso tópico',
+                        personalizado: 'Personalizado',
+                        uso_restrito: 'Uso restrito'
+                    }
+                },
+                receitaPersonalizada: {
+                    id: null,
+                    titulo: '',
+                    texto: '',
+                    uso_restrito: false,
+                    salvando: false
+                },
                 modelosAnamnese: [],
                 modelosLaudo: [],
                 modelosDocumento: [],
@@ -1961,6 +2101,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     cabecalho: false,
                     titulo: null,
                     tipo: 'anamnese',
+                    exigir_assinatura_paciente:true,
+                    exigir_assinatura_profissional:false,
                     salvando: false
                 },
                 receita: {
@@ -1971,6 +2113,9 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     cabecalho: false,
                     titulo: 'Receita',
                     tipo: 'receita',
+                    uso_restrito: false,
+                    exigir_assinatura_profissional:true,
+                    exigir_assinatura_paciente: false,
                     salvando: false
                 },
                 laudo: {
@@ -1981,6 +2126,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     cabecalho: false,
                     titulo: null,
                     tipo: 'laudo',
+                    exigir_assinatura_profissional:true,
+                    exigir_assinatura_paciente: false,
                     salvando: false
                 },
                 documento: {
@@ -1991,6 +2138,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     cabecalho: false,
                     titulo: null,
                     tipo: 'documento',
+                    exigir_assinatura_paciente: false,
+                    exigir_assinatura_profissional: false,
                     salvando: false
                 },
                 logsModal: {
@@ -2011,15 +2160,49 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                 },
             };
         },
+        watch: {
+            temUsoRestrito(valor) {
+                    this.receita.uso_restrito = valor;
+            }
+        },
         mounted() {
             this.itens = this.itens.map(item => ({
                 ...item,
                 aberto: false,
                 anexos: item.anexos || []
             }));
+
+            // Carrega todos os modelos de uma vez
+            this.carregarModelosAnamnese();
+            this.carregarModelosLaudo();
+            this.carregarModelosDocumento();
         },
 
         computed: {
+            temUsoRestrito() {
+                return this.Busca.selecionados.some(item => item.uso_restrito === true);
+            },
+            receitasIBusca() {
+
+                let resultado = {};
+
+                for (let categoria in this.Busca.receitas) {
+
+                    const filtrados = this.Busca.receitas[categoria].filter(item => {
+                        return item.titulo
+                            .toLowerCase()
+                            .includes(this.Busca.termo.toLowerCase());
+                    });
+
+                    // só adiciona se tiver itens
+                    if (filtrados.length > 0) {
+                        resultado[categoria] = filtrados;
+                    }
+
+                }
+
+                return resultado;
+            },
 
             servicos() {
                 return Object.entries(this.servicosRaw).map(([id, text]) => ({
@@ -2035,6 +2218,203 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
         },
 
         methods: {
+        excluirReceitaBusca(item) {
+
+            AppAlerts.confirm({
+                title: 'Excluir?',
+                text: 'Deseja remover esta receita?'
+            }).then(result => {
+
+                if (!result.isConfirmed) return;
+
+                axios.delete(
+                    "<?= $this->Url->build(['controller' => 'Receituarios', 'action' => 'delete']) ?>/" + item.id +'.json',
+                    {
+                        headers: {
+                            'X-CSRF-Token': "<?= $this->request->getAttribute('csrfToken') ?>"
+                        }
+                    }
+                ).then(() => {
+
+                    AppAlerts.success('Removido', 'Receita excluída');
+
+                    // atualiza lista
+                    this.carregarReceitasBusca();
+
+                });
+
+            });
+        },
+        editarReceita(item) {
+           
+            this.receitaPersonalizada = {
+                id: item.id,
+                titulo: item.titulo,
+                texto: item.descricao,  // campo renomeado para 'texto'
+                uso_restrito: item.uso_restrito || false,
+                salvando: false
+            };
+            
+            const modal = new bootstrap.Modal(
+                document.getElementById('bs-modal-receita-personalizada')
+            );
+            
+            modal.show();
+            
+            // Carrega o conteúdo no TinyMCE após o modal abrir
+            this.$nextTick(() => {
+                const editor = tinymce.get('texto-receita-personalizada');
+                if (editor && this.receitaPersonalizada.texto) {
+                    editor.setContent(this.receitaPersonalizada.texto);
+                }
+            });
+        },
+        isSelecionado(item) {
+            return this.Busca.selecionados.some(i => i.id === item.id);
+        },
+        toggleReceitaBusca(item) {
+
+            const texto = item.descricao;
+            if (!texto) return;
+
+            const editor = tinymce.get('texto-receita');
+            const hash = btoa(texto);
+
+            const index = this.Busca.selecionados.findIndex(i => i.id === item.id);
+
+            if (index !== -1) {
+
+                // REMOVE do selecionado
+                this.Busca.selecionados.splice(index, 1);
+
+                // REMOVE do editor
+                let parser = new DOMParser();
+                let doc = parser.parseFromString(editor.getContent(), 'text/html');
+
+                $(doc).find(`p[data-receita="${hash}"]`).remove();
+
+                editor.setContent(doc.body.innerHTML);
+
+            } else {
+
+                // ADICIONA no selecionado
+                this.Busca.selecionados.push(item);
+
+                const bloco = `<p data-receita="${hash}">${texto}</p>`;
+
+                editor.insertContent(bloco + '<br>');
+            }
+        },
+
+        abrirModalReceitaPersonalizada() {
+            // Preenche com os dados atuais da receita (se houver)
+            const editor = tinymce.get('texto-receita');
+            const conteudoAtual = editor ? editor.getContent() : this.receita.texto;
+            
+            this.receitaPersonalizada = {
+                titulo: '',
+                descricao: conteudoAtual || '',
+                uso_restrito: false,
+            };
+            
+            // Abre o modal
+            const modal = new bootstrap.Modal(document.getElementById('bs-modal-receita-personalizada'));
+            modal.show();
+        },
+        carregarReceitasBusca() {
+
+            axios.get("<?= $this->Url->build(['controller' => 'Receituarios', 'action' => 'listar', '_ext' => 'json']) ?>")
+                .then(response => {
+
+                    if (response.data.success) {
+
+                        // atualiza lista reativa
+                        this.Busca.receitas = response.data.receitas;
+
+                    }
+
+                })
+                .catch(() => {
+                    AppAlerts.error('Erro', 'Erro ao carregar receitas');
+                });
+
+        },
+        salvarReceitaPersonalizada() {
+            if (this.receitaPersonalizada.salvando) return;
+
+            // Pega conteúdo do TinyMCE
+            const editor = tinymce.get('texto-receita-personalizada');
+            if (editor) {
+                this.receitaPersonalizada.texto = editor.getContent();
+            }
+
+            if (!this.receitaPersonalizada.texto) {
+                AppAlerts.warning('Atenção', 'Informe o conteúdo da receita personalizada');
+                return;
+            }
+            
+            if (!this.receitaPersonalizada.titulo) {
+                AppAlerts.warning('Atenção', 'Informe um título para a receita');
+                return;
+            }
+            
+            this.receitaPersonalizada.salvando = true;
+            
+            const dadosReceita = {
+                id: this.receitaPersonalizada.id || null,  // se tiver ID, atualiza
+                descricao: this.receitaPersonalizada.texto,
+                titulo: this.receitaPersonalizada.titulo,
+                exigir_assinatura_profissional:true,
+                uso_restrito: this.receitaPersonalizada.uso_restrito
+            };
+            
+            axios.post(
+                "<?= $this->Url->build(['controller' => 'Receituarios', 'action' => 'salvar', '_ext' => 'json']) ?>",
+                dadosReceita,
+                {
+                    headers: {
+                        'X-CSRF-Token': "<?= $this->request->getAttribute('csrfToken') ?>"
+                    }
+                }
+            ).then(response => {
+                if (response.data.success) {
+                    AppAlerts.success('Sucesso', this.receitaPersonalizada.id ? 'Receita atualizada com sucesso' : 'Receita personalizada salva com sucesso');
+                    this.carregarReceitasBusca();
+                    
+                    // Fecha modal
+                    bootstrap.Modal.getInstance(document.getElementById('bs-modal-receita-personalizada')).hide();
+                    
+                    // Limpa formulário se for nova (não edição)
+                    if (!this.receitaPersonalizada.id) {
+                        this.Busca.selecionados = [];
+                        this.receita.texto = '';
+                        if (tinymce.get('texto-receita')) {
+                            tinymce.get('texto-receita').setContent('');
+                        }
+                        this.receita.uso_restrito = false;
+                        this.receita.titulo = '';
+                    }
+                    
+                    // Reseta dados
+                    this.receitaPersonalizada = {
+                        id: null,
+                        titulo: '',
+                        texto: '',
+                        uso_restrito: false,
+                        salvando: false
+                    };
+                    this.receitaPersonalizada.salvando = false;
+                } else {
+                    AppAlerts.error('Erro', response.data.message || 'Ocorreu um erro');
+                    this.receitaPersonalizada.salvando = false;
+                }
+            }).catch(() => {
+                AppAlerts.error('Erro', 'Erro ao salvar receita personalizada');
+                this.receitaPersonalizada.salvando = false;
+            }).finally(() => {
+                this.receitaPersonalizada.salvando = false;
+            });
+        },
             excluirModelo(modelo, tipo) {
                 AppAlerts.confirm({
                     title: 'Tem certeza?',
@@ -2511,6 +2891,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                             // limpa dados
                             this.receita.texto = '';
                             this.receita.titulo = '';
+                            this.receita.uso_restrito = false;
                             this.receita.procedimento_id = null;
                             this.itemReceita = null;
 
@@ -2635,6 +3016,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     cabecalho: false,
                     titulo: null,
                     tipo: 'laudo',
+                    exigir_assinatura_profissional:true,
                     salvando: false
                 };
 
@@ -2715,6 +3097,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     titulo: null,
                     cabecalho: false,
                     tipo: 'anamnese',
+                    exigir_assinatura_paciente:true,
                     salvando: false
                 };
 
@@ -2742,11 +3125,11 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     tipo: 'receita',
                     titulo: 'Receita',
                     cabecalho: false,
+                    exigir_assinatura_profissional:true,
                     texto: '',
                     salvando: false
                 };
-
-                limparReceitasSelecionadas();
+                this.Busca.selecionados = [];
 
                 const modalEl = document.getElementById('bs-modal-receitas');
                 const modalReceitas = bootstrap.Modal.getOrCreateInstance(modalEl);
@@ -2794,13 +3177,18 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
                 return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
             },
-
-            formatarData(data) {
+            formatarData(data, isDateTime = true) {
                 if (!data) return '-';
-
+                
                 const d = new Date(data);
-                return d.toLocaleDateString('pt-BR') + ' ' +
-                    d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                const dataFormatada = d.toLocaleDateString('pt-BR');
+                
+                if (isDateTime) {
+                    const horaFormatada = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                    return `${dataFormatada} ${horaFormatada}`;
+                }
+                
+                return dataFormatada;
             },
             removerAnexo(item, anexo, index) {
 
@@ -2927,6 +3315,31 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
                 event.target.value = '';
             },
+            buscarFinancasProcedimento(procedimentoId) {
+                // Usando a action search com parâmetros
+                return axios.get("<?= $this->Url->build(['controller' => 'Financas', 'action' => 'buscaAvancada', '_ext' => 'json'], ['fullBase' => true]); ?>", {
+                    params: {
+                        tipo: 'receitas', // ou o tipo que você usa
+                        procedimento_id: procedimentoId, // se adicionou o filtro (Opção 1)
+                    },
+                    headers: {
+                        'X-CSRF-Token': "<?= $this->request->getAttribute('csrfToken') ?>"
+                    }
+                }).then(response => {
+                    if (response.data && response.data.data) {
+                        // Filtra apenas as finanças do procedimento específico
+                        // (caso o backend já não tenha filtrado)
+                        const financasDoProcedimento = response.data.data.filter(
+                            financia => financia.procedimento_id == procedimentoId
+                        );
+                        return financasDoProcedimento;
+                    }
+                    return [];
+                }).catch(error => {
+                    console.error('Erro ao buscar finanças:', error);
+                    return [];
+                });
+            },
             aprovarProcedimento(item, index) {
 
                 //  Se desaprovou, fecha imediatamente
@@ -3011,7 +3424,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                 return subtotal > 0 ? subtotal : 0;
             },
             formatarMoeda(valor) {
-                return valor.toLocaleString('pt-BR', {
+                return parseFloat(valor).toLocaleString('pt-BR', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 });
@@ -3051,6 +3464,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                             //this.itens[index].id = response.data.id;
                             this.$set(this.itens[index], 'id', response.data.id);
 
+                                this.buscarFinancasProcedimento(item.id).then(financas => {
+                                    if (financas && financas.length > 0) {
+                                        this.$set(this.itens[index], 'financas', financas);
+                                    }
+                                }).catch(() => {
+                                    //imp
+                                });
                             AppAlerts.success('Sucesso', response.data.message);
 
                         } else {
@@ -3270,61 +3690,6 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
     });
 
-    $(document).on('keyup', '#buscarReceita', function () {
-
-        var termo = $(this).val().toLowerCase();
-
-        $('.adicionarReceitas').each(function () {
-
-            var texto = $(this).text().toLowerCase();
-            var item = $(this).closest('.mb-2');
-
-            if (texto.includes(termo)) {
-                item.show();
-                $(this).closest('.accordion-collapse').addClass('show');
-            } else {
-                item.hide();
-            }
-
-        });
-
-    });
-
-    $(document).on('click', '.adicionarReceitas', function (e) {
-        e.preventDefault();
-
-        var $link = $(this);
-        var texto = $link.data('descricao');
-
-        if (!texto) return;
-
-        var editor = tinymce.get('texto-receita');
-        var conteudoAtual = editor.getContent();
-
-        var bloco = '<p data-receita="' + btoa(texto) + '">' + texto + '</p>';
-
-        if ($link.hasClass('receita-selecionada')) {
-
-            // REMOVE do editor
-            var parser = new DOMParser();
-            var doc = parser.parseFromString(conteudoAtual, 'text/html');
-
-            $(doc).find('p[data-receita="' + btoa(texto) + '"]').remove();
-
-            editor.setContent(doc.body.innerHTML);
-
-            $link.removeClass('receita-selecionada');
-
-        } else {
-
-            // ADICIONA se ainda não existir
-            if (!conteudoAtual.includes('data-receita="' + btoa(texto) + '"')) {
-                editor.insertContent(bloco + '<br>');
-            }
-
-            $link.addClass('receita-selecionada');
-        }
-    });
 
     function limparReceitasSelecionadas() {
 
@@ -3340,7 +3705,6 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
         }
     }
 
-
     function atualizarEditor(tipo, vm) {
 
         const conteudo = vm.selecionados[tipo]
@@ -3351,35 +3715,80 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
         if (editor) {
             editor.setContent(conteudo);
+            editor.focus();
         } else {
-            $('#texto-' + tipo).val(conteudo);
+            $('#texto-' + tipo).val(conteudo).focus();;
+
         }
     }
+
     $(document).on('click', '.adicionarModelo', function () {
 
         const id = $(this).data('id');
         const tipo = $(this).data('tipo');
         const descricao = decodeURIComponent($(this).data('descricao'));
-        const titulo = $(this).data('titulo'); // NOVO
-        const cabecalho = $(this).data('cabecalho'); // NOVO
-
+        const titulo = $(this).data('titulo');
+        const cabecalho = $(this).data('cabecalho');
+        
+        // Pega as exigências do modelo atual
+        let exigirAssinaturaProfissional = $(this).data('exigir-assinatura-profissional');
+        let exigirAssinaturaPaciente = $(this).data('exigir-assinatura-paciente');
+        
+        // Converte para boolean
+        exigirAssinaturaProfissional = (exigirAssinaturaProfissional === true || 
+                                         exigirAssinaturaProfissional === 'true' || 
+                                         exigirAssinaturaProfissional === 1 || 
+                                         exigirAssinaturaProfissional === '1');
+        
+        exigirAssinaturaPaciente = (exigirAssinaturaPaciente === true || 
+                                     exigirAssinaturaPaciente === 'true' || 
+                                     exigirAssinaturaPaciente === 1 || 
+                                     exigirAssinaturaPaciente === '1');
+        
         const vm = appConsulta;
-
         const lista = vm.selecionados[tipo];
-
         const index = lista.findIndex(m => m.id == id);
 
         if (index >= 0) {
+            // REMOVENDO modelo - recalcular os checkboxes
             lista.splice(index, 1);
             $(this).removeClass('active');
+            
+            // Recalcula os status baseado nos modelos RESTANTES
+            let precisaPaciente = false;
+            let precisaProfissional = false;
+            
+            lista.forEach(modelo => {
+                if (modelo.exigir_assinatura_paciente) precisaPaciente = true;
+                if (modelo.exigir_assinatura_profissional) precisaProfissional = true;
+            });
+            
+            vm.$set(vm[tipo], 'exigir_assinatura_paciente', precisaPaciente);
+            vm.$set(vm[tipo], 'exigir_assinatura_profissional', precisaProfissional);
+            
         } else {
-            lista.push({ id, descricao, titulo, cabecalho }); // NOVO
+            // ADICIONANDO modelo
+            lista.push({ 
+                id, 
+                descricao, 
+                titulo, 
+                cabecalho,
+                exigir_assinatura_paciente: exigirAssinaturaPaciente,
+                exigir_assinatura_profissional: exigirAssinaturaProfissional
+            });
             $(this).addClass('active');
+            
+            // ACUMULA: se qualquer modelo exigir, marca o checkbox
+            // Se o checkbox já estiver true, mantém true (não sobrescreve)
+            const pacienteAtual = vm[tipo].exigir_assinatura_paciente;
+            const profissionalAtual = vm[tipo].exigir_assinatura_profissional;
+            
+            vm.$set(vm[tipo], 'exigir_assinatura_paciente', pacienteAtual || exigirAssinaturaPaciente);
+            vm.$set(vm[tipo], 'exigir_assinatura_profissional', profissionalAtual || exigirAssinaturaProfissional);
         }
 
         atualizarEditor(tipo, vm);
 
-        // DEFINE O TÍTULO AUTOMATICAMENTE
         if (lista.length > 0) {
             vm[tipo].titulo = lista[lista.length - 1].titulo;
             vm[tipo].cabecalho = lista[lista.length - 1].cabecalho;
@@ -3387,9 +3796,10 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
             vm[tipo].titulo = null;
             vm[tipo].cabecalho = null;
         }
+        
     });
 
-    document.addEventListener("show.bs.modal", function (event) {
+document.addEventListener("show.bs.modal", function (event) {
 
         const modals = document.querySelectorAll('.modal.show');
         const zIndex = 1050 + (10 * modals.length);
@@ -3407,6 +3817,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
             }
         }, 0);
     });
+
 
     document.addEventListener("hidden.bs.modal", function () {
 
@@ -3621,4 +4032,27 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
         padding-left: 6px;
         border-radius: 4px;
     }
+.receita-selecionada {
+    background: #d1e7dd;
+    padding: 6px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+.receita-uso-restrito {
+    background: #f8d7da;
+    padding: 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    border-left: 4px solid #dc3545;
+}
+/* Estilo para uso restrito quando selecionado */
+.receita-selecionada.receita-uso-restrito {
+    background: #f8d7da;
+    border-left: 4px solid #dc3545;
+}
+/* Opcional: ícone ou indicador visual */
+.receita-uso-restrito::before {
+    content: "⚠️ ";
+    font-weight: normal;
+}
 </style>
