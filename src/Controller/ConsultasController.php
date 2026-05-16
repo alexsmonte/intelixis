@@ -160,7 +160,7 @@ class ConsultasController extends AppController
         $receituarioMedico = $receituariosTable->getAgrupadosPorCategoria($this->getRequest()->getSession()->read('Auth.Estabelecimento.id'));
 
         $title  =   'Minha consulta';
-        $this->set(compact('consulta', 'clientes', 'profissionais','title', 'servicos', 'receituarioMedico','agrupados'));
+        $this->set(compact('consulta', 'clientes', 'profissionais','title', 'servicos', 'receituarioMedico'));
     }
 
 
