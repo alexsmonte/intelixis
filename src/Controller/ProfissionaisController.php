@@ -318,4 +318,28 @@ class ProfissionaisController extends AppController
             ->withType('application/json')
             ->withStringBody(json_encode($res));
     }
+
+
+    public function fornecedorIndex()
+    {
+    
+    }
+
+    public function fornecedorNovo()
+    {
+    
+    }
+
+
+    public function fornecedorEditar()
+    {
+    
+    }
+
+    public function fornecedorDelete()
+    {
+    
+    }
+
+
 }

@@ -88,6 +88,13 @@ return function (RouteBuilder $routes): void {
         $builder->get('/documentos/get-logs/{id}', ['controller' => 'Documentos', 'action' => 'getLogs'])->setPass(['id']);
         $builder->get('/documentos/download-logs/{id}', ['controller' => 'Documentos', 'action' => 'downloadLogs'])->setPass(['id']);
 
+        $builder->connect('/fornecedor', ['controller' => 'Profissionais', 'action' => 'fornecedorIndex']);
+        $builder->connect('/fornecedor/index', ['controller' => 'Profissionais', 'action' => 'fornecedorIndex']);
+        $builder->connect('/fornecedor/novo', ['controller' => 'Profissionais', 'action' => 'fornecedorNovo']);
+        $builder->connect('/fornecedor/editar/', ['controller' => 'Profissionais', 'action' => 'fornecedorEditar'])->setPass(['id']);
+        $builder->connect('/fornecedor/delete/', ['controller' => 'Profissionais', 'action' => 'fornecedorDelete'])->setPass(['id']);
+
+
         /*
          * ...and connect the rest of 'Pages' controller's URLs.
          */
