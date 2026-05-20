@@ -437,10 +437,9 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
 
                             <div class="col-md-2 mb-3">
                                 <label for="valor" class="form-label">Valor *</label>
-                                <input type="text" class="form-control" id="valor" name="valor" v-model="form.valor"
-                                    @focus="prepararParaEdicao('valor', $event, 'form')"
-                                    @blur="finalizarFormatacao('valor', 'form')"
-                                    @input="formatarCampoMonetario('valor', $event, 'form')" placeholder="0,00"
+                                <input type="text" class="form-control" id="valor" name="valor"
+                                    v-model="form.valor" v-monetario
+                                    placeholder="0,00"
                                     :class="{'is-invalid': erros.valor}" required>
                                 <div class="invalid-feedback" v-if="erros.valor">{{ erros.valor }}</div>
                             </div>
@@ -488,19 +487,17 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                             <div class="col-md-2 mb-3">
                                 <label for="desconto" class="form-label">Desconto</label>
                                 <input type="text" class="form-control" id="desconto" name="desconto"
-                                    v-model="form.desconto" @focus="prepararParaEdicao('desconto', $event, 'form')"
-                                    @blur="finalizarFormatacao('desconto', 'form')"
-                                    @input="formatarCampoMonetario('desconto', $event, 'form')" placeholder="0,00"
+                                    v-model="form.desconto" v-monetario
+                                    placeholder="0,00"
                                     :class="{'is-invalid': erros.desconto}">
                                 <div class="invalid-feedback" v-if="erros.desconto">{{ erros.desconto }}</div>
                             </div>
 
                             <div class="col-md-2 mb-3">
                                 <label for="juros" class="form-label">Juros e Multa</label>
-                                <input type="text" class="form-control" id="juros" name="juros" v-model="form.juros"
-                                    @focus="prepararParaEdicao('juros', $event, 'form')"
-                                    @blur="finalizarFormatacao('juros', 'form')"
-                                    @input="formatarCampoMonetario('juros', $event, 'form')" placeholder="0,00"
+                                <input type="text" class="form-control" id="juros" name="juros"
+                                    v-model="form.juros" v-monetario
+                                    placeholder="0,00"
                                     :class="{'is-invalid': erros.juros}">
                                 <div class="invalid-feedback" v-if="erros.juros">{{ erros.juros }}</div>
                             </div>
@@ -510,10 +507,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                                     {{ abaAtivaTipo === 'receitas' ? 'Valor Recebido' : 'Valor Pago' }}
                                 </label>
                                 <input type="text" class="form-control" id="valor_recebido" name="valor_recebido"
-                                    v-model="form.valor_recebido"
-                                    @focus="prepararParaEdicao('valor_recebido', $event, 'form')"
-                                    @blur="finalizarFormatacao('valor_recebido', 'form')"
-                                    @input="formatarCampoMonetario('valor_recebido', $event, 'form')" placeholder="0,00"
+                                    v-model="form.valor_recebido" v-monetario
+                                    placeholder="0,00"
                                     :class="{'is-invalid': erros.valor_recebido}">
                                 <div class="invalid-feedback" v-if="erros.valor_recebido">{{ erros.valor_recebido }}
                                 </div>
@@ -569,9 +564,6 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                                                     <td>
                                                         <input type="text" class="form-control form-control-sm text-end"
                                                             v-model="rec.valor"
-                                                            @focus="prepararParaEdicao('valor', $event, 'recorrencia', rec)"
-                                                            @blur="finalizarFormatacao('valor', 'recorrencia', rec)"
-                                                            @input="formatarCampoMonetario('valor', $event, 'recorrencia', rec)"
                                                             placeholder="0,00" disabled>
                                                     </td>
                                                 </tr>
@@ -637,18 +629,16 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                                             <input type="text"
                                                 class="form-control form-control-sm rounded-pill text-end"
                                                 v-model="lan.descontoBaixa"
-                                                @focus="prepararParaEdicao('descontoBaixa', $event, 'baixa', lan)"
-                                                @blur="finalizarFormatacao('descontoBaixa', 'baixa', lan)"
-                                                @input="formatarCampoMonetario('descontoBaixa', $event, 'baixa', lan)"
+                                                v-monetario
+                                                @input="calcularTotalBaixa"
                                                 placeholder="0,00">
                                         </td>
                                         <td class="col-md-2 mb-3">
                                             <input type="text"
                                                 class="form-control form-control-sm rounded-pill text-end"
                                                 v-model="lan.valorRecebidoBaixa"
-                                                @focus="prepararParaEdicao('valorRecebidoBaixa', $event, 'baixa', lan)"
-                                                @blur="finalizarFormatacao('valorRecebidoBaixa', 'baixa', lan)"
-                                                @input="formatarCampoMonetario('valorRecebidoBaixa', $event, 'baixa', lan)"
+                                                v-monetario
+                                                @input="calcularTotalBaixa"
                                                 placeholder="0,00" required>
                                         </td>
                                     </tr>
@@ -734,6 +724,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
 
 <!-- Vue 3 -->
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<?= $this->Html->script('vue/vue-masks.js?v=2.5') ?>
 <?= $this->Html->script('vue/vue-index.js?v=' . filemtime(WWW_ROOT . 'js/vue/vue-index.js')) ?>
 
 <script>
@@ -770,9 +761,19 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
         }
     };
 
+    // Diretiva monetária — delega ao VueMasks centralizado
+    const MonetarioDirective = {
+        mounted(el, binding) {
+            if (window.VueMasks && window.VueMasks.aplicarMascaraMonetariaCustom) {
+                window.VueMasks.aplicarMascaraMonetariaCustom(el);
+            }
+        }
+    };
+
     createVueIndex({
         directives: {
-            'selectpicker': SelectpickerDirective
+            'selectpicker': SelectpickerDirective,
+            'monetario': MonetarioDirective
         },
         customFilters: {
             categoriaFiltroId: 'categoria_id'
@@ -990,16 +991,16 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                 this.form = {
                     descricao: lan.descricao || '',
                     data_vencimento: this.formatarDataParaInput(lan.data_vencimento) || TODAY,
-                    valor: this.converterParaBrasileiro(lan.valor) || '0,00',
+                    valor: this.formatarMoedaBR(lan.valor),
                     cliente_id: lan.cliente_id || '',
                     profissional_id: lan.profissional_id || '',
                     categoria_id: this.abaAtivaTipo === 'despesas' ? (lan.ccustos_id || '') : '',
                     ccustos_id: lan.ccustos_id || '',
                     tipo_aba: this.abaAtivaTipo,
                     data_baixa: lan.data_baixa || '',
-                    desconto: this.converterParaBrasileiro(lan.desconto) || '0,00',
-                    juros: this.converterParaBrasileiro(lan.juros) || '0,00',
-                    valor_recebido: this.converterParaBrasileiro(lan.valor_recebido) || '0,00',
+                    desconto: this.formatarMoedaBR(lan.desconto),
+                    juros: this.formatarMoedaBR(lan.juros),
+                    valor_recebido: this.formatarMoedaBR(lan.valor_recebido),
                     repetir_lancamento: false, periodo_recorrencia: 'mensal', ocorrencia_recorrencia: 1
                 };
                 this.listaRecorrencias = [];
@@ -1112,8 +1113,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                 this.lancamentosSelecionados = this.lancamentos.filter(lan => this.selecionados.includes(lan.id))
                     .map(lan => ({
                         ...lan,
-                        descontoBaixa: this.converterParaBrasileiro(lan.desconto || '0'),
-                        valorRecebidoBaixa: lan.valor_recebido ? this.converterParaBrasileiro(lan.valor_recebido) : '0,00'
+                        descontoBaixa: this.formatarMoedaBR(lan.desconto || '0'),
+                        valorRecebidoBaixa: this.formatarMoedaBR(lan.valor_recebido || '0')
                     }));
                 this.calcularTotalBaixa();
                 if (this.modalBaixaInstance) this.modalBaixaInstance.show();
@@ -1216,40 +1217,12 @@ $this->BreadcrumbsPlus->add([['title' => 'Lançamentos Financeiros']]);
                 }
             },
 
-            formatarCampoMonetario(campo, evento, contexto = 'form', item = null) {
-                let v = evento.target.value.replace(/[^\d]/g, '');
-                if (v === '') {
-                    if (contexto === 'form') this.form[campo] = '0,00';
-                    else if (item) item[campo] = '0,00';
-                    if (contexto === 'baixa') this.calcularTotalBaixa(); return;
-                }
-                while (v.length < 3) v = '0' + v;
-                let c = v.slice(-2);
-                let i = v.slice(0, -2).replace(/^0+/g, '') || '0';
-                if (i.length > 3) i = i.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                let vf = i + ',' + c;
-                if (contexto === 'form') this.form[campo] = vf;
-                else if (item) item[campo] = vf;
-                if (contexto === 'baixa') this.calcularTotalBaixa();
-            },
-            prepararParaEdicao(campo, evento, contexto = 'form', item = null) {
-                let v = (contexto === 'form') ? (this.form[campo] || '0,00') : (item[campo] || '0,00');
-                if (contexto === 'form') this.form[campo] = v.replace(/\./g, '');
-                else item[campo] = v.replace(/\./g, '');
-                setTimeout(() => evento.target.select(), 10);
-            },
-            finalizarFormatacao(campo, contexto = 'form', item = null) {
-                let v = (contexto === 'form') ? (this.form[campo] || '0,00') : ((item) ? (item[campo] || '0,00') : null);
-                if (!v) return;
-                if (!v.includes(',')) v += ',00';
-                if (contexto === 'form') this.form[campo] = v; else item[campo] = v;
-                if (contexto === 'baixa') this.calcularTotalBaixa();
-            },
-            prepararValorParaEnvio(vf) { return (!vf || vf === '') ? '0,00' : vf.toString().replace(/\./g, ''); },
-            converterParaBrasileiro(vd) {
+            // Converte valor do banco (decimal com ponto, ex: "150.50") para formato BR ("150,50")
+            formatarMoedaBR(vd) {
                 let n = parseFloat(vd);
                 return (!vd || isNaN(n)) ? '0,00' : n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             },
+            prepararValorParaEnvio(vf) { return (!vf || vf === '') ? '0,00' : vf.toString().replace(/\./g, ''); },
             formatarDataParaInput(d) {
                 try { return (!d) ? '' : new Date(d).toISOString().split('T')[0]; } catch (e) { return ''; }
             }

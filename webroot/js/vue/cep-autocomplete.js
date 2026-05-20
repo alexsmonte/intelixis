@@ -8,17 +8,39 @@
             const carregando = ref(false);
             const erro = ref(null);
 
-            const aplicarMascara = () => {
+            const aplicarMascara = (autoSearch = true) => {
                 let valorLimpo = cep.value.replace(/\D/g, "");
                 if (valorLimpo.length > 5) {
                     valorLimpo = valorLimpo.slice(0, 5) + "-" + valorLimpo.slice(5, 8);
                 }
                 cep.value = valorLimpo;
+
+                // Busca automatica ao atingir 8 digitos
+                if (autoSearch && valorLimpo.replace(/\D/g, "").length === 8) {
+                    buscarCep();
+                }
+            };
+
+            // Formata o CEP inicial sem disparar nova busca ViaCEP
+            aplicarMascara(false);
+
+            const setInputValue = (selector, value) => {
+                const el = document.querySelector(selector);
+                if (el) {
+                    el.value = value || '';
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                }
             };
 
             const buscarCep = async () => {
+                if (carregando.value) return;
                 erro.value = null;
                 const cepLimpo = cep.value.replace(/\D/g, "");
+
+                if (cepLimpo.length === 0) {
+                    return; // Retorna sem erro se o campo estiver vazio
+                }
 
                 if (cepLimpo.length !== 8) {
                     erro.value = "CEP inválido.";
@@ -33,27 +55,28 @@
 
                     if (data.erro) {
                         erro.value = "CEP não encontrado.";
-                        document.querySelector('#logradouro').value = '';
-                        document.querySelector('#bairro').value = '';
-                        document.querySelector('#cidade').value = '';
-                        document.querySelector('#uf').value = '';
-                        document.querySelector('#numero').value = '';
+                        setInputValue('#logradouro', '');
+                        setInputValue('#bairro', '');
+                        setInputValue('#cidade', '');
+                        setInputValue('#uf', '');
+                        setInputValue('#numero', '');
                     } else {
-                        document.querySelector('#cep').value = data.cep;
-                        document.querySelector('#logradouro').value = data.logradouro;
-                        document.querySelector('#bairro').value = data.bairro;
-                        document.querySelector('#cidade').value = data.localidade;
-                        document.querySelector('#uf').value = data.uf;
-                        document.querySelector('#cep').value = data.cep;
-                        document.querySelector('#numero').focus();
+                        cep.value = data.cep; // Atualiza o Ref diretamente para evitar loop de evento
+                        setInputValue('#logradouro', data.logradouro);
+                        setInputValue('#bairro', data.bairro);
+                        setInputValue('#cidade', data.localidade);
+                        setInputValue('#uf', data.uf);
+                        
+                        const inputNumero = document.querySelector('#numero');
+                        if (inputNumero) inputNumero.focus();
                     }
                 } catch (e) {
-                    document.querySelector('#logradouro').value = '';
-                    document.querySelector('#bairro').value = '';
-                    document.querySelector('#cidade').value = '';
-                    document.querySelector('#uf').value = '';
-                    document.querySelector('#numero').value = '';
-                    document.querySelector('#cep').value = '';
+                    setInputValue('#logradouro', '');
+                    setInputValue('#bairro', '');
+                    setInputValue('#cidade', '');
+                    setInputValue('#uf', '');
+                    setInputValue('#numero', '');
+                    cep.value = ''; // Atualiza o Ref diretamente
                     erro.value = "Erro ao consultar o CEP.";
                 } finally {
                     carregando.value = false;
@@ -63,31 +86,41 @@
             return { cep, carregando, erro, aplicarMascara, buscarCep };
         },
 
+        mounted() {
+            if (typeof Iconify !== 'undefined') {
+                Iconify.scan(this.$el);
+            }
+        },
+
         template: `
         <div class="mb-3">
-            
-           <label for="cep-input" class="form-label spike-label">CEP</label>
-
-            <div class="input-group">
-               
+            <label for="cep">CEP</label>
+            <div class="position-relative">
+                <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
+                    <span class="iconify fs-5" data-icon="solar:map-point-linear"></span>
+                </span>
+                
                 <input
                     id="cep"
                     name="cep" 
                     type="text"
-                    class="form-control"
+                    class="form-control rounded-pill ps-5 pe-5"
                     v-model="cep"
                     @input="aplicarMascara"
                     @blur="buscarCep"
+                    @keyup.enter="buscarCep"
                     placeholder="00000-000"
                     maxlength="9"
                 />
-                <button type="button" @click="buscarCep" class="btn border border-primary-subtle btn-primary search-btn" 
-                data-bs-toggle="tooltip" data-bs-placement="top" title="Consultar Cep" :disabled="carregando">
-                    <span v-if="carregando" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    <span v-else><i class="ti ti-search"></i></span>
-                </button>
+                
+                <span class="position-absolute top-50 end-0 translate-middle-y pe-3 text-muted">
+                    <span v-show="carregando" class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
+                    <button v-show="!carregando" type="button" @click="buscarCep" class="btn btn-link p-0 text-muted hover-primary" title="Consultar CEP">
+                        <span class="iconify fs-5" data-icon="solar:magnifer-linear"></span>
+                    </button>
+                </span>
             </div>
-            <div v-if="erro" class="text-danger mt-1">{{ erro }}</div>
+            <div v-if="erro" class="text-danger mt-1 small ms-3">{{ erro }}</div>
         </div>
         `
     };

@@ -3,7 +3,6 @@
 $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 'Consultas', 'action' => 'index']], ['title' => 'Realizando consulta']]);
 
 ?>
-
 <?= $this->element('barra-titulo', ['title' => $title]); ?>
 
 <div class="card w-100 position-relative overflow-hidden" id="appConsulta">
@@ -53,8 +52,11 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                             class="fs-9 aside-icon"></iconify-icon>
                                     </a>
                                     <a href="#" class="sidebar-link primary-hover-bg"
-                                        @click.prevent="item.aberto = !item.aberto" v-show="item.id && item.aprovar == 1">
-                                        <iconify-icon :icon="item.aberto ? 'solar:minimize-square-bold-duotone':'solar:maximize-square-bold-duotone'" class="fs-9 aside-icon"></iconify-icon>
+                                        @click.prevent="item.aberto = !item.aberto"
+                                        v-show="item.id && item.aprovar == 1">
+                                        <iconify-icon
+                                            :icon="item.aberto ? 'solar:minimize-square-bold-duotone':'solar:maximize-square-bold-duotone'"
+                                            class="fs-9 aside-icon"></iconify-icon>
                                     </a>
                                 </div>
                             </div>
@@ -254,21 +256,26 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                         <td>
                                                             <div class="dropdown">
                                                                 <button
-                                                                    class="btn  bg-transparent text-primary  d-inline-flex align-items-center justify-content-center" type="button" :id="'dropdownMenu-' + anamnese.id" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-bars"></i></button>
+                                                                    class="btn  bg-transparent text-primary  d-inline-flex align-items-center justify-content-center"
+                                                                    type="button" :id="'dropdownMenu-' + anamnese.id"
+                                                                    data-bs-toggle="dropdown" aria-expanded="false"><i
+                                                                        class="fas fa-bars"></i></button>
                                                                 <ul class="dropdown-menu dropdown-menu-end"
                                                                     :aria-labelledby="'dropdownMenu-' + anamnese.id">
                                                                     <!-- Assinar Paciente -->
                                                                     <li class="dropdown-item"
                                                                         v-if="!anamnese.assinatura_hash">
-                                                                        <a :href="`<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'assinarPaciente'], ['fullBase' => true]) ?>/${anamnese.id}`"
+                                                                        <a href="#"
+                                                                            @click.prevent="abrirModalAssinarPaciente(anamnese)"
                                                                             class="link-state link-success2 d-flex align-items-center gap-2"
                                                                             title="Gerar link de assinatura do paciente">
-                                                                            <iconify-icon
-                                                                                icon="solar:user-hand-up-bold-duotone"
-                                                                                class="fs-7"></iconify-icon> Assinar
-                                                                            Paciente
+                                                                            <iconify-icon icon="ph:signature-fill"
+                                                                                class="fs-7"></iconify-icon>
+                                                                            Solicitar Assinatura do Paciente
                                                                         </a>
+
                                                                     </li>
+
                                                                     <!-- Assinar Profissional -->
                                                                     <li class="dropdown-item"
                                                                         v-if="!anamnese.assinatura_prof_hash"
@@ -279,6 +286,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                             <iconify-icon
                                                                                 icon="solar:pen-new-square-bold-duotone"
                                                                                 class="fs-7"></iconify-icon> Assinar
+                                                                            como
                                                                             Profissional
                                                                         </a>
                                                                     </li>
@@ -426,13 +434,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                     <!-- Assinar Paciente -->
                                                                     <li class="dropdown-item"
                                                                         v-if="!anotacao.assinatura_hash">
-                                                                        <a :href="`<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'assinarPaciente'], ['fullBase' => true]) ?>/${anotacao.id}`"
+                                                                        <a href="#"
+                                                                            @click.prevent="abrirModalAssinarPaciente(anotacao)"
                                                                             class="link-state link-success2 d-flex align-items-center gap-2"
                                                                             title="Gerar link de assinatura do paciente">
-                                                                            <iconify-icon
-                                                                                icon="solar:user-hand-up-bold-duotone"
-                                                                                class="fs-7"></iconify-icon> Assinar
-                                                                            Paciente
+                                                                            <iconify-icon icon="ph:signature-fill"
+                                                                                class="fs-7"></iconify-icon>Solicitar
+                                                                            Assinatura do Paciente
                                                                         </a>
                                                                     </li>
                                                                     <!-- Assinar Profissional -->
@@ -445,6 +453,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                             <iconify-icon
                                                                                 icon="solar:pen-new-square-bold-duotone"
                                                                                 class="fs-7"></iconify-icon> Assinar
+                                                                            como
                                                                             Profissional
                                                                         </a>
                                                                     </li>
@@ -607,13 +616,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                     <!-- Assinar Paciente -->
                                                                     <li class="dropdown-item"
                                                                         v-if="!doc.assinatura_hash">
-                                                                        <a :href="`<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'assinarPaciente'], ['fullBase' => true]) ?>/${doc.id}`"
+                                                                        <a href="#"
+                                                                            @click.prevent="abrirModalAssinarPaciente(doc)"
                                                                             class="link-state link-success2 d-flex align-items-center gap-2"
                                                                             title="Gerar link de assinatura do paciente">
-                                                                            <iconify-icon
-                                                                                icon="solar:user-hand-up-bold-duotone"
-                                                                                class="fs-7"></iconify-icon> Assinar
-                                                                            Paciente
+                                                                            <iconify-icon icon="ph:signature-fill"
+                                                                                class="fs-7"></iconify-icon>Solicitar
+                                                                            Assinatura do Paciente
                                                                         </a>
                                                                     </li>
                                                                     <!-- Ação: Assinar Profissional com Precedência -->
@@ -626,6 +635,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                             <iconify-icon
                                                                                 icon="solar:pen-new-square-bold-duotone"
                                                                                 class="fs-7"></iconify-icon> Assinar
+                                                                            como
                                                                             Profissional
                                                                         </a>
                                                                     </li>
@@ -774,13 +784,13 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                     <!-- Assinar Paciente -->
                                                                     <li class="dropdown-item"
                                                                         v-if="!laudo.assinatura_hash">
-                                                                        <a :href="`<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'assinarPaciente'], ['fullBase' => true]) ?>/${laudo.id}`"
+                                                                        <a href="#"
+                                                                            @click.prevent="abrirModalAssinarPaciente(laudo)"
                                                                             class="link-state link-success2 d-flex align-items-center gap-2"
                                                                             title="Gerar link de assinatura do paciente">
-                                                                            <iconify-icon
-                                                                                icon="solar:user-hand-up-bold-duotone"
-                                                                                class="fs-7"></iconify-icon> Assinar
-                                                                            Paciente
+                                                                            <iconify-icon icon="ph:signature-fill"
+                                                                                class="fs-7"></iconify-icon>Solicitar
+                                                                            Assinatura do Paciente
                                                                         </a>
                                                                     </li>
                                                                     <!-- Assinar Profissional -->
@@ -793,6 +803,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                             <iconify-icon
                                                                                 icon="solar:pen-new-square-bold-duotone"
                                                                                 class="fs-7"></iconify-icon> Assinar
+                                                                            como
                                                                             Profissional
                                                                         </a>
                                                                     </li>
@@ -876,7 +887,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
 
                                                 <tbody v-if="item.receitas && item.receitas.length">
 
-                                                    <tr v-for="(receita, receitasIndex) in item.receitas" :key="receita.id">
+                                                    <tr v-for="(receita, receitasIndex) in item.receitas"
+                                                        :key="receita.id">
 
                                                         <td style="white-space: normal;"
                                                             :title="resumoReceita(receita.texto, 500)">
@@ -953,10 +965,9 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                         <a :href="`<?= $this->Url->build(['controller' => 'Documentos', 'action' => 'assinarPaciente'], ['fullBase' => true]) ?>/${receita.id}`"
                                                                             class="link-state link-success2 d-flex align-items-center gap-2"
                                                                             title="Gerar link de assinatura do paciente">
-                                                                            <iconify-icon
-                                                                                icon="solar:user-hand-up-bold-duotone"
-                                                                                class="fs-7"></iconify-icon> Assinar
-                                                                            Paciente
+                                                                            <iconify-icon icon="ph:signature-fill"
+                                                                                class="fs-7"></iconify-icon>Solicitar
+                                                                            Assinatura do Paciente
                                                                         </a>
                                                                     </li>
                                                                     <!-- Assinar Profissional -->
@@ -969,6 +980,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                                             <iconify-icon
                                                                                 icon="solar:pen-new-square-bold-duotone"
                                                                                 class="fs-7"></iconify-icon> Assinar
+                                                                            como
                                                                             Profissional
                                                                         </a>
                                                                     </li>
@@ -1055,7 +1067,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                                     </th>
                                                 </thead>
                                                 <tbody v-if="item.financas && item.financas.length">
-                                                    <tr v-for="(financa, financasIndex) in item.financas" :key="financa.id">
+                                                    <tr v-for="(financa, financasIndex) in item.financas"
+                                                        :key="financa.id">
                                                         <td>{{financa.descricao}}</td>
                                                         <td>R$ {{formatarMoeda(financa.valor)}}</td>
                                                         <td>R$ {{formatarMoeda(financa.desconto)}}</td>
@@ -1158,7 +1171,8 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                     <div class="form-check form-switch">
                                         <label class="form-check-label" for="item-aprovar">Aprovar</label>
                                         <input class="form-check-input success" type="checkbox" id="item-aprovar"
-                                            v-model="item.aprovar" @change="aprovarProcedimento(item, index)"  :disabled="!item.id">
+                                            v-model="item.aprovar" @change="aprovarProcedimento(item, index)"
+                                            :disabled="!item.id">
                                     </div>
                                 </div>
                                 <div class="col-lg-1 col-sm-4" style="height: 70px;">
@@ -1289,105 +1303,115 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                             <input type="hidden" name="procedimento_id" id="procedimento-id"
                                 v-model="receita.procedimento_id">
                             <br>
-<input type="hidden" name="usuario_id" id="usuario-id" v-model="receita.usuario_id">
+                            <input type="hidden" name="usuario_id" id="usuario-id" v-model="receita.usuario_id">
 
                             <?= $this->Form->control('texto', ['label' => '', 'class' => 'form-control', 'type' => 'textarea', 'rows' => 5, 'id' => 'texto-receita']); ?>
 
-<input class="form-check-input" type="checkbox" value="1" id="checkReceitaUsoRestrito" 
-v-model="receita.uso_restrito" :disabled="temUsoRestrito">
-<label class="form-check-label text-danger" for="checkReceitaUsoRestrito">
-    <strong>Esta receita contém medicamento de uso restrito</strong>
-    <span v-if="temUsoRestrito" class="badge bg-danger ms-2">(Obrigatório)</span>
-</label>
+                            <input class="form-check-input" type="checkbox" value="1" id="checkReceitaUsoRestrito"
+                                v-model="receita.uso_restrito" :disabled="temUsoRestrito">
+                            <label class="form-check-label text-danger" for="checkReceitaUsoRestrito">
+                                <strong>Esta receita contém medicamento de uso restrito</strong>
+                                <span v-if="temUsoRestrito" class="badge bg-danger ms-2">(Obrigatório)</span>
+                            </label>
                         </div>
                         <div class="col-md-4 mb-0">
                             <div class="receitas-container">
-<input type="text" v-model="Busca.termo" class="form-control" placeholder="Buscar medicamento...">
+                                <input type="text" v-model="Busca.termo" class="form-control"
+                                    placeholder="Buscar medicamento...">
 
-<div class="accordion mt-4" id="accordionReceitas">
+                                <div class="accordion mt-4" id="accordionReceitas">
 
-    <div class="accordion-item" v-for="(itens, categoria, index) in receitasIBusca" :key="categoria">
-        <h2 class="accordion-header" :id="'heading' + index">
-            <button class="accordion-button" :class="{'collapsed': !Busca.termo}" type="button"
-                    data-bs-toggle="collapse" :data-bs-target="'#collapse' + index"
-                    :aria-expanded="Busca.termo ? 'true' : 'false'" :aria-controls="'collapse' + index">
-                {{ Busca.labels[categoria] || categoria }}
-                ({{ itens.length }})
-            </button>
+                                    <div class="accordion-item" v-for="(itens, categoria, index) in receitasIBusca"
+                                        :key="categoria">
+                                        <h2 class="accordion-header" :id="'heading' + index">
+                                            <button class="accordion-button" :class="{'collapsed': !Busca.termo}"
+                                                type="button" data-bs-toggle="collapse"
+                                                :data-bs-target="'#collapse' + index"
+                                                :aria-expanded="Busca.termo ? 'true' : 'false'"
+                                                :aria-controls="'collapse' + index">
+                                                {{ Busca.labels[categoria] || categoria }}
+                                                ({{ itens.length }})
+                                            </button>
 
-        </h2>
+                                        </h2>
 
-        <div :id="'collapse' + index"
-             class="accordion-collapse collapse"
-             :class="{'show': Busca.termo}"
-             :aria-labelledby="'heading' + index"
-             data-bs-parent="#accordionReceitas">
+                                        <div :id="'collapse' + index" class="accordion-collapse collapse"
+                                            :class="{'show': Busca.termo}" :aria-labelledby="'heading' + index"
+                                            data-bs-parent="#accordionReceitas">
 
-            <div class="accordion-body">
+                                            <div class="accordion-body">
 
-                <div v-for="item in itens" :key="item.id" class="mb-2">
+                                                <div v-for="item in itens" :key="item.id" class="mb-2">
 
-<div class="mb-2 d-flex justify-content-between align-items-center">
+                                                    <div class="mb-2 d-flex justify-content-between align-items-center">
 
-<a href="#"
-   class="adicionarReceitas text-decoration-none flex-grow-1"
-      :class="{
+                                                        <a href="#"
+                                                            class="adicionarReceitas text-decoration-none flex-grow-1"
+                                                            :class="{
        'receita-selecionada': isSelecionado(item),
        'receita-uso-restrito': item.uso_restrito && isSelecionado(item)
-   }"
-   @click.prevent="toggleReceitaBusca(item)">
-    
-    {{ item.titulo }}
-    
-    <!-- Badge opcional para indicar uso restrito -->
-    <span v-if="item.uso_restrito && isSelecionado(item)" class="badge bg-danger ms-2"style="font-size: 10px;">Restrito</span>
-</a>
+   }" @click.prevent="toggleReceitaBusca(item)">
 
-    <!-- DROPDOWN -->
-    <div v-if="item.estabelecimento_id" class="dropdown ms-2">
+                                                            {{ item.titulo }}
 
-        <button class="btn btn-sm bg-transparent text-primary d-inline-flex align-items-center justify-content-centert" data-bs-toggle="dropdown"><i class="fas fa-bars"></i></button>
+                                                            <!-- Badge opcional para indicar uso restrito -->
+                                                            <span v-if="item.uso_restrito && isSelecionado(item)"
+                                                                class="badge bg-danger ms-2"
+                                                                style="font-size: 10px;">Restrito</span>
+                                                        </a>
 
-        <ul class="dropdown-menu dropdown-menu-end">
+                                                        <!-- DROPDOWN -->
+                                                        <div v-if="item.estabelecimento_id" class="dropdown ms-2">
 
-            <li>
-                <a class="dropdown-item"
-                   href="#"
-                   @click.prevent="editarReceita(item)">
-                    <iconify-icon icon="solar:pen-bold-duotone" class="fs-4 aside-icon"></iconify-icon> Editar
-                </a>
-            </li>
+                                                            <button
+                                                                class="btn btn-sm bg-transparent text-primary d-inline-flex align-items-center justify-content-centert"
+                                                                data-bs-toggle="dropdown"><i
+                                                                    class="fas fa-bars"></i></button>
 
-            <li>
-                <a class="dropdown-item text-danger"
-                   href="#"
-                   @click.prevent="excluirReceitaBusca(item)">
-                    <iconify-icon icon="solar:trash-bin-minimalistic-bold-duotone" class="fs-4 aside-icon"></iconify-icon> Excluir
-                </a>
-            </li>
+                                                            <ul class="dropdown-menu dropdown-menu-end">
 
-        </ul>
+                                                                <li>
+                                                                    <a class="dropdown-item" href="#"
+                                                                        @click.prevent="editarReceita(item)">
+                                                                        <iconify-icon icon="solar:pen-bold-duotone"
+                                                                            class="fs-4 aside-icon"></iconify-icon>
+                                                                        Editar
+                                                                    </a>
+                                                                </li>
 
-    </div>
+                                                                <li>
+                                                                    <a class="dropdown-item text-danger" href="#"
+                                                                        @click.prevent="excluirReceitaBusca(item)">
+                                                                        <iconify-icon
+                                                                            icon="solar:trash-bin-minimalistic-bold-duotone"
+                                                                            class="fs-4 aside-icon"></iconify-icon>
+                                                                        Excluir
+                                                                    </a>
+                                                                </li>
 
-</div>
+                                                            </ul>
 
-                </div>
+                                                        </div>
 
-            </div>
-        </div>
+                                                    </div>
 
-    </div>
+                                                </div>
 
-</div>
-</div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                 </div>
                 <div class="modal-footer pt-0">
-                    <button type="button" class="btn btn-info waves-effect text-start" @click="abrirModalReceitaPersonalizada">
-Receita Personalizada</button>
+                    <button type="button" class="btn btn-info waves-effect text-start"
+                        @click="abrirModalReceitaPersonalizada">
+                        Receita Personalizada</button>
                     <button type="button" class="btn bg-danger-subtle text-danger  waves-effect text-start"
                         data-bs-dismiss="modal">Fechar</button>
                     <button type="button" class="btn bg-info-subtle text-info"
@@ -1464,47 +1488,50 @@ Receita Personalizada</button>
     </div>
 
 
-<!-- Modal Receita Personalizada -->
-<div class="modal fade" id="bs-modal-receita-personalizada" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Personalizar Receita</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Título da Receita</label>
-                    <input type="text" class="form-control" v-model="receitaPersonalizada.titulo" 
-                           placeholder="Ex: Nome do medicamento OU Pós-operatório">
+    <!-- Modal Receita Personalizada -->
+    <div class="modal fade" id="bs-modal-receita-personalizada" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Personalizar Receita</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Conteúdo Personalizado</label>
-                    <textarea class="form-control" rows="8" id="texto-receita-personalizada" placeholder="Digite sua receita personalizada aqui..."></textarea>
-                    <small class="text-muted">Use este campo para criar uma receita livre, com formatação simples.</small>
-                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Título da Receita</label>
+                        <input type="text" class="form-control" v-model="receitaPersonalizada.titulo"
+                            placeholder="Ex: Nome do medicamento OU Pós-operatório">
+                    </div>
 
-                <div class="mb-3">
-                    <div class="py-2">
-                        <input class="form-check-input" type="checkbox" value="1" id="checkReceitaUsoRestritoModal" 
-                               v-model="receitaPersonalizada.uso_restrito">
-                        <label class="form-check-label text-danger" for="checkReceitaUsoRestritoModal">
-                            <strong>Esse medicamento é de uso restrito</strong>
-                        </label>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Conteúdo Personalizado</label>
+                        <textarea class="form-control" rows="8" id="texto-receita-personalizada"
+                            placeholder="Digite sua receita personalizada aqui..."></textarea>
+                        <small class="text-muted">Use este campo para criar uma receita livre, com formatação
+                            simples.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="py-2">
+                            <input class="form-check-input" type="checkbox" value="1" id="checkReceitaUsoRestritoModal"
+                                v-model="receitaPersonalizada.uso_restrito">
+                            <label class="form-check-label text-danger" for="checkReceitaUsoRestritoModal">
+                                <strong>Esse medicamento é de uso restrito</strong>
+                            </label>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                <button class="btn btn-success" @click="salvarReceitaPersonalizada" :disabled="receitaPersonalizada.salvando">
-                    <span v-if="receitaPersonalizada.salvando">Salvando...</span>
-                    <span v-else>Salvar Receita</span>
-                </button>
+                <div class="modal-footer">
+                    <button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-success" @click="salvarReceitaPersonalizada"
+                        :disabled="receitaPersonalizada.salvando">
+                        <span v-if="receitaPersonalizada.salvando">Salvando...</span>
+                        <span v-else>Salvar Receita</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <!---- modal anamneses ------>
     <div class="modal fade" id="bs-modal-anamnese" tabindex="-1" aria-labelledby="bs-modal-anamnese" aria-hidden="true">
@@ -1531,33 +1558,44 @@ Receita Personalizada</button>
                         <div class="col-md-4 mb-0">
                             <h4>Modelos de Anamnese</h4>
                             <div class="list-group">
-                                <a href="#" v-for="modelo in modelosAnamnese" :key="modelo.id" class="list-group-item d-flex justify-content-between align-items-center adicionarModelo p-3" :data-id="modelo.id" :data-tipo="'anamnese'":data-cabecalho="modelo.cabecalho" :data-titulo="modelo.titulo" :data-descricao="encodeURIComponent(modelo.descricao)"@click.prevent>
+                                <a href="#" v-for="modelo in modelosAnamnese" :key="modelo.id"
+                                    class="list-group-item d-flex justify-content-between align-items-center adicionarModelo p-3"
+                                    :data-id="modelo.id" :data-tipo="'anamnese'" :data-cabecalho="modelo.cabecalho"
+                                    :data-titulo="modelo.titulo" :data-descricao="encodeURIComponent(modelo.descricao)"
+                                    @click.prevent>
 
-    <span>{{ modelo.nome }}</span>
+                                    <span>{{ modelo.nome }}</span>
 
-    <!-- DROPDOWN -->
-    <div class="dropdown" v-show="modelo.estabelecimento_id">
+                                    <!-- DROPDOWN -->
+                                    <div class="dropdown" v-show="modelo.estabelecimento_id">
 
-        <button class="btn btn-sm bg-transparent text-primary d-inline-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" @click.stop>
-<i class="fas fa-bars"></i>
-            
-        </button>
+                                        <button
+                                            class="btn btn-sm bg-transparent text-primary d-inline-flex align-items-center justify-content-center"
+                                            type="button" data-bs-toggle="dropdown" @click.stop>
+                                            <i class="fas fa-bars"></i>
 
-        <ul class="dropdown-menu dropdown-menu-end">
-            <li>
-                <button class="dropdown-item" @click.stop="editarModelo(modelo, 'anamnese')"> <iconify-icon icon="solar:pen-bold-duotone" class="fs-4 aside-icon"></iconify-icon> Editar</button>
-            </li>
+                                        </button>
 
-            <li>
-                <button class="dropdown-item text-danger" @click.stop="excluirModelo(modelo, 'anamnese')">
-                    <iconify-icon icon="solar:trash-bin-minimalistic-bold-duotone" class="fs-4 aside-icon"></iconify-icon> Excluir
-                </button>
-            </li>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li>
+                                                <button class="dropdown-item"
+                                                    @click.stop="editarModelo(modelo, 'anamnese')"> <iconify-icon
+                                                        icon="solar:pen-bold-duotone"
+                                                        class="fs-4 aside-icon"></iconify-icon> Editar</button>
+                                            </li>
 
-        </ul>
-    </div>
+                                            <li>
+                                                <button class="dropdown-item text-danger"
+                                                    @click.stop="excluirModelo(modelo, 'anamnese')">
+                                                    <iconify-icon icon="solar:trash-bin-minimalistic-bold-duotone"
+                                                        class="fs-4 aside-icon"></iconify-icon> Excluir
+                                                </button>
+                                            </li>
 
-</a>
+                                        </ul>
+                                    </div>
+
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -1600,32 +1638,43 @@ Receita Personalizada</button>
                         <div class="col-md-4 mb-0">
                             <h4>Modelos de Laudos</h4>
                             <div class="list-group">
-                                <a href="#" v-for="modelo in modelosLaudo" :key="modelo.id" class="list-group-item d-flex justify-content-between align-items-center adicionarModelo p-3" :data-id="modelo.id" :data-tipo="'laudo'":data-cabecalho="modelo.cabecalho" :data-titulo="modelo.titulo" :data-descricao="encodeURIComponent(modelo.descricao)"@click.prevent>
+                                <a href="#" v-for="modelo in modelosLaudo" :key="modelo.id"
+                                    class="list-group-item d-flex justify-content-between align-items-center adicionarModelo p-3"
+                                    :data-id="modelo.id" :data-tipo="'laudo'" :data-cabecalho="modelo.cabecalho"
+                                    :data-titulo="modelo.titulo" :data-descricao="encodeURIComponent(modelo.descricao)"
+                                    @click.prevent>
 
-    <span>{{ modelo.nome }}</span>
+                                    <span>{{ modelo.nome }}</span>
 
-    <!-- DROPDOWN -->
-    <div class="dropdown" v-show="modelo.estabelecimento_id">
+                                    <!-- DROPDOWN -->
+                                    <div class="dropdown" v-show="modelo.estabelecimento_id">
 
-        <button class="btn btn-sm bg-transparent text-primary d-inline-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" @click.stop>
-<i class="fas fa-bars"></i>
-            
-        </button>
+                                        <button
+                                            class="btn btn-sm bg-transparent text-primary d-inline-flex align-items-center justify-content-center"
+                                            type="button" data-bs-toggle="dropdown" @click.stop>
+                                            <i class="fas fa-bars"></i>
 
-        <ul class="dropdown-menu dropdown-menu-end">
-            <li>
-                <button class="dropdown-item" @click.stop="editarModelo(modelo, 'laudo')"> <iconify-icon icon="solar:pen-bold-duotone" class="fs-4 aside-icon"></iconify-icon> Editar</button>
-            </li>
+                                        </button>
 
-            <li>
-                <button class="dropdown-item text-danger" @click.stop="excluirModelo(modelo, 'laudo')">
-                    <iconify-icon icon="solar:trash-bin-minimalistic-bold-duotone" class="fs-4 aside-icon"></iconify-icon> Excluir
-                </button>
-            </li>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li>
+                                                <button class="dropdown-item"
+                                                    @click.stop="editarModelo(modelo, 'laudo')"> <iconify-icon
+                                                        icon="solar:pen-bold-duotone"
+                                                        class="fs-4 aside-icon"></iconify-icon> Editar</button>
+                                            </li>
 
-        </ul>
-    </div>
-</a>
+                                            <li>
+                                                <button class="dropdown-item text-danger"
+                                                    @click.stop="excluirModelo(modelo, 'laudo')">
+                                                    <iconify-icon icon="solar:trash-bin-minimalistic-bold-duotone"
+                                                        class="fs-4 aside-icon"></iconify-icon> Excluir
+                                                </button>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </a>
 
 
                             </div>
@@ -1666,56 +1715,58 @@ Receita Personalizada</button>
                                 v-model="documento.procedimento_id">
                             <input type="hidden" name="usuario_id" id="usuario-id" v-model="documento.usuario_id">
                             <?= $this->Form->control('texto', ['label' => '', 'class' => 'form-control', 'type' => 'textarea', 'rows' => 5, 'id' => 'texto-documento']); ?>
-<input class="form-check-input" type="checkbox" value="1" id="checkDocumentoExigirAssinaturaPaciente" 
-v-model="documento.exigir_assinatura_paciente">
-<label class="form-check-label" for="checkDocumentoExigirAssinaturaPaciente">
-    <strong>Solicitar assinatura do paciente</strong>
-</label>
-&nbsp;&nbsp;
-<input class="form-check-input" type="checkbox" value="1" id="checkDocumentoExigirAssinaturaProfissional" 
-v-model="documento.exigir_assinatura_profissional">
-<label class="form-check-label" for="checkDocumentoExigirAssinaturaProfissional">
-    <strong>Solicitar assinatura do profissional</strong>
-</label>
+                            <input class="form-check-input" type="checkbox" value="1"
+                                id="checkDocumentoExigirAssinaturaPaciente"
+                                v-model="documento.exigir_assinatura_paciente">
+                            <label class="form-check-label" for="checkDocumentoExigirAssinaturaPaciente">
+                                <strong>Solicitar assinatura do paciente</strong>
+                            </label>
+                            &nbsp;&nbsp;
+                            <input class="form-check-input" type="checkbox" value="1"
+                                id="checkDocumentoExigirAssinaturaProfissional"
+                                v-model="documento.exigir_assinatura_profissional">
+                            <label class="form-check-label" for="checkDocumentoExigirAssinaturaProfissional">
+                                <strong>Solicitar assinatura do profissional</strong>
+                            </label>
                         </div>
                         <div class="col-md-4 mb-0">
                             <h4>Modelos de Documentos</h4>
                             <div class="list-group">
-                            <a href="#" 
-   v-for="modelo in modelosDocumento" 
-   :key="modelo.id" 
-   class="list-group-item d-flex justify-content-between align-items-center adicionarModelo p-3" 
-   :data-id="modelo.id" 
-   :data-tipo="'documento'"
-   :data-cabecalho="modelo.cabecalho" 
-   :data-titulo="modelo.titulo" 
-   :data-descricao="encodeURIComponent(modelo.descricao)"
-   :data-exigir-assinatura-paciente="modelo.exigir_assinatura_paciente"
-   :data-exigir-assinatura-profissional="modelo.exigir_assinatura_profissional"
-   @click.prevent>
+                                <a href="#" v-for="modelo in modelosDocumento" :key="modelo.id"
+                                    class="list-group-item d-flex justify-content-between align-items-center adicionarModelo p-3"
+                                    :data-id="modelo.id" :data-tipo="'documento'" :data-cabecalho="modelo.cabecalho"
+                                    :data-titulo="modelo.titulo" :data-descricao="encodeURIComponent(modelo.descricao)"
+                                    :data-exigir-assinatura-paciente="modelo.exigir_assinatura_paciente"
+                                    :data-exigir-assinatura-profissional="modelo.exigir_assinatura_profissional"
+                                    @click.prevent>
 
-    <span>{{ modelo.nome }}</span>
+                                    <span>{{ modelo.nome }}</span>
 
-    <!-- DROPDOWN -->
-    <div class="dropdown" v-show="modelo.estabelecimento_id">
-        <button class="btn btn-sm bg-transparent text-primary d-inline-flex align-items-center justify-content-center" 
-                type="button" data-bs-toggle="dropdown" @click.stop>
-            <i class="fas fa-bars"></i>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end">
-            <li>
-                <button class="dropdown-item" @click.stop="editarModelo(modelo, 'documento')"> 
-                    <iconify-icon icon="solar:pen-bold-duotone" class="fs-4 aside-icon"></iconify-icon> Editar
-                </button>
-            </li>
-            <li>
-                <button class="dropdown-item text-danger" @click.stop="excluirModelo(modelo, 'documento')">
-                    <iconify-icon icon="solar:trash-bin-minimalistic-bold-duotone" class="fs-4 aside-icon"></iconify-icon> Excluir
-                </button>
-            </li>
-        </ul>
-    </div>
-</a>
+                                    <!-- DROPDOWN -->
+                                    <div class="dropdown" v-show="modelo.estabelecimento_id">
+                                        <button
+                                            class="btn btn-sm bg-transparent text-primary d-inline-flex align-items-center justify-content-center"
+                                            type="button" data-bs-toggle="dropdown" @click.stop>
+                                            <i class="fas fa-bars"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li>
+                                                <button class="dropdown-item"
+                                                    @click.stop="editarModelo(modelo, 'documento')">
+                                                    <iconify-icon icon="solar:pen-bold-duotone"
+                                                        class="fs-4 aside-icon"></iconify-icon> Editar
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button class="dropdown-item text-danger"
+                                                    @click.stop="excluirModelo(modelo, 'documento')">
+                                                    <iconify-icon icon="solar:trash-bin-minimalistic-bold-duotone"
+                                                        class="fs-4 aside-icon"></iconify-icon> Excluir
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </a>
                             </div>
                         </div>
 
@@ -1913,11 +1964,119 @@ v-model="documento.exigir_assinatura_profissional">
         </div>
     </div>
 
+    <!-- Modal Assinatura Paciente -->
+    <div class="modal fade" id="bs-modal-assinatura-paciente" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white p-4">
+                    <h5 class="mb-1 text-white d-flex align-items-center gap-2">
+                        <iconify-icon icon="solar:shield-keyhole-bold" class="fs-6"></iconify-icon>
+                        Solicitar assinatura de paciente
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4" v-if="assinaturaPacienteDoc">
+
+                    <div v-if="assinaturaPacienteDoc.assinatura_hash"
+                        class="alert alert-success d-flex align-items-center gap-2 mb-4">
+                        <iconify-icon icon="solar:check-circle-bold" class="fs-5"></iconify-icon>
+                        <span><strong>Documento já assinado!</strong> Este documento já possui assinatura eletrônica
+                            registrada.</span>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12 mb-3 mt-1">
+                            <h6 class="border-bottom pb-2">Informações do Documento:</h6>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small text-uppercase fw-bold mb-1">Tipo</label>
+                            <div class="fw-medium text-dark">{{ assinaturaPacienteDoc.tipo }}</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small text-uppercase fw-bold mb-1">Título</label>
+                            <div class="fw-medium text-dark">{{ assinaturaPacienteDoc.titulo || '—' }}</div>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label text-muted small text-uppercase fw-bold mb-1">Código</label>
+                            <div class="fw-medium text-dark"><code
+                                    class="text-primary">{{ assinaturaPacienteDoc.codigo_validacao }}</code></div>
+                        </div>
+                        <template v-if="assinaturaPacienteDoc.assinatura_hash">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted small text-uppercase fw-bold mb-1">Assinado
+                                    em</label>
+                                <div class="fw-medium text-dark">{{ formatarData(assinaturaPacienteDoc.assinatura_data)
+                                    }}</div>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label text-muted small text-uppercase fw-bold mb-1">Hash
+                                    SHA-256</label>
+                                <div class="fw-medium text-dark"><code class="text-muted"
+                                        style="word-break:break-all;">{{ assinaturaPacienteDoc.assinatura_hash }}</code>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-2 mt-2">
+                            <h6 class="border-bottom pb-2 text-primary">Enviar link:</h6>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <button class="btn btn-link p-0 text-secondary" type="button" @click="copiarUrlCurta($event)"
+                            title="Copiar link">
+                            <span class="nav-icon-hover-bg rounded-circle p-1">
+                                <iconify-icon icon="flowbite:link-outline" class="fs-7 align-middle"></iconify-icon>
+                            </span>
+                        </button>
+
+                        <button type="button" disabled class="btn btn-link p-0 text-success"
+                            title="Enviar via WhatsApp">
+                            <span class="nav-icon-hover-bg rounded-circle p-1">
+                                <iconify-icon icon="ic:baseline-whatsapp" class="fs-7 align-middle"></iconify-icon>
+                            </span>
+                        </button>
+
+                        <button type="button" disabled class="btn btn-link p-0 text-dark" title="Enviar via Email">
+                            <span class="nav-icon-hover-bg rounded-circle p-1">
+                                <iconify-icon icon="streamline:send-email-remix"
+                                    class="fs-7 align-middle"></iconify-icon>
+                            </span>
+                        </button>
+
+                        <a :href="urlCurta" target="_blank" class="btn btn-link p-0 text-primary"
+                            title="Abrir link para assinatura">
+                            <span class="nav-icon-hover-bg rounded-circle p-1">
+                                <iconify-icon icon="streamline-plump:web" class="fs-7 align-middle"></iconify-icon>
+                            </span>
+                        </a>
+                    </div>
+
+                    <div class="alert alert-info d-flex align-items-center mb-0">
+                        <iconify-icon icon="solar:info-circle-bold" class="fs-4 me-2 flex-shrink-0"></iconify-icon>
+                        <div style="font-size: 13px;">
+                            <strong>Atenção:</strong> Certifique-se de que o documento foi
+                            <strong>impresso/gerado</strong> pelo menos uma vez antes de enviar este link ao paciente. O
+                            arquivo PDF precisa existir no servidor para que a assinatura seja processada.
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-danger-subtle text-danger rounded-pill fw-bold w-100"
+                        data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://unpkg.com/vue@2.7.16/dist/vue.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<?= $this->Html->script(['vue/v-money.2.x.js', 'plugins/bootstrap-select.js', 'vue/select2-vue.js', 'vue/swal-utils.js','tinymce/tinymce.min.js']); ?>
+<?= $this->Html->script(['vue/v-money.2.x.js', 'plugins/bootstrap-select.js', 'vue/select2-vue.js', 'vue/swal-utils.js', 'tinymce/tinymce.min.js']); ?>
 <?= $this->Html->css(['plugins/bootstrap-select.css']); ?>
 
 <script>
@@ -2070,6 +2229,7 @@ v-model="documento.exigir_assinatura_profissional">
                 itemAnamnese: null,
                 itemLaudo: null,
                 itemDocumento: null,
+                assinaturaPacienteDoc: null,
                 filaImpressao: [],
                 itens: <?= json_encode($consulta->procedimentos); ?>,
                 servicosRaw: <?= json_encode($servicos); ?>,
@@ -2101,8 +2261,8 @@ v-model="documento.exigir_assinatura_profissional">
                     cabecalho: false,
                     titulo: null,
                     tipo: 'anamnese',
-                    exigir_assinatura_paciente:true,
-                    exigir_assinatura_profissional:false,
+                    exigir_assinatura_paciente: true,
+                    exigir_assinatura_profissional: false,
                     salvando: false
                 },
                 receita: {
@@ -2114,7 +2274,7 @@ v-model="documento.exigir_assinatura_profissional">
                     titulo: 'Receita',
                     tipo: 'receita',
                     uso_restrito: false,
-                    exigir_assinatura_profissional:true,
+                    exigir_assinatura_profissional: true,
                     exigir_assinatura_paciente: false,
                     salvando: false
                 },
@@ -2126,7 +2286,7 @@ v-model="documento.exigir_assinatura_profissional">
                     cabecalho: false,
                     titulo: null,
                     tipo: 'laudo',
-                    exigir_assinatura_profissional:true,
+                    exigir_assinatura_profissional: true,
                     exigir_assinatura_paciente: false,
                     salvando: false
                 },
@@ -2162,7 +2322,7 @@ v-model="documento.exigir_assinatura_profissional">
         },
         watch: {
             temUsoRestrito(valor) {
-                    this.receita.uso_restrito = valor;
+                this.receita.uso_restrito = valor;
             }
         },
         mounted() {
@@ -2179,6 +2339,10 @@ v-model="documento.exigir_assinatura_profissional">
         },
 
         computed: {
+            urlCurta() {
+                if (!this.assinaturaPacienteDoc) return '';
+                return "<?= \Cake\Routing\Router::url('/assinar/', true) ?>" + this.assinaturaPacienteDoc.codigo_validacao;
+            },
             temUsoRestrito() {
                 return this.Busca.selecionados.some(item => item.uso_restrito === true);
             },
@@ -2218,203 +2382,224 @@ v-model="documento.exigir_assinatura_profissional">
         },
 
         methods: {
-        excluirReceitaBusca(item) {
+            abrirModalAssinarPaciente(doc) {
+                this.assinaturaPacienteDoc = doc;
+                const modal = new bootstrap.Modal(document.getElementById('bs-modal-assinatura-paciente'));
+                modal.show();
+            },
+            copiarUrlCurta(event) {
+                if (!this.urlCurta) return;
+                const input = document.createElement('input');
+                input.value = this.urlCurta;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
 
-            AppAlerts.confirm({
-                title: 'Excluir?',
-                text: 'Deseja remover esta receita?'
-            }).then(result => {
+                const btn = event.currentTarget;
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<span class="nav-icon-hover-bg rounded-circle p-1"><iconify-icon icon="solar:check-bold" class="fs-7 align-middle text-success"></iconify-icon></span>';
+                setTimeout(() => {
+                    btn.innerHTML = orig;
+                }, 2000);
+            },
+            excluirReceitaBusca(item) {
 
-                if (!result.isConfirmed) return;
+                AppAlerts.confirm({
+                    title: 'Excluir?',
+                    text: 'Deseja remover esta receita?'
+                }).then(result => {
 
-                axios.delete(
-                    "<?= $this->Url->build(['controller' => 'Receituarios', 'action' => 'delete']) ?>/" + item.id +'.json',
+                    if (!result.isConfirmed) return;
+
+                    axios.delete(
+                        "<?= $this->Url->build(['controller' => 'Receituarios', 'action' => 'delete']) ?>/" + item.id + '.json',
+                        {
+                            headers: {
+                                'X-CSRF-Token': "<?= $this->request->getAttribute('csrfToken') ?>"
+                            }
+                        }
+                    ).then(() => {
+
+                        AppAlerts.success('Removido', 'Receita excluída');
+
+                        // atualiza lista
+                        this.carregarReceitasBusca();
+
+                    });
+
+                });
+            },
+            editarReceita(item) {
+
+                this.receitaPersonalizada = {
+                    id: item.id,
+                    titulo: item.titulo,
+                    texto: item.descricao,  // campo renomeado para 'texto'
+                    uso_restrito: item.uso_restrito || false,
+                    salvando: false
+                };
+
+                const modal = new bootstrap.Modal(
+                    document.getElementById('bs-modal-receita-personalizada')
+                );
+
+                modal.show();
+
+                // Carrega o conteúdo no TinyMCE após o modal abrir
+                this.$nextTick(() => {
+                    const editor = tinymce.get('texto-receita-personalizada');
+                    if (editor && this.receitaPersonalizada.texto) {
+                        editor.setContent(this.receitaPersonalizada.texto);
+                    }
+                });
+            },
+            isSelecionado(item) {
+                return this.Busca.selecionados.some(i => i.id === item.id);
+            },
+            toggleReceitaBusca(item) {
+
+                const texto = item.descricao;
+                if (!texto) return;
+
+                const editor = tinymce.get('texto-receita');
+                const hash = btoa(texto);
+
+                const index = this.Busca.selecionados.findIndex(i => i.id === item.id);
+
+                if (index !== -1) {
+
+                    // REMOVE do selecionado
+                    this.Busca.selecionados.splice(index, 1);
+
+                    // REMOVE do editor
+                    let parser = new DOMParser();
+                    let doc = parser.parseFromString(editor.getContent(), 'text/html');
+
+                    $(doc).find(`p[data-receita="${hash}"]`).remove();
+
+                    editor.setContent(doc.body.innerHTML);
+
+                } else {
+
+                    // ADICIONA no selecionado
+                    this.Busca.selecionados.push(item);
+
+                    const bloco = `<p data-receita="${hash}">${texto}</p>`;
+
+                    editor.insertContent(bloco + '<br>');
+                }
+            },
+
+            abrirModalReceitaPersonalizada() {
+                // Preenche com os dados atuais da receita (se houver)
+                const editor = tinymce.get('texto-receita');
+                const conteudoAtual = editor ? editor.getContent() : this.receita.texto;
+
+                this.receitaPersonalizada = {
+                    titulo: '',
+                    descricao: conteudoAtual || '',
+                    uso_restrito: false,
+                };
+
+                // Abre o modal
+                const modal = new bootstrap.Modal(document.getElementById('bs-modal-receita-personalizada'));
+                modal.show();
+            },
+            carregarReceitasBusca() {
+
+                axios.get("<?= $this->Url->build(['controller' => 'Receituarios', 'action' => 'listar', '_ext' => 'json']) ?>")
+                    .then(response => {
+
+                        if (response.data.success) {
+
+                            // atualiza lista reativa
+                            this.Busca.receitas = response.data.receitas;
+
+                        }
+
+                    })
+                    .catch(() => {
+                        AppAlerts.error('Erro', 'Erro ao carregar receitas');
+                    });
+
+            },
+            salvarReceitaPersonalizada() {
+                if (this.receitaPersonalizada.salvando) return;
+
+                // Pega conteúdo do TinyMCE
+                const editor = tinymce.get('texto-receita-personalizada');
+                if (editor) {
+                    this.receitaPersonalizada.texto = editor.getContent();
+                }
+
+                if (!this.receitaPersonalizada.texto) {
+                    AppAlerts.warning('Atenção', 'Informe o conteúdo da receita personalizada');
+                    return;
+                }
+
+                if (!this.receitaPersonalizada.titulo) {
+                    AppAlerts.warning('Atenção', 'Informe um título para a receita');
+                    return;
+                }
+
+                this.receitaPersonalizada.salvando = true;
+
+                const dadosReceita = {
+                    id: this.receitaPersonalizada.id || null,  // se tiver ID, atualiza
+                    descricao: this.receitaPersonalizada.texto,
+                    titulo: this.receitaPersonalizada.titulo,
+                    exigir_assinatura_profissional: true,
+                    uso_restrito: this.receitaPersonalizada.uso_restrito
+                };
+
+                axios.post(
+                    "<?= $this->Url->build(['controller' => 'Receituarios', 'action' => 'salvar', '_ext' => 'json']) ?>",
+                    dadosReceita,
                     {
                         headers: {
                             'X-CSRF-Token': "<?= $this->request->getAttribute('csrfToken') ?>"
                         }
                     }
-                ).then(() => {
-
-                    AppAlerts.success('Removido', 'Receita excluída');
-
-                    // atualiza lista
-                    this.carregarReceitasBusca();
-
-                });
-
-            });
-        },
-        editarReceita(item) {
-           
-            this.receitaPersonalizada = {
-                id: item.id,
-                titulo: item.titulo,
-                texto: item.descricao,  // campo renomeado para 'texto'
-                uso_restrito: item.uso_restrito || false,
-                salvando: false
-            };
-            
-            const modal = new bootstrap.Modal(
-                document.getElementById('bs-modal-receita-personalizada')
-            );
-            
-            modal.show();
-            
-            // Carrega o conteúdo no TinyMCE após o modal abrir
-            this.$nextTick(() => {
-                const editor = tinymce.get('texto-receita-personalizada');
-                if (editor && this.receitaPersonalizada.texto) {
-                    editor.setContent(this.receitaPersonalizada.texto);
-                }
-            });
-        },
-        isSelecionado(item) {
-            return this.Busca.selecionados.some(i => i.id === item.id);
-        },
-        toggleReceitaBusca(item) {
-
-            const texto = item.descricao;
-            if (!texto) return;
-
-            const editor = tinymce.get('texto-receita');
-            const hash = btoa(texto);
-
-            const index = this.Busca.selecionados.findIndex(i => i.id === item.id);
-
-            if (index !== -1) {
-
-                // REMOVE do selecionado
-                this.Busca.selecionados.splice(index, 1);
-
-                // REMOVE do editor
-                let parser = new DOMParser();
-                let doc = parser.parseFromString(editor.getContent(), 'text/html');
-
-                $(doc).find(`p[data-receita="${hash}"]`).remove();
-
-                editor.setContent(doc.body.innerHTML);
-
-            } else {
-
-                // ADICIONA no selecionado
-                this.Busca.selecionados.push(item);
-
-                const bloco = `<p data-receita="${hash}">${texto}</p>`;
-
-                editor.insertContent(bloco + '<br>');
-            }
-        },
-
-        abrirModalReceitaPersonalizada() {
-            // Preenche com os dados atuais da receita (se houver)
-            const editor = tinymce.get('texto-receita');
-            const conteudoAtual = editor ? editor.getContent() : this.receita.texto;
-            
-            this.receitaPersonalizada = {
-                titulo: '',
-                descricao: conteudoAtual || '',
-                uso_restrito: false,
-            };
-            
-            // Abre o modal
-            const modal = new bootstrap.Modal(document.getElementById('bs-modal-receita-personalizada'));
-            modal.show();
-        },
-        carregarReceitasBusca() {
-
-            axios.get("<?= $this->Url->build(['controller' => 'Receituarios', 'action' => 'listar', '_ext' => 'json']) ?>")
-                .then(response => {
-
+                ).then(response => {
                     if (response.data.success) {
+                        AppAlerts.success('Sucesso', this.receitaPersonalizada.id ? 'Receita atualizada com sucesso' : 'Receita personalizada salva com sucesso');
+                        this.carregarReceitasBusca();
 
-                        // atualiza lista reativa
-                        this.Busca.receitas = response.data.receitas;
+                        // Fecha modal
+                        bootstrap.Modal.getInstance(document.getElementById('bs-modal-receita-personalizada')).hide();
 
-                    }
-
-                })
-                .catch(() => {
-                    AppAlerts.error('Erro', 'Erro ao carregar receitas');
-                });
-
-        },
-        salvarReceitaPersonalizada() {
-            if (this.receitaPersonalizada.salvando) return;
-
-            // Pega conteúdo do TinyMCE
-            const editor = tinymce.get('texto-receita-personalizada');
-            if (editor) {
-                this.receitaPersonalizada.texto = editor.getContent();
-            }
-
-            if (!this.receitaPersonalizada.texto) {
-                AppAlerts.warning('Atenção', 'Informe o conteúdo da receita personalizada');
-                return;
-            }
-            
-            if (!this.receitaPersonalizada.titulo) {
-                AppAlerts.warning('Atenção', 'Informe um título para a receita');
-                return;
-            }
-            
-            this.receitaPersonalizada.salvando = true;
-            
-            const dadosReceita = {
-                id: this.receitaPersonalizada.id || null,  // se tiver ID, atualiza
-                descricao: this.receitaPersonalizada.texto,
-                titulo: this.receitaPersonalizada.titulo,
-                exigir_assinatura_profissional:true,
-                uso_restrito: this.receitaPersonalizada.uso_restrito
-            };
-            
-            axios.post(
-                "<?= $this->Url->build(['controller' => 'Receituarios', 'action' => 'salvar', '_ext' => 'json']) ?>",
-                dadosReceita,
-                {
-                    headers: {
-                        'X-CSRF-Token': "<?= $this->request->getAttribute('csrfToken') ?>"
-                    }
-                }
-            ).then(response => {
-                if (response.data.success) {
-                    AppAlerts.success('Sucesso', this.receitaPersonalizada.id ? 'Receita atualizada com sucesso' : 'Receita personalizada salva com sucesso');
-                    this.carregarReceitasBusca();
-                    
-                    // Fecha modal
-                    bootstrap.Modal.getInstance(document.getElementById('bs-modal-receita-personalizada')).hide();
-                    
-                    // Limpa formulário se for nova (não edição)
-                    if (!this.receitaPersonalizada.id) {
-                        this.Busca.selecionados = [];
-                        this.receita.texto = '';
-                        if (tinymce.get('texto-receita')) {
-                            tinymce.get('texto-receita').setContent('');
+                        // Limpa formulário se for nova (não edição)
+                        if (!this.receitaPersonalizada.id) {
+                            this.Busca.selecionados = [];
+                            this.receita.texto = '';
+                            if (tinymce.get('texto-receita')) {
+                                tinymce.get('texto-receita').setContent('');
+                            }
+                            this.receita.uso_restrito = false;
+                            this.receita.titulo = '';
                         }
-                        this.receita.uso_restrito = false;
-                        this.receita.titulo = '';
+
+                        // Reseta dados
+                        this.receitaPersonalizada = {
+                            id: null,
+                            titulo: '',
+                            texto: '',
+                            uso_restrito: false,
+                            salvando: false
+                        };
+                        this.receitaPersonalizada.salvando = false;
+                    } else {
+                        AppAlerts.error('Erro', response.data.message || 'Ocorreu um erro');
+                        this.receitaPersonalizada.salvando = false;
                     }
-                    
-                    // Reseta dados
-                    this.receitaPersonalizada = {
-                        id: null,
-                        titulo: '',
-                        texto: '',
-                        uso_restrito: false,
-                        salvando: false
-                    };
+                }).catch(() => {
+                    AppAlerts.error('Erro', 'Erro ao salvar receita personalizada');
                     this.receitaPersonalizada.salvando = false;
-                } else {
-                    AppAlerts.error('Erro', response.data.message || 'Ocorreu um erro');
+                }).finally(() => {
                     this.receitaPersonalizada.salvando = false;
-                }
-            }).catch(() => {
-                AppAlerts.error('Erro', 'Erro ao salvar receita personalizada');
-                this.receitaPersonalizada.salvando = false;
-            }).finally(() => {
-                this.receitaPersonalizada.salvando = false;
-            });
-        },
+                });
+            },
             excluirModelo(modelo, tipo) {
                 AppAlerts.confirm({
                     title: 'Tem certeza?',
@@ -2555,7 +2740,7 @@ v-model="documento.exigir_assinatura_profissional">
                         AppAlerts.error('Erro', 'Ocorreu uma falha na comunicação com o servidor.');
                     });
             }
-            ,editarModelo(modeloSelecionado, tipo) {
+            , editarModelo(modeloSelecionado, tipo) {
 
                 // mantém isso
                 this.modelo = {
@@ -3016,7 +3201,7 @@ v-model="documento.exigir_assinatura_profissional">
                     cabecalho: false,
                     titulo: null,
                     tipo: 'laudo',
-                    exigir_assinatura_profissional:true,
+                    exigir_assinatura_profissional: true,
                     salvando: false
                 };
 
@@ -3097,7 +3282,7 @@ v-model="documento.exigir_assinatura_profissional">
                     titulo: null,
                     cabecalho: false,
                     tipo: 'anamnese',
-                    exigir_assinatura_paciente:true,
+                    exigir_assinatura_paciente: true,
                     salvando: false
                 };
 
@@ -3125,7 +3310,7 @@ v-model="documento.exigir_assinatura_profissional">
                     tipo: 'receita',
                     titulo: 'Receita',
                     cabecalho: false,
-                    exigir_assinatura_profissional:true,
+                    exigir_assinatura_profissional: true,
                     texto: '',
                     salvando: false
                 };
@@ -3179,15 +3364,15 @@ v-model="documento.exigir_assinatura_profissional">
             },
             formatarData(data, isDateTime = true) {
                 if (!data) return '-';
-                
+
                 const d = new Date(data);
                 const dataFormatada = d.toLocaleDateString('pt-BR');
-                
+
                 if (isDateTime) {
                     const horaFormatada = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
                     return `${dataFormatada} ${horaFormatada}`;
                 }
-                
+
                 return dataFormatada;
             },
             removerAnexo(item, anexo, index) {
@@ -3464,13 +3649,13 @@ v-model="documento.exigir_assinatura_profissional">
                             //this.itens[index].id = response.data.id;
                             this.$set(this.itens[index], 'id', response.data.id);
 
-                                this.buscarFinancasProcedimento(item.id).then(financas => {
-                                    if (financas && financas.length > 0) {
-                                        this.$set(this.itens[index], 'financas', financas);
-                                    }
-                                }).catch(() => {
-                                    //imp
-                                });
+                            this.buscarFinancasProcedimento(item.id).then(financas => {
+                                if (financas && financas.length > 0) {
+                                    this.$set(this.itens[index], 'financas', financas);
+                                }
+                            }).catch(() => {
+                                //imp
+                            });
                             AppAlerts.success('Sucesso', response.data.message);
 
                         } else {
@@ -3729,22 +3914,22 @@ v-model="documento.exigir_assinatura_profissional">
         const descricao = decodeURIComponent($(this).data('descricao'));
         const titulo = $(this).data('titulo');
         const cabecalho = $(this).data('cabecalho');
-        
+
         // Pega as exigências do modelo atual
         let exigirAssinaturaProfissional = $(this).data('exigir-assinatura-profissional');
         let exigirAssinaturaPaciente = $(this).data('exigir-assinatura-paciente');
-        
+
         // Converte para boolean
-        exigirAssinaturaProfissional = (exigirAssinaturaProfissional === true || 
-                                         exigirAssinaturaProfissional === 'true' || 
-                                         exigirAssinaturaProfissional === 1 || 
-                                         exigirAssinaturaProfissional === '1');
-        
-        exigirAssinaturaPaciente = (exigirAssinaturaPaciente === true || 
-                                     exigirAssinaturaPaciente === 'true' || 
-                                     exigirAssinaturaPaciente === 1 || 
-                                     exigirAssinaturaPaciente === '1');
-        
+        exigirAssinaturaProfissional = (exigirAssinaturaProfissional === true ||
+            exigirAssinaturaProfissional === 'true' ||
+            exigirAssinaturaProfissional === 1 ||
+            exigirAssinaturaProfissional === '1');
+
+        exigirAssinaturaPaciente = (exigirAssinaturaPaciente === true ||
+            exigirAssinaturaPaciente === 'true' ||
+            exigirAssinaturaPaciente === 1 ||
+            exigirAssinaturaPaciente === '1');
+
         const vm = appConsulta;
         const lista = vm.selecionados[tipo];
         const index = lista.findIndex(m => m.id == id);
@@ -3753,36 +3938,36 @@ v-model="documento.exigir_assinatura_profissional">
             // REMOVENDO modelo - recalcular os checkboxes
             lista.splice(index, 1);
             $(this).removeClass('active');
-            
+
             // Recalcula os status baseado nos modelos RESTANTES
             let precisaPaciente = false;
             let precisaProfissional = false;
-            
+
             lista.forEach(modelo => {
                 if (modelo.exigir_assinatura_paciente) precisaPaciente = true;
                 if (modelo.exigir_assinatura_profissional) precisaProfissional = true;
             });
-            
+
             vm.$set(vm[tipo], 'exigir_assinatura_paciente', precisaPaciente);
             vm.$set(vm[tipo], 'exigir_assinatura_profissional', precisaProfissional);
-            
+
         } else {
             // ADICIONANDO modelo
-            lista.push({ 
-                id, 
-                descricao, 
-                titulo, 
+            lista.push({
+                id,
+                descricao,
+                titulo,
                 cabecalho,
                 exigir_assinatura_paciente: exigirAssinaturaPaciente,
                 exigir_assinatura_profissional: exigirAssinaturaProfissional
             });
             $(this).addClass('active');
-            
+
             // ACUMULA: se qualquer modelo exigir, marca o checkbox
             // Se o checkbox já estiver true, mantém true (não sobrescreve)
             const pacienteAtual = vm[tipo].exigir_assinatura_paciente;
             const profissionalAtual = vm[tipo].exigir_assinatura_profissional;
-            
+
             vm.$set(vm[tipo], 'exigir_assinatura_paciente', pacienteAtual || exigirAssinaturaPaciente);
             vm.$set(vm[tipo], 'exigir_assinatura_profissional', profissionalAtual || exigirAssinaturaProfissional);
         }
@@ -3796,10 +3981,10 @@ v-model="documento.exigir_assinatura_profissional">
             vm[tipo].titulo = null;
             vm[tipo].cabecalho = null;
         }
-        
+
     });
 
-document.addEventListener("show.bs.modal", function (event) {
+    document.addEventListener("show.bs.modal", function (event) {
 
         const modals = document.querySelectorAll('.modal.show');
         const zIndex = 1050 + (10 * modals.length);
@@ -4032,27 +4217,31 @@ document.addEventListener("show.bs.modal", function (event) {
         padding-left: 6px;
         border-radius: 4px;
     }
-.receita-selecionada {
-    background: #d1e7dd;
-    padding: 6px;
-    border-radius: 4px;
-    font-weight: bold;
-}
-.receita-uso-restrito {
-    background: #f8d7da;
-    padding: 6px;
-    border-radius: 4px;
-    font-weight: bold;
-    border-left: 4px solid #dc3545;
-}
-/* Estilo para uso restrito quando selecionado */
-.receita-selecionada.receita-uso-restrito {
-    background: #f8d7da;
-    border-left: 4px solid #dc3545;
-}
-/* Opcional: ícone ou indicador visual */
-.receita-uso-restrito::before {
-    content: "⚠️ ";
-    font-weight: normal;
-}
+
+    .receita-selecionada {
+        background: #d1e7dd;
+        padding: 6px;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+
+    .receita-uso-restrito {
+        background: #f8d7da;
+        padding: 6px;
+        border-radius: 4px;
+        font-weight: bold;
+        border-left: 4px solid #dc3545;
+    }
+
+    /* Estilo para uso restrito quando selecionado */
+    .receita-selecionada.receita-uso-restrito {
+        background: #f8d7da;
+        border-left: 4px solid #dc3545;
+    }
+
+    /* Opcional: ícone ou indicador visual */
+    .receita-uso-restrito::before {
+        content: "⚠️ ";
+        font-weight: normal;
+    }
 </style>

@@ -102,12 +102,20 @@ class ProfissionaisTable extends Table
             ->minLength('nome', 5, __('O nome deve ter pelo menos 5 caracteres.'))
             ->maxLength('nome', 255)
             ->add('nome', 'fullName', [
-            'rule' => 'isFullName',
-            'provider' => 'table',
-            'message' => __('Informe nome e sobrenome.'),
-        ])
+                'rule' => 'isFullName',
+                'provider' => 'table',
+                'message' => __('Informe nome e sobrenome.'),
+            ])
             ->requirePresence('nome', 'create')
             ->notEmptyString('nome', __('O nome é obrigatório.'));
+        $validator
+            ->requirePresence('documento', 'create', __('O documento é obrigatório.'))
+            ->notEmptyString('documento', __('O documento é obrigatório.'))
+            ->add('documento', 'validLength', [
+                'rule' => ['custom', '/^(\d{11}|\d{14})$/'],
+                'message' => __('O documento deve conter exatamente 11 ou 14 caracteres.')
+            ]);
+
 
         $validator
             ->date('data_nascimento', ['dmy'], 'Informe uma data válida')
@@ -224,8 +232,8 @@ class ProfissionaisTable extends Table
 
         $caracterInvalido = [" ", ".", "-", "/", ")", "(", ","];
 
-        if (isset($data['cpf_cnpj']))
-            $data['cpf_cnpj'] = str_replace($caracterInvalido, "", $data['cpf_cnpj']);
+        if (isset($data['documento']))
+            $data['documento'] = str_replace($caracterInvalido, "", $data['documento']);
 
         if (isset($data['cep']))
             $data['cep'] = str_replace($caracterInvalido, "", $data['cep']);
@@ -245,28 +253,35 @@ class ProfissionaisTable extends Table
             $entity->cor = $this->gerarCorUnica($entity->estabelecimento_id);
         }
     }
-    
+
 
     private function gerarCorUnica(int $estabelecimentoId): string
     {
         $tabela = $this;
 
         $coresProibidas = [
-            '#ADB5BD', '#FAED96', '#A5D4ED', '#A4E082',
-            '#FF0000', '#FF7F7F', '#0000FF', '#A020F0'
+            '#ADB5BD',
+            '#FAED96',
+            '#A5D4ED',
+            '#A4E082',
+            '#FF0000',
+            '#FF7F7F',
+            '#0000FF',
+            '#A020F0'
         ];
 
         //  Busca cores já usadas
         $coresUsadas = $tabela->find()
             ->select(['cor'])
             ->where([
-            'estabelecimento_id' => $estabelecimentoId,
-            'cor IS NOT' => null
-        ])            ->enableHydration(false)
+                'estabelecimento_id' => $estabelecimentoId,
+                'cor IS NOT' => null
+            ])->enableHydration(false)
             ->toArray();
 
         $usadas = array_map(
-        fn($c) => strtoupper($c),            array_column($coresUsadas, 'cor')
+            fn($c) => strtoupper($c),
+            array_column($coresUsadas, 'cor')
         );
 
         // Índice baseado na quantidade já usada
@@ -305,7 +320,7 @@ class ProfissionaisTable extends Table
 
         return $cor;
     }
-    
+
     private function gerarCorVisivel(): string
     {
         // Gera uma cor aleatória saturada e contrastante
@@ -355,35 +370,31 @@ class ProfissionaisTable extends Table
             $r = $c;
             $g = $x;
             $b = 0;
-        }
-        elseif ($h < 120) {
+        } elseif ($h < 120) {
             $r = $x;
             $g = $c;
             $b = 0;
-        }
-        elseif ($h < 180) {
+        } elseif ($h < 180) {
             $r = 0;
             $g = $c;
             $b = $x;
-        }
-        elseif ($h < 240) {
+        } elseif ($h < 240) {
             $r = 0;
             $g = $x;
             $b = $c;
-        }
-        elseif ($h < 300) {
+        } elseif ($h < 300) {
             $r = $x;
             $g = 0;
             $b = $c;
-        }
-        else {
+        } else {
             $r = $c;
             $g = 0;
-            $b = $x;        }
+            $b = $x;
+        }
 
-        $r = (int)(($r + $m) * 255);
-        $g = (int)(($g + $m) * 255);
-        $b = (int)(($b + $m) * 255);
+        $r = (int) (($r + $m) * 255);
+        $g = (int) (($g + $m) * 255);
+        $b = (int) (($b + $m) * 255);
 
         return sprintf("#%02X%02X%02X", $r, $g, $b);
     }

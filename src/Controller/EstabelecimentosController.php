@@ -82,8 +82,20 @@ class EstabelecimentosController extends AppController
             }
             $this->Flash->error(__('The estabelecimento could not be saved. Please, try again.'));
         }
-        $contas = $this->Estabelecimentos->Contas->find('list', limit: 200)->all();
-        $assinaturas = $this->Estabelecimentos->Assinaturas->find('list', limit: 200)->all();
+        $contas = $this->Estabelecimentos->Contas->find('list', [
+            'keyField' => 'id',
+            'valueField' => function ($c) {
+                return $c->nome . ' (' . $c->cpf_cnpj . ')';
+            }
+        ])->limit(200)->all();
+        
+        $assinaturas = $this->Estabelecimentos->Assinaturas->find('list', [
+            'keyField' => 'id',
+            'valueField' => function ($a) {
+                return 'ID: ' . $a->id . ' - ' . ($a->plano ? $a->plano->nome : '') . ' - ' . ($a->conta ? $a->conta->nome : '');
+            }
+        ])->contain(['Planos', 'Contas'])->limit(200)->all();
+        
         $extensoes = $this->Estabelecimentos->Extensoes->find('list', limit: 200)->all();
         $usuarios = $this->Estabelecimentos->Usuarios->find('list', limit: 200)->all();
         $this->set(compact('estabelecimento', 'contas', 'assinaturas', 'extensoes', 'usuarios'));
@@ -108,8 +120,20 @@ class EstabelecimentosController extends AppController
             }
             $this->Flash->error(__('The estabelecimento could not be saved. Please, try again.'));
         }
-        $contas = $this->Estabelecimentos->Contas->find('list', limit: 200)->all();
-        $assinaturas = $this->Estabelecimentos->Assinaturas->find('list', limit: 200)->all();
+        $contas = $this->Estabelecimentos->Contas->find('list', [
+            'keyField' => 'id',
+            'valueField' => function ($c) {
+                return $c->nome . ' (' . $c->cpf_cnpj . ')';
+            }
+        ])->limit(200)->all();
+        
+        $assinaturas = $this->Estabelecimentos->Assinaturas->find('list', [
+            'keyField' => 'id',
+            'valueField' => function ($a) {
+                return 'ID: ' . $a->id . ' - ' . ($a->plano ? $a->plano->nome : '') . ' - ' . ($a->conta ? $a->conta->nome : '');
+            }
+        ])->contain(['Planos', 'Contas'])->limit(200)->all();
+        
         $extensoes = $this->Estabelecimentos->Extensoes->find('list', limit: 200)->all();
         $usuarios = $this->Estabelecimentos->Usuarios->find('list', limit: 200)->all();
         $this->set(compact('estabelecimento', 'contas', 'assinaturas', 'extensoes', 'usuarios'));

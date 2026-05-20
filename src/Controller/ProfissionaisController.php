@@ -27,7 +27,10 @@ class ProfissionaisController extends AppController
     public function index()
     {
         $query = $this->Profissionais->find()
-            ->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])
+            ->where([
+                'estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id'),
+                'tipo IN' => [1]
+            ])
             ->contain(['Estabelecimentos', 'Servicos', 'Convenios']);
         // pega o parâmetro do GET
         $estabelecimentoId = $this->request->getQuery('estabelecimento_id', );
@@ -71,6 +74,7 @@ class ProfissionaisController extends AppController
         ));
     }
 
+
     /**
      * View method
      *
@@ -108,6 +112,7 @@ class ProfissionaisController extends AppController
         if ($this->request->is('post')) {
             $data = $this->request->getData();
             $data["estabelecimento_id"] = $this->getRequest()->getSession()->read('Auth.Estabelecimento.id');
+            $data["tipo"] = 1;
 
 
             //debug($data);
@@ -115,14 +120,18 @@ class ProfissionaisController extends AppController
 
             if (!empty($data['periodos'])) {
                 $data['periodos'] = array_map(
-                fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+                    fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
                     $data['periodos']
                 );
             }
 
 
             // ---------- PATCH ENTITY ----------
-            $data['data_nascimento'] = new FrozenDate($data['data_nascimento']);
+            if (!empty($data['data_nascimento'])) {
+                $data['data_nascimento'] = new FrozenDate($data['data_nascimento']);
+            } else {
+                $data['data_nascimento'] = null;
+            }
             $profissional = $this->Profissionais->patchEntity($profissional, $data, ['associated' => ['Periodos', 'Servicos', 'Convenios']]);
 
             if ($this->Profissionais->save($profissional, ['associated' => ['Periodos', 'Servicos', 'Convenios']])) {
@@ -131,7 +140,7 @@ class ProfissionaisController extends AppController
             }
 
             $this->Flash->error(__('Ocorreu um erro. Verifique os dados e tente novamente.'));
-        //Log::error('[SERVICOS::novo] Erros ao salvar: ' . json_encode($servico->getErrors(), JSON_UNESCAPED_UNICODE));
+            //Log::error('[SERVICOS::novo] Erros ao salvar: ' . json_encode($servico->getErrors(), JSON_UNESCAPED_UNICODE));
         }
 
         //render_form:
@@ -160,7 +169,10 @@ class ProfissionaisController extends AppController
     public function editar($id = null)
     {
         $profissional = $this->Profissionais->get($id, [
-            'conditions' => ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+            'conditions' => [
+                'estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id'),
+                'tipo IN' => [1]
+            ],
             'contain' => ['Servicos', 'Convenios', 'Periodos']
         ]);
 
@@ -170,7 +182,7 @@ class ProfissionaisController extends AppController
             //die;
             try {
                 // 1. Extrair e validar dados
-                $habilitarProgramacao = (int)($data['habilitar_programacao'] ?? 0);
+                $habilitarProgramacao = (int) ($data['habilitar_programacao'] ?? 0);
                 $periodos = $data['periodos'] ?? [];
 
                 // 2. Validar se períodos é array
@@ -193,21 +205,24 @@ class ProfissionaisController extends AppController
 
 
                     $data['periodos'] = array_map(
-                    fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+                        fn($periodo) => $periodo + ['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
                         $data['periodos']
                     );
 
                 }
 
-            }
-            catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException $e) {
                 // Logar erro ou tratar exceção
                 $this->log("Erro ao processar períodos: " . $e->getMessage());
                 throw $e; // Re-lançar se necessário
             }
 
 
-            $data['data_nascimento'] = new FrozenDate($data['data_nascimento']);
+            if (!empty($data['data_nascimento'])) {
+                $data['data_nascimento'] = new FrozenDate($data['data_nascimento']);
+            } else {
+                $data['data_nascimento'] = null;
+            }
 
             //debug($data);
             //die;
@@ -218,8 +233,7 @@ class ProfissionaisController extends AppController
             if ($this->Profissionais->save($profissional)) {
                 $this->Flash->success(__('Profissional atualizado com sucesso.'));
                 return $this->redirect(['action' => 'index']);
-            }
-            else {
+            } else {
                 $this->Flash->error(__('Não foi possível atualizar o profissional.'));
             }
         }
@@ -249,13 +263,23 @@ class ProfissionaisController extends AppController
         $this->request->allowMethod(['post', 'delete']);
         $profissional = $this->Profissionais->get($id, [
             'where' => [
-                'Profissionais.estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')
+                'Profissionais.estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id'),
+                'tipo IN' => [1]
             ]
         ]);
+
+        if ($this->request->is('json') || $this->request->is('ajax')) {
+            $this->autoRender = false;
+            $success = $this->Profissionais->delete($profissional);
+            $this->response = $this->response
+                ->withType('application/json')
+                ->withStringBody(json_encode(['success' => (bool) $success]));
+            return $this->response;
+        }
+
         if ($this->Profissionais->delete($profissional)) {
             $this->Flash->success(__('Profissional excluído com sucesso.'));
-        }
-        else {
+        } else {
             $this->Flash->error(__('Ocorreu um erro ao excluir. Por favor, tente novamente.'));
         }
 
@@ -272,6 +296,7 @@ class ProfissionaisController extends AppController
 
         $allowedFilters = [
             'estabelecimento_id' => ['field' => 'Profissionais.estabelecimento_id', 'value' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')],
+            'tipo' => ['field' => 'Profissionais.tipo', 'operator' => 'IN'],
             'q' => [
                 'operator' => 'MULTI_LIKE',
                 'fields' => [
@@ -319,27 +344,153 @@ class ProfissionaisController extends AppController
             ->withStringBody(json_encode($res));
     }
 
-
+    #FORNECEDOR
     public function fornecedorIndex()
     {
-    
+        $query = $this->Profissionais->find()
+            ->where([
+                'estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id'),
+                'tipo IN' => [2]
+            ])
+            ->contain(['Estabelecimentos']);
+        // pega o parâmetro do GET
+        $estabelecimentoId = $this->request->getQuery('estabelecimento_id', );
+        if (!empty($estabelecimentoId)) {
+            $query->where(['Profissionais.estabelecimento_id' => $estabelecimentoId]);
+        }
+
+        $profissionais = $this->paginate($query);
+
+
+        // lista de estabelecimentos para o select
+        $estabelecimentos = $this->Profissionais->Estabelecimentos
+            ->find('list', ['keyField' => 'id', 'valueField' => 'nome_fantasia'])
+            ->order(['nome_fantasia' => 'ASC'])
+            ->all();
+        $title = 'Lista de Fornecedores'; // defina o título
+        $this->set(compact(
+            'profissionais',
+            'estabelecimentos',
+            'estabelecimentoId',
+            'title'
+        ));
     }
 
     public function fornecedorNovo()
     {
-    
+        $profissional = $this->Profissionais->newEmptyEntity();
+
+
+
+        if ($this->request->is('post')) {
+            $data = $this->request->getData();
+            $data["estabelecimento_id"] = $this->getRequest()->getSession()->read('Auth.Estabelecimento.id');
+            $data["tipo"] = 2;
+
+
+            //debug($data);
+            //die;
+
+
+            // ---------- PATCH ENTITY ----------
+            if (!empty($data['data_nascimento'])) {
+                $data['data_nascimento'] = new FrozenDate($data['data_nascimento']);
+            } else {
+                $data['data_nascimento'] = null;
+            }
+            $profissional = $this->Profissionais->patchEntity($profissional, $data, ['associated' => ['Periodos', 'Servicos', 'Convenios']]);
+
+            if ($this->Profissionais->save($profissional)) {
+                $this->Flash->success(__('Fornecedor cadastrado com sucesso.'));
+                return $this->redirect(['action' => 'fornecedorIndex']);
+            }
+
+            $this->Flash->error(__('Ocorreu um erro. Verifique os dados e tente novamente.'));
+            //Log::error('[SERVICOS::novo] Erros ao salvar: ' . json_encode($servico->getErrors(), JSON_UNESCAPED_UNICODE));
+        }
+
+        //render_form:
+        //$estabelecimentos = $this->Servicos->Estabelecimentos->find('list', limit: 200)->all();
+        //$convenios        = $this->Servicos->Convenios->find('list', limit: 200)->all();
+
+        $title = 'Novo Fornecedor';
+        $this->set(compact('profissional', 'title'));
     }
 
 
-    public function fornecedorEditar()
+    public function fornecedorEditar($id = null)
     {
-    
+        $profissional = $this->Profissionais->get($id, [
+            'conditions' => [
+                'estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id'),
+                'tipo IN' => [2]
+            ],
+        ]);
+
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            $data = $this->request->getData();
+            //debug($data);
+            //die;
+
+
+
+            if (!empty($data['data_nascimento'])) {
+                $data['data_nascimento'] = new FrozenDate($data['data_nascimento']);
+            } else {
+                $data['data_nascimento'] = null;
+            }
+
+            //debug($data);
+            //die;
+            $profissional = $this->Profissionais->patchEntity($profissional, $data);
+            //debug ($profissional);
+            //die;
+            // Salva profissional e associações
+            if ($this->Profissionais->save($profissional)) {
+                $this->Flash->success(__('Fornecedor atualizado com sucesso.'));
+                return $this->redirect(['action' => 'fornecedorIndex']);
+            } else {
+                $this->Flash->error(__('Não foi possível atualizar o fornecedor.'));
+            }
+        }
+
+
+
+
+
+        $title = 'Editar Fornecedor';
+        $this->set(compact('profissional', 'title'));
     }
 
-    public function fornecedorDelete()
+    public function fornecedorDelete($id = null)
     {
-    
+        $this->request->allowMethod(['post', 'delete']);
+        $profissional = $this->Profissionais->get($id, [
+            'where' => [
+                'Profissionais.estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id'),
+                'tipo IN' => [2]
+            ]
+        ]);
+
+        if ($this->request->is('json') || $this->request->is('ajax')) {
+            $this->autoRender = false;
+            $success = $this->Profissionais->delete($profissional);
+            $this->response = $this->response
+                ->withType('application/json')
+                ->withStringBody(json_encode(['success' => (bool) $success]));
+            return $this->response;
+        }
+
+        if ($this->Profissionais->delete($profissional)) {
+            $this->Flash->success(__('Fornecedor excluído com sucesso.'));
+        } else {
+            $this->Flash->error(__('Ocorreu um erro ao excluir. Por favor, tente novamente.'));
+        }
+
+        return $this->redirect(['action' => 'fornecedorIndex']);
     }
+
+
 
 
 }

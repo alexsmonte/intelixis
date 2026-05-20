@@ -10,6 +10,8 @@ namespace App\Controller;
  */
 class PlanosController extends AppController
 {
+    use \App\Controller\Traits\SearchableTrait;
+
     /**
      * Index method
      *
@@ -98,15 +100,7 @@ class PlanosController extends AppController
      */
     public function delete($id = null)
     {
-        $this->request->allowMethod(['post', 'delete']);
-        $plano = $this->Planos->get($id);
-        if ($this->Planos->delete($plano)) {
-            $this->Flash->success(__('The plano has been deleted.'));
-        } else {
-            $this->Flash->error(__('The plano could not be deleted. Please, try again.'));
-        }
-
-        return $this->redirect(['action' => 'index']);
+        return $this->doDelete($this->Planos, $id);
     }
 
 
@@ -120,25 +114,16 @@ class PlanosController extends AppController
 
     public function search()
     {
-        $this->request->allowMethod(['get']);
-        $q = $this->request->getQuery('q');
-
-        $query = $this->Planos->find();
-        if (!empty($q)) {
-            $conditions =   [];
-
-            $busca  =   ['OR' => ['Planos.nome LIKE' => "%$q%"]];
-
-            $conditions  =   array_merge($conditions, $busca);
-
-            $query->where($conditions);
-        }
-
-        $planos = $query->limit(50)->all()->toArray(); // toArray() obrigatório
-
-        $this->autoRender = false;
-        $this->response = $this->response
-            ->withType('application/json')
-            ->withStringBody(json_encode(['data' => $planos]));
+        $allowedFilters = [
+            'q' => [
+                'operator' => 'MULTI_LIKE',
+                'fields' => [
+                    'Planos.nome',
+                ]
+            ],
+            'ativar' => ['field' => 'Planos.ativar'],
+        ];
+        
+        return $this->doAdvancedSearch($this->Planos, $allowedFilters, ['Planos.nome' => 'ASC']);
     }
 }

@@ -1,135 +1,187 @@
 <?php
-
 $this->BreadcrumbsPlus->add([['title' => 'Contas']]);
-
 ?>
+<script src="https://cdn.jsdelivr.net/npm/@iconify/iconify@3/dist/iconify.min.js"></script>
+<?= $this->element('barra-titulo', ['title' => $title ?? 'Contas']); ?>
+<?= $this->Html->css('index') ?>
+<?= $this->Html->css('barra-filtro') ?>
 
-<?= $this->element('barra-titulo',['title' => $title]); ?>
+<!-- Vue App Container -->
+<div id="app" v-cloak data-csrf="<?= $this->request->getAttribute('csrfToken'); ?>" data-entity-name="a Conta"
+    data-routes='<?= json_encode([
+        'search' => $this->Url->build(['controller' => 'Contas', 'action' => 'search']),
+        'visualizar' => $this->Url->build(['controller' => 'Contas', 'action' => 'view']),
+        'edit' => $this->Url->build(['controller' => 'Contas', 'action' => 'editar']),
+        'delete' => $this->Url->build(['controller' => 'Contas', 'action' => 'delete'])
+    ], JSON_HEX_APOS | JSON_HEX_QUOT) ?>'>
 
-<div class="card w-100 position-relative overflow-hidden">
-    <div class="px-4 py-3 border-bottom">
-        <div class="card-body p-4">
-            <div class="d-flex mb-3 align-items-center">
-                <h4 class="card-title mb-0"><?= __('Contas') ?></h4>
-                <div class="ms-auto flex-shrink-0">
-                    <button class="btn bg-primary-subtle text-primary "  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-bars" aria-hidden="true"></i>
-                    </button>
-                    <ul class="dropdown-menu animated flipInX">
-                        <li><?= $this->Html->link('<i class="fa fa-plus" aria-hidden="true"></i> Novo Conta', ['action' => 'novo'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
-                        <li><?= $this->Html->link('<i class="fa fa-print" aria-hidden="true"></i> Imprimir esta página', ['action' => 'imprimir'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
-                        <li><?= $this->Html->link('<i class="fa fa-print" aria-hidden="true"></i> Imprimir tudo', ['action' => 'imprimir'], ['class' => 'dropdown-item', 'escape' =>false]) ?></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="row">
+    <div class="card w-100 position-relative overflow-x-hidden">
+        <div class="px-4 py-3 border-bottom">
+            <div class="card-body p-4">
 
-                <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('cpf_cnpj', ['label'=>'cpf_cnpj', 'class'=>'form-control']); ?>
-                </div>                            <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('nome', ['label'=>'nome', 'class'=>'form-control']); ?>
-                </div>                            <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('razao_social', ['label'=>'razao_social', 'class'=>'form-control']); ?>
-                </div>                            <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('email', ['label'=>'email', 'class'=>'form-control']); ?>
-                </div>                            <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('logradouro', ['label'=>'logradouro', 'class'=>'form-control']); ?>
-                </div>                            <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('cep', ['label'=>'cep', 'class'=>'form-control']); ?>
-                </div>                            <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('bairro', ['label'=>'bairro', 'class'=>'form-control']); ?>
-                </div>                            <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('cidade', ['label'=>'cidade', 'class'=>'form-control']); ?>
-                </div>                            <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('uf', ['label'=>'uf', 'class'=>'form-control']); ?>
-                </div>                            <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('complemento', ['label'=>'complemento', 'class'=>'form-control']); ?>
-                </div>                            <div class="col-md-3 mb-3">
-                    <?= $this->Form->control('ativar', ['label'=>'ativar', 'class'=>'form-control']); ?>
-                </div>                <div class="col-md-12 mb-3">
-                    <div class="row">
-                        <div class="col-md-2 offset-md-10  mb-3">
-                            <button type="button" class="justify-content-center w-100 btn btn-primary d-flex align-items-center">Pesquisar</button>
-                        </div>
+                <!-- Título e Menu -->
+                <div class="d-flex mb-3 align-items-center justify-content-between">
+                    <h4 class="card-title mb-0">
+                        <?= __('Contas') ?>
+                    </h4>
+                    <div class="col-md-6 d-flex justify-content-end">
+                        <button
+                            class="btn btn-novo bg-primary-subtle text-primary border-primary d-flex align-items-center justify-content-center"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="iconify" data-icon="solar:list-arrow-down-bold" style="font-size:22px;"></span>
+                        </button>
+                        <ul class="dropdown-menu animated flipInX">
+                            <li>
+                                <?= $this->Html->link('<span class="iconify text-gray me-2" data-icon="solar:add-circle-linear" style="font-size:16px;"></span> Nova Conta', ['action' => 'novo'], ['class' => 'dropdown-item d-flex align-items-center', 'escape' => false]) ?>
+                            </li>
+                        </ul>
                     </div>
                 </div>
-            </div>
 
-            <div class="table-responsive mb-4 border rounded-1">
-                <table class="table table-striped text-nowrap mb-0 align-middle">
-                    <thead class="text-dark fs-4">
-                    <tr>
-                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('id') ?></h6></th>
-                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('cpf_cnpj') ?></h6></th>
-                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('nome') ?></h6></th>
-                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('razao_social') ?></h6></th>
-                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('email') ?></h6></th>
-                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('logradouro') ?></h6></th>
-                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('cep') ?></h6></th>
-                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('bairro') ?></h6></th>
-                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('cidade') ?></h6></th>
-                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('uf') ?></h6></th>
-                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('complemento') ?></h6></th>
-                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('ativar') ?></h6></th>
-                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('created') ?></h6></th>
-                        <th><h6 class="fs-4 fw-semibold mb-0"><?= $this->Paginator->sort('modified') ?></h6></th>
-                        <th><?= __('Opções') ?></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <?php foreach ($contas as $conta): ?>
-                        <tr>
-                            <td><p class="mb-0 fw-normal fs-4"><?= $this->Number->format($conta->id) ?></p></td>
-                            <td><p class="mb-0 fw-normal fs-4"><?= h($conta->cpf_cnpj) ?> </p></td>
-                            <td><p class="mb-0 fw-normal fs-4"><?= h($conta->nome) ?> </p></td>
-                            <td><p class="mb-0 fw-normal fs-4"><?= h($conta->razao_social) ?> </p></td>
-                            <td><p class="mb-0 fw-normal fs-4"><?= h($conta->email) ?> </p></td>
-                            <td><p class="mb-0 fw-normal fs-4"><?= h($conta->logradouro) ?> </p></td>
-                            <td><p class="mb-0 fw-normal fs-4"><?= h($conta->cep) ?> </p></td>
-                            <td><p class="mb-0 fw-normal fs-4"><?= h($conta->bairro) ?> </p></td>
-                            <td><p class="mb-0 fw-normal fs-4"><?= h($conta->cidade) ?> </p></td>
-                            <td><p class="mb-0 fw-normal fs-4"><?= h($conta->uf) ?> </p></td>
-                            <td><p class="mb-0 fw-normal fs-4"><?= h($conta->complemento) ?> </p></td>
-                            <td><?= $conta->ativar == 1 ? '<span class="badge bg-success-subtle text-success">Ativo</span>' : '<span class="badge bg-warning-subtle text-warning">Não</span>'; ?></td>
-                            <td><p class="mb-0 fw-normal fs-4"><?= h($conta->created) ?> </p></td>
-                            <td><p class="mb-0 fw-normal fs-4"><?= h($conta->modified) ?> </p></td>
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn btn-warning dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Opções
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <li><?= $this->Html->link('Visualizar', ['action' => 'view', $conta->id],['class'=>'dropdown-item','escape'=>false]) ?></li>
-                                        <li><?= $this->Html->link('Editar', ['action' => 'edit', $conta->id],['class'=>'dropdown-item','escape'=>false]) ?> </li>
-                                        <li>
-                                            <?= $this->Form->postLink(
-                                                'Excluir',
-                                                ['action' => 'delete', $conta->id],
-                                                [
-                                                    'class'=>'dropdown-item',
-                                                    'escape'=>false,
-                                                    'method' => 'delete',
-                                                    'confirm' => __('Tem certeza que deseja excluir # {0}?', $conta->id),
-                                                ]
-                                            ) ?>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                    </tbody>
-                </table>
-                <div class="paginator mt-4">
-                    <ul class="pagination justify-content-center">
-                        <?= $this->Paginator->first('<< ') ?>
-                        <?= $this->Paginator->prev('< ') ?>
-                        <?= $this->Paginator->numbers() ?>
-                        <?= $this->Paginator->next(' >') ?>
-                        <?= $this->Paginator->last(' >>') ?>
-                    </ul>
+                <!-- Linha de filtros -->
+                <div class="row align-items-center g-2 mb-2">
+
+                    <!-- Busca textual -->
+                    <div class="col-xl-4 col-lg-4 col-md-12">
+
+                        <filtro-busca v-model="query" placeholder="Buscar por nome, CPF/CNPJ, email..."
+                            @search="debouncedSearch"></filtro-busca>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="col-xl-4 col-lg-4 col-md-12">
+                        <select v-model="situacaoFiltro" class="form-select select-situacao w-100"
+                            @change="aplicarFiltros">
+                            <option value="">Todos os status</option>
+                            <option value="1">Ativa</option>
+                            <option value="0">Inativa</option>
+                        </select>
+                    </div>
+
                 </div>
+
+                <!-- Filtros ativos -->
+                <filtro-badges :query="query" :data-inicio="dataInicio" :data-fim="dataFim
+             " :tem-filtros-ativos="temFiltrosAtivos" @remover-filtro="removerFiltro" @limpar-filtros="limparFiltros">
+                    <div v-if="situacaoFiltro !== ''" class="filtro-badge">
+                        <i class="ti ti-building" style="font-size:0.8rem;"></i>
+                        <span>{{ textoSituacao }}</span>
+                        <button class="btn-remover" @click="removerFiltro('situacao')">✕</button>
+                    </div>
+                </filtro-badges>
+
+                <!-- Tabela -->
+                <div class="table-responsive-sm mb-4 border rounded-1 position-relative">
+                    <div v-if="carregando"
+                        class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center bg-white"
+                        style="opacity:0.7; z-index:10;">
+                        <i class="fa fa-spinner fa-spin fa-3x text-primary"></i>
+                    </div>
+
+                    <table class="table table-striped text-nowrap mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>Nome / Razão Social</th>
+                                <th>CPF / CNPJ</th>
+                                <th>Email</th>
+                                <th>Cidade / UF</th>
+                                <th>Status</th>
+                                <th>Criada em</th>
+                                <th>Opções</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="item in filteredItems" :key="item.id">
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-semibold text-dark">{{ item.nome }}</span>
+
+                                        <small class="text-muted" v-if="item.razao_social">{{ item.razao_social
+                                            }}</small>
+                                    </div>
+                                </td>
+                                <td>{{ item.cpf_cnpj }}</td>
+                                <td>{{ item.email }}</td>
+                                <td>
+
+                                    <span v-if="item.cidade">{{ item.cidade }}<span v-if="item.uf">/{{ item.uf
+                                            }}</span></span>
+                                    <span v-else class="text-muted">—</span>
+                                </td>
+                                <td>
+                                    <span v-if="item.ativar == 1"
+                                        class="badge bg-success-subtle border border-success text-success">
+                                        Ativa
+                                    </span>
+                                    <span v-else class="badge bg-danger-subtle border border-danger text-danger">
+                                        Inativa
+                                    </span>
+                                </td>
+                                <td>
+
+                                    {{ new Date(item.created).toLocaleDateString('pt-BR', { day: '2-digit', month:
+                                    '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}
+                                </td>
+                                <td style="width:8%;">
+                                    <div class="dropdown">
+                                        <button
+                                            class="btn bg-transparent text-primary d-inline-flex align-items-center justify-content-center"
+                                            type="button" :id="'dropdownMenu-' + item.id" data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            <i class="fas fa-bars"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end"
+                                            :aria-labelledby="'dropdownMenu-' + item.id">
+                                            <li>
+                                                <a class="dropdown-item" :href="`${routes.visualizar}/${item.id}`">
+                                                    <span class="iconify text-gray" data-icon="solar:eye-bold-duotone"
+                                                        style="font-size:15px;"></span> Visualizar
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" :href="`${routes.edit}/${item.id}`">
+                                                    <span class="iconify text-gray" data-icon="solar:pen-bold-duotone"
+                                                        style="font-size:15px;"></span> Editar
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li>
+                                                <button type="button" class="dropdown-item text-danger"
+                                                    @click="confirmarExclusao(item)">
+                                                    <span class="iconify text-danger"
+                                                        data-icon="solar:trash-bin-minimalistic-bold-duotone"
+                                                        style="font-size:15px;"></span> Excluir
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-if="filteredItems.length === 0 && !carregando">
+                                <td colspan="7" class="text-center text-muted py-4">Nenhuma conta encontrada</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Paginação -->
+                    <div class="p-3">
+                        <?= $this->element('vue_pagination') ?>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 </div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<?= $this->Html->script('vue/vue-index.js?v=' . filemtime(WWW_ROOT . 'js/vue/vue-index.js')) ?>
+<script>
+    createVueIndex({
+        customFilters: {
+            situacaoFiltro: 'ativar'
+        }
+    });
+</script>

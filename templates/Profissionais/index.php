@@ -9,7 +9,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais']]);
 <!-- Vue App Container -->
 <div id="app" v-cloak data-csrf="<?= $this->request->getAttribute('csrfToken'); ?>" data-entity-name="o Profissional"
     data-routes='<?= json_encode([
-        'search' => $this->Url->build(['controller' => 'Profissionais', 'action' => 'search']),
+        'search' => $this->Url->build(['controller' => 'Profissionais', 'action' => 'search', '?' => ['tipo' => 1]]),
         'visualizar' => $this->Url->build(['controller' => 'Profissionais', 'action' => 'visualizar']),
         'edit' => $this->Url->build(['controller' => 'Profissionais', 'action' => 'editar']),
         'delete' => $this->Url->build(['controller' => 'Profissionais', 'action' => 'delete'])

@@ -283,7 +283,7 @@ $retornoAtendimento = $this->request->getSession()
 <?= $this->Html->script('vue/generic-modal.js') ?>
 <?= $this->Html->script('vue/vue-masks.js') ?>
 <?= $this->Html->script('vue/form-cadastrar.js') ?>
-<?= $this->Html->script('vue/cep-autocomplete.js') ?>
+<?= $this->Html->script('vue/cep-autocomplete.js?v=' . filemtime(WWW_ROOT . 'js/vue/cep-autocomplete.js')) ?>
 
 <?= $this->Html->script([
     'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js',

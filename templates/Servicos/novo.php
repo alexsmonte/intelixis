@@ -58,28 +58,15 @@ $this->BreadcrumbsPlus->add([['title' => 'Serviços', 'url' => ['controller' => 
                         'label' => 'Valor',
                         'type' => 'text',
                         'class' => 'form-control',
+                        'v-mask' => "'valor'",
                         'templates' => ['inputContainer' => '{{content}}'],
                         'title' => 'Digite o valor em R$',
                         'data-bs-toggle' => 'tooltip',
                         'data-bs-placement' => 'top'
                     ]); ?>
                 </div>
-                <div class="col-md-2 mb-3">
-                    <div class="position-relative">
-                        <?= $this->Form->control('duracao', [
-                            'type' => 'number',
-                            'min' => 5,
-                            'step' => 5,
-                            'class' => 'form-control', // padding right para espaço do texto
-                            'placeholder' => 'Ex: 30',
-                            'label' => 'Duração'
-
-                        ]) ?>
-                        <span
-                            style="position: absolute; top: 50%; align: center; right: 60px; transform: translateY(0%); pointer-events: none; color: #6c757d;">Minutos</span>
-
-                    </div>
-
+                <div class="col-md-3 mb-3" data-vue="duracao-picker">
+                    <!-- Componente de duração: converte para minutos antes de enviar -->
                 </div>
 
             </div>
@@ -140,3 +127,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Serviços', 'url' => ['controller' => 
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <!-- Vue e componentes programacao.js -->
 <?= $this->Html->script('vue/programacao-semanal.js') ?>
+<!-- Vue e componentes vue-masks.js -->
+<?= $this->Html->script('vue/vue-masks.js?v=2.5') ?>
+<!-- Componente de duração -->
+<?= $this->Html->script('vue/duracao-picker.js?v=2.5') ?>

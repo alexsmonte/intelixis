@@ -81,20 +81,35 @@ class ClientesTable extends Table
             ->requirePresence('nome', 'create')
             ->notEmptyString('nome', __('O nome é obrigatório.'));
 
-            $validator
-            ->date('data_nascimento',['dmy'],'Informe uma data válida')
+        $validator
+            ->scalar('nome_social')
+            ->minLength('nome_social', 5, __('O nome deve ter pelo menos 5 caracteres.'))
+            ->maxLength('nome_social', 255)
+            ->add('nome_social', 'fullName', [
+                'rule' => 'isFullName',
+                'provider' => 'table',
+                'message' => __('Informe nome e sobrenome.'),
+            ])
+            ->allowEmptyString('nome_social');
+        $validator
+            ->scalar('sexo')
+            ->maxLength('sexo', 1)
+            ->notEmptyString('sexo', __('O sexo é obrigatório.'))
+            ->inList('sexo', ['M', 'F', 'I'], __('O sexo deve ser Masculino, Feminino ou Indefinido.'));
+        $validator
+            ->date('data_nascimento', ['dmy'], 'Informe uma data válida')
             ->requirePresence('data_nascimento', 'create')
             ->allowEmptyDate('data_nascimento');
 
         $validator
             ->requirePresence('documento', 'create', __('O documento é obrigatório.'))
             ->notEmptyString('documento', __('O documento é obrigatório.'))
-            ->add('documento', 'length', [
-                'rule' => ['lengthBetween', 11, 14],
-                'message' => __('O documento deve conter exatamente 11 caracteres.')
+            ->add('documento', 'validLength', [
+                'rule' => ['custom', '/^(\d{11}|\d{14})$/'],
+                'message' => __('O documento deve conter exatamente 11 ou 14 caracteres.')
             ]);
-            
-            
+
+
 
         $validator
             ->email('email')
@@ -112,6 +127,8 @@ class ClientesTable extends Table
             ->maxLength('celular', 15)
             ->allowEmptyString('celular');
 
+
+
         $validator
             ->scalar('cep')
             ->minLength('cep', 8, __('O CEP deve conter 8 caracteres.'))
@@ -123,10 +140,15 @@ class ClientesTable extends Table
             ->maxLength('logradouro', 50)
             ->allowEmptyString('logradouro');
 
-            $validator
+        $validator
             ->scalar('numero')
             ->maxLength('numero', 10)
             ->allowEmptyString('numero');
+
+        $validator
+            ->scalar('complemento')
+            ->maxLength('complemento', 100)
+            ->allowEmptyString('complemento');
 
         $validator
             ->scalar('cidade')
@@ -137,6 +159,29 @@ class ClientesTable extends Table
             ->scalar('bairro')
             ->maxLength('bairro', 45)
             ->allowEmptyString('bairro');
+
+        $validator
+            ->scalar('nome_responsavel')
+            ->allowEmptyString('nome_responsavel');
+
+        $validator
+            ->scalar('documento_responsavel')
+            ->allowEmptyString('documento_responsavel')
+            ->add('documento_responsavel', 'validLength', [
+                'rule' => ['custom', '/^(\d{11}|\d{14})$/'],
+                'message' => __('O documento deve conter exatamente 11 ou 14 caracteres.')
+            ]);
+
+        $validator
+            ->scalar('telefone_responsavel')
+            ->minLength('telefone_responsavel', 11, __('O Telefone deve conter 11 caracteres.'))
+            ->maxLength('telefone_responsavel', 15)
+            ->allowEmptyString('telefone_responsavel');
+
+        $validator
+            ->scalar('parentesco_responsavel')
+            ->maxLength('parentesco_responsavel', 20)
+            ->allowEmptyString('parentesco_responsavel');
 
         return $validator;
     }
@@ -156,44 +201,49 @@ class ClientesTable extends Table
     }
 
     public function isFullName($value, array $context): bool
-{
-    if (!is_string($value)) {
-        return false;
+    {
+        if (!is_string($value)) {
+            return false;
+        }
+
+        // Normaliza espaços
+        $value = trim(preg_replace('/\s+/u', ' ', $value));
+
+        // Separa por espaço
+        $parts = explode(' ', $value);
+
+        // Mantém apenas partes com pelo menos 2 letras (Unicode)
+        $validParts = array_filter($parts, function ($w) {
+            $lettersOnly = preg_replace('/[^\\p{L}]/u', '', $w);
+            return mb_strlen($lettersOnly) >= 2;
+        });
+
+        // Precisa de pelo menos duas partes válidas
+        return count($validParts) >= 2;
     }
 
-    // Normaliza espaços
-    $value = trim(preg_replace('/\s+/u', ' ', $value));
+    public function beforeMarshal(Event $event, \ArrayObject $data, \ArrayObject $options)
+    {
 
-    // Separa por espaço
-    $parts = explode(' ', $value);
+        $caracterInvalido = [" ", ".", "-", "/", ")", "(", ","];
 
-    // Mantém apenas partes com pelo menos 2 letras (Unicode)
-    $validParts = array_filter($parts, function ($w) {
-        $lettersOnly = preg_replace('/[^\\p{L}]/u', '', $w);
-        return mb_strlen($lettersOnly) >= 2;
-    });
+        if (isset($data['documento']))
+            $data['documento'] = str_replace($caracterInvalido, "", $data['documento']);
 
-    // Precisa de pelo menos duas partes válidas
-    return count($validParts) >= 2;
-}
+        if (isset($data['documento_responsavel']))
+            $data['documento_responsavel'] = str_replace($caracterInvalido, "", $data['documento_responsavel']);
 
-public function beforeMarshal(Event $event, \ArrayObject $data, \ArrayObject $options)
-{
+        if (isset($data['telefone']))
+            $data['telefone'] = preg_replace('/[\p{L}]/', '', str_replace($caracterInvalido, "", $data['telefone']));
+        if (isset($data['telefone_responsavel']))
+            $data['telefone_responsavel'] = preg_replace('/[\p{L}]/', '', str_replace($caracterInvalido, "", $data['telefone_responsavel']));
 
-    $caracterInvalido   =   [" ",".","-","/",")","(",","];
+        if (isset($data['celular']))
+            $data['celular'] = preg_replace('/[\p{L}]/', '', str_replace($caracterInvalido, "", $data['celular']));
 
-    if(isset($data['documento']))
-        $data['documento']      =   str_replace($caracterInvalido, "", $data['documento']);
+        if (isset($data['cep']))
+            $data['cep'] = preg_replace('/[\p{L}]/', '', str_replace($caracterInvalido, "", $data['cep']));
 
-    if(isset($data['telefone']))
-        $data['telefone']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['telefone']));
-
-        if(isset($data['celular']))
-        $data['celular']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['celular']));
-
-        if(isset($data['cep']))
-        $data['cep']      =   preg_replace('/[\p{L}]/', '',str_replace($caracterInvalido, "", $data['cep']));
-
-}
+    }
 
 }

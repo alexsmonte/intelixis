@@ -10,7 +10,12 @@ $this->assign('title', 'Caixa');
 
 ?>
 <meta name="csrfToken" content="<?= $this->request->getAttribute('csrfToken') ?>">
-<div class="container-fluid" id="app-caixa" v-cloak>
+<div class="container-fluid" id="app" v-cloak
+    data-csrf="<?= $this->request->getAttribute('csrfToken') ?>"
+    data-routes='<?= json_encode([
+        'search' => $this->Url->build("/financas/searchOpen"),
+        'checkout' => $this->Url->build("/financas/pdvCheckout")
+    ], JSON_HEX_APOS | JSON_HEX_QUOT) ?>'>
 
     
     <!-- Busca Form -->
@@ -23,18 +28,7 @@ $this->assign('title', 'Caixa');
 
             <div class="row mb-3 align-items-center">
                 <div class="col-md-6 position-relative">
-                    <div class="input-group">
-                        <input type="text" 
-                            id="searchClient"
-                            class="form-control form-control-lg placeholdert" 
-                            placeholder="pesquisar paciente ou descrição..." 
-                            v-model="query"
-                            @input="debouncedSearch"
-                            @keydown.enter="buscar">
-                        <button class="btn bg-primary-subtle text-primary border-primary" @click="buscar" title="Pesquisar">
-                            <i class="ti ti-search fs-5"></i>
-                        </button>
-                    </div>
+                    <filtro-busca v-model="query" placeholder="pesquisar paciente ou descrição..."></filtro-busca>
                 
                     <!-- Resultados da busca dropdown -->
                     <ul class="list-group position-absolute w-100 shadow-sm z-3" v-if="resultados.length > 0 && query.length >= 2" style="max-height: 300px; overflow-y: auto; top: 100%; border-radius: 8px; margin-top: 5px;">
@@ -83,14 +77,18 @@ $this->assign('title', 'Caixa');
                 </h4>
             </div>
             
-            <div>
+            <div class="d-inline-block" 
+                v-tooltip="itensSelecionados.length === 0 ? 'Adicione pelo menos um item/lançamento para pagar.' : (troco < 0 ? 'Adicione formas de pagamento suficientes para cobrir o valor restante.' : 'Finalizar transação e receber pagamento')"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top">
                  <input type="hidden" name="_csrfToken" :value="csrfToken">
-                <button class="btn bg-success-subtle text-success px-4 py-2" style="font-weight: 600;" 
-                    @click="finalizarEReceber" 
-                    :disabled="itensSelecionados.length === 0 || troco < 0 || processando">
-                    <span v-if="processando" class="spinner-border spinner-border-sm me-2"></span>
-                    Finalizar e Receber
-                </button>
+                 <button class="btn px-4 py-2" style="font-weight: 600;" 
+                     :class="(itensSelecionados.length === 0 || troco < 0 || processando) ? 'bg-light text-muted border border-light opacity-75' : 'bg-success text-white shadow-sm'"
+                     @click="finalizarEReceber" 
+                     :disabled="itensSelecionados.length === 0 || troco < 0 || processando">
+                     <span v-if="processando" class="spinner-border spinner-border-sm me-2"></span>
+                     Finalizar e Receber
+                 </button>
             </div>
         </div>
     </div>
@@ -130,6 +128,7 @@ $this->assign('title', 'Caixa');
                                     <td class="text-end">R$ {{ converterParaBrasileiro(item.valor) }}</td>
                                     <td class="text-end" style="width: 120px;">
                                         <input type="text" class="form-control form-control-sm text-end" v-model="item.desconto" 
+                                            v-monetario
                                             @input="calcTotalItem(item)" 
                                             @blur="formatarDesconto(item)"
                                             placeholder="0,00">
@@ -169,10 +168,18 @@ $this->assign('title', 'Caixa');
                         </div>
                         <div class="col-3">
                             <label class="form-label text-muted small mb-1">Valor</label>
-                            <input type="text" class="form-control form-control-sm border-0 text-end" v-model="novoPgto.valor" placeholder="0,00" @input="formatNovoPgtoValor" @blur="onBlurNovoPgtoValor">
+                            <input type="text" class="form-control form-control-sm border-0 text-end" v-model="novoPgto.valor" 
+                                v-monetario
+                                placeholder="0,00">
                         </div>
-                        <div class="col-1 text-end">
-                            <button class="btn bg-success-subtle text-success btn-sm w-200 h-200" @click="addPagamento" :disabled="!novoPgto.forma_id || valorStrToFloat(novoPgto.valor) <= 0">
+                        <div class="col-1 text-end" 
+                            v-tooltip="!novoPgto.forma_id ? 'Selecione uma forma de pagamento.' : (valorStrToFloat(novoPgto.valor) <= 0 ? 'Digite um valor de pagamento maior que 0,00.' : 'Adicionar forma de pagamento')"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top">
+                            <button class="btn btn-sm w-200 h-200" 
+                                :class="(!novoPgto.forma_id || valorStrToFloat(novoPgto.valor) <= 0) ? 'bg-light text-muted border border-light opacity-75' : 'bg-success text-white shadow-sm'"
+                                @click="addPagamento" 
+                                :disabled="!novoPgto.forma_id || valorStrToFloat(novoPgto.valor) <= 0">
                                 <i class="fas fa-plus"></i></button>
                         </div>
                         <div class="col-12 mt-2 text-end" v-if="troco < 0 && itensSelecionados.length > 0">
@@ -206,16 +213,72 @@ $this->assign('title', 'Caixa');
 </div>
 
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<?= $this->Html->script('vue/vue-masks.js?v=2.5') ?>
+<?= $this->Html->script('vue/vue-index.js?v=' . filemtime(WWW_ROOT . 'js/vue/vue-index.js')) ?>
 <script>
 const URLS = {
     search: '<?= $this->Url->build("/financas/searchOpen") ?>',
     checkout: '<?= $this->Url->build("/financas/pdvCheckout") ?>'
 };
 
-const app = Vue.createApp({
+createVueIndex({
+    directives: {
+        monetario: {
+            mounted(el) {
+                if (window.VueMasks && window.VueMasks.aplicarMascaraMonetariaCustom) {
+                    window.VueMasks.aplicarMascaraMonetariaCustom(el);
+                }
+            }
+        },
+        tooltip: {
+            mounted(el, binding) {
+                if (window.bootstrap && bootstrap.Tooltip) {
+                    if (binding.value) {
+                        el.setAttribute('title', binding.value);
+                    }
+                    new bootstrap.Tooltip(el);
+                    el.removeAttribute('title');
+                }
+            },
+            updated(el, binding) {
+                if (window.bootstrap && bootstrap.Tooltip) {
+                    const tooltip = bootstrap.Tooltip.getInstance(el);
+                    const newTitle = binding.value || el.getAttribute('data-bs-title') || el.getAttribute('data-bs-original-title') || '';
+                    if (tooltip) {
+                        if (tooltip._config) tooltip._config.title = newTitle;
+                        if (typeof tooltip.setContent === 'function') {
+                            try { tooltip.setContent({ '.tooltip-inner': newTitle }); } catch (e) {}
+                        }
+                        const tip = tooltip.tip || (typeof tooltip.getTipElement === 'function' ? tooltip.getTipElement() : null);
+                        if (tip) {
+                            const inner = tip.querySelector('.tooltip-inner');
+                            if (inner) inner.textContent = newTitle;
+                        }
+                    } else {
+                        if (binding.value) el.setAttribute('title', binding.value);
+                        new bootstrap.Tooltip(el);
+                    }
+                    // Sempre remover o title para não conflitar com o nativo
+                    if (el.hasAttribute('title')) el.removeAttribute('title');
+                }
+            },
+            unmounted(el) {
+                if (window.bootstrap && bootstrap.Tooltip) {
+                    const tooltip = bootstrap.Tooltip.getInstance(el);
+                    if (tooltip) {
+                        tooltip.dispose();
+                    }
+                }
+            }
+        }
+    },
+    watch: {
+        query(newVal) {
+            this.debouncedSearch();
+        }
+    },
     data() {
         return {
-            query: '',
             resultados: [],
             itensSelecionados: [],
             pagamentosAdicionados: [],
@@ -226,7 +289,6 @@ const app = Vue.createApp({
                 parcelas: 1,
                 valor: '0,00'
             },
-            searchTimeout: null,
             processando: false
         }
     },
@@ -244,48 +306,36 @@ const app = Vue.createApp({
     methods: {
         // Formatação
         converterParaBrasileiro(valor) {
-            if (valor === undefined || valor === null) return '0,00';
-            return parseFloat(valor).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        },
-        formatarDataBR(dataStr) {
-            if (!dataStr) return '';
-            const data = new Date(dataStr + 'T12:00:00');
-            return data.toLocaleDateString('pt-BR');
+            return this.formatarMoeda(valor);
         },
         valorStrToFloat(str) {
             if (!str) return 0;
             if (typeof str === 'number') return str;
-            return parseFloat(str.replace(/\./g, '').replace(',', '.'));
+            return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
         },
         
-        // Busca
-        debouncedSearch() {
-            clearTimeout(this.searchTimeout);
+        // Busca Autocomplete customizada para o PDV (substitui carregarDados padrão do vue-index)
+        async carregarDados() {
             if (this.query.length < 2) {
                 this.resultados = [];
                 return;
             }
-            this.searchTimeout = setTimeout(this.buscar, 500);
-        },
-        async buscar() {
-            if (!this.query) return;
             try {
-                const resp = await fetch(`${URLS.search}?q=${encodeURIComponent(this.query)}`, {
+                const resp = await fetch(`${this.routes.search}?q=${encodeURIComponent(this.query)}`, {
                     headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
                 });
                 if (resp.ok) {
                     const jsonResp = await resp.json();
-                    
-                    // doAdvancedSearch returns { data: [...], paginator: {...} }
                     const resultsArray = jsonResp.data || [];
-                    
-                    // Filtra os que já estão selecionados
                     const idsSelecionados = this.itensSelecionados.map(i => i.id);
                     this.resultados = resultsArray.filter(item => !idsSelecionados.includes(item.id));
                 }
             } catch (e) {
                 console.error('Busca falhou', e);
             }
+        },
+        buscar() {
+            this.carregarDados();
         },
         selecionarLancamento(item) {
             const val = parseFloat(item.valor) || 0;
@@ -295,7 +345,7 @@ const app = Vue.createApp({
                 ...item,
                 valor: val,
                 desconto_raw: desc,
-                desconto: this.converterParaBrasileiro(desc),
+                desconto: this.formatarMoeda(desc),
                 total_pagar: Math.max(0, val - desc),
                 cliente_nome: item.cliente ? item.cliente.nome : ''
             });
@@ -312,35 +362,12 @@ const app = Vue.createApp({
         
         // Cálculos e Inputs
         calcTotalItem(item) {
-            let descStr = item.desconto.replace(/[^\d]/g, '');
-            if(!descStr) descStr = '0';
-            while (descStr.length < 3) descStr = '0' + descStr;
-            const cents = descStr.slice(-2);
-            let ints = descStr.slice(0, -2).replace(/^0+/g, '') || '0';
-            // Pular formatacao de milhar por enquanto pra facilitar, só mascara na saida
-            
-            item.desconto = ints + ',' + cents;
-            
-            const descFloat = parseFloat(ints + '.' + cents);
+            const descFloat = this.valorStrToFloat(item.desconto);
             item.desconto_raw = descFloat;
             item.total_pagar = Math.max(0, item.valor - descFloat);
         },
         formatarDesconto(item) {
-            if(!item.desconto.includes(',')) item.desconto += ',00';
             this.preencherRestante();
-        },
-        
-        formatNovoPgtoValor(e) {
-            let val = e.target.value.replace(/[^\d]/g, '');
-            if(!val) val = '0';
-            while (val.length < 3) val = '0' + val;
-            const cents = val.slice(-2);
-            let ints = val.slice(0, -2).replace(/^0+/g, '') || '0';
-            if (ints.length > 3) ints = ints.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-            this.novoPgto.valor = ints + ',' + cents;
-        },
-        onBlurNovoPgtoValor() {
-            if(!this.novoPgto.valor.includes(',')) this.novoPgto.valor += ',00';
         },
         
         // Pagamentos
@@ -350,7 +377,7 @@ const app = Vue.createApp({
         },
         preencherRestante() {
             if (this.troco < 0) {
-                this.novoPgto.valor = this.converterParaBrasileiro(Math.abs(this.troco));
+                this.novoPgto.valor = this.formatarMoeda(Math.abs(this.troco));
             } else {
                 this.novoPgto.valor = '0,00';
             }
@@ -380,8 +407,6 @@ const app = Vue.createApp({
             
             this.processando = true;
             try {
-                const csrfToken = document.querySelector('meta[name="csrfToken"]')?.getAttribute('content');
-                
                 const payload = {
                     lancamentos: this.itensSelecionados.map(i => ({
                         id: i.id,
@@ -393,26 +418,25 @@ const app = Vue.createApp({
                         parcelas: p.parcelas,
                         valor: p.valor,
                         caixa_id: this.caixa_id,
-                      
                     })),
                     troco: this.troco > 0 ? this.troco : 0
                 };
                 
-                const resp = await fetch(URLS.checkout, {
-    method: 'POST',
-    body: (() => {
-        const formData = new FormData();
-        formData.append('_csrfToken', csrfToken);
-        formData.append('lancamentos', JSON.stringify(payload.lancamentos));
-        formData.append('pagamentos', JSON.stringify(payload.pagamentos));
-        formData.append('troco', payload.troco);
-        return formData;
-    })(),
-    headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'Accept': 'application/json'
-    }
-});
+                const resp = await fetch(this.routes.checkout, {
+                    method: 'POST',
+                    body: (() => {
+                        const formData = new FormData();
+                        formData.append('_csrfToken', this.csrfToken);
+                        formData.append('lancamentos', JSON.stringify(payload.lancamentos));
+                        formData.append('pagamentos', JSON.stringify(payload.pagamentos));
+                        formData.append('troco', payload.troco);
+                        return formData;
+                    })(),
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
                 
                 if (resp.ok) {
                     const data = await resp.json();
@@ -422,13 +446,13 @@ const app = Vue.createApp({
                         const totalCalculado = this.totalAPagar;
                         const subtotalCalculado = this.itensSelecionados.reduce((acc, item) => acc + item.valor, 0);
                         const descontoTotal = this.itensSelecionados.reduce((acc, item) => acc + item.desconto_raw, 0);
-
+ 
                         // Reset form state so UI is clean Behind the alert
                         this.itensSelecionados = [];
                         this.pagamentosAdicionados = [];
                         this.novoPgto.valor = '0,00';
                         this.query = '';
-
+ 
                         // SweetAlert2 de Sucesso
                         if (typeof Swal !== 'undefined') {
                             Swal.fire({
@@ -449,7 +473,7 @@ const app = Vue.createApp({
                         } else {
                             alert('Pagamento finalizado com sucesso!');
                         }
-
+ 
                     } else {
                         if (typeof Swal !== 'undefined') {
                             Swal.fire('Erro', data.message || 'Problema ao processar caixa.', 'error');
@@ -485,7 +509,7 @@ const app = Vue.createApp({
             const usuarioNome = <?= json_encode($this->request->getSession()->read('Auth.nome') ?? $this->request->getSession()->read('Auth.Usuario.nome') ?? 'Usuário') ?>;
             
             const dataHora = new Date().toLocaleString('pt-BR');
-
+ 
             // Monte o HTML para a janela de impressão
             let html = `
             <!DOCTYPE html>
@@ -533,7 +557,7 @@ const app = Vue.createApp({
                 <div class="linha"></div>
                 <table>
                     <tbody>`;
-
+ 
             itens.forEach(item => {
                 html += `
                         <tr>
@@ -543,7 +567,7 @@ const app = Vue.createApp({
                             <td class="right" style="width: 20%;">${this.converterParaBrasileiro(item.total_pagar)}</td>
                         </tr>`;
             });
-
+ 
             html += `
                     </tbody>
                 </table>
@@ -575,7 +599,7 @@ const app = Vue.createApp({
                 <\/script>
             </body>
             </html>`;
-
+ 
             const printWind = window.open('', '_blank', 'width=400,height=600');
             printWind.document.write(html);
             printWind.document.close();
@@ -583,7 +607,6 @@ const app = Vue.createApp({
     }
 });
 
-app.mount('#app-caixa');
 </script>
 <style>
 [v-cloak] { display: none; }

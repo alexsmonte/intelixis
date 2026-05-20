@@ -45,6 +45,7 @@ class Profissional extends Entity
     protected array $_accessible = [
         'estabelecimento_id' => true,
         'nome' => true,
+        'documento' => true,
         'email' => true,
         'telefone' => true,
         'celular' => true,
@@ -57,6 +58,7 @@ class Profissional extends Entity
         'uf' => true,
         'ativar' => true,
         'cor' => true,
+        'tipo' => true,
         'habilitar_programacao' => true,
         'data_nascimento' => true,
         'conselho' => true,
@@ -68,5 +70,6 @@ class Profissional extends Entity
         'periodos' => true,
         'convenios' => true,
         'servicos' => true,
+
     ];
 }

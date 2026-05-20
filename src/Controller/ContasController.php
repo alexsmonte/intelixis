@@ -10,6 +10,7 @@ namespace App\Controller;
  */
 class ContasController extends AppController
 {
+    use \App\Controller\Traits\SearchableTrait;
 
     public function beforeFilter(\Cake\Event\EventInterface $event): void
     {
@@ -36,11 +37,11 @@ class ContasController extends AppController
             $conta = $this->Contas->patchEntity($conta, $dadosContas,['associated' => ['Usuarios']]);
 
             if ($this->Contas->save($conta)) {
-                $this->Flash->success(__('Conta criar com sucesso'));
+                $this->Flash->success(__('Conta criada com sucesso.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('Ocorreu um erro ao tentar criar sua conta'));
+            $this->Flash->error(__('Ocorreu um erro ao tentar criar sua conta.'));
         }
 
         $this->set(compact('conta'));
@@ -56,7 +57,8 @@ class ContasController extends AppController
         $query = $this->Contas->find();
         $contas = $this->paginate($query);
 
-        $this->set(compact('contas'));
+        $title = 'Contas';
+        $this->set(compact('contas', 'title'));
     }
 
     /**
@@ -73,25 +75,41 @@ class ContasController extends AppController
     }
 
     /**
-     * Edit method
-     *
-     * @param string|null $id Conta id.
-     * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * Novo method (Add)
      */
-    public function edit($id = null)
+    public function novo()
+    {
+        $conta = $this->Contas->newEmptyEntity();
+        if ($this->request->is('post')) {
+            $conta = $this->Contas->patchEntity($conta, $this->request->getData());
+            if ($this->Contas->save($conta)) {
+                $this->Flash->success(__('Conta salva com sucesso.'));
+
+                return $this->redirect(['action' => 'index']);
+            }
+            $this->Flash->error(__('Ocorreu um erro na tentativa de criar uma conta. Por favor, tente novamente.'));
+        }
+        $title = 'Nova Conta';
+        $this->set(compact('conta', 'title'));
+    }
+
+    /**
+     * Editar method (Edit)
+     */
+    public function editar($id = null)
     {
         $conta = $this->Contas->get($id, contain: []);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $conta = $this->Contas->patchEntity($conta, $this->request->getData());
             if ($this->Contas->save($conta)) {
-                $this->Flash->success(__('The conta has been saved.'));
+                $this->Flash->success(__('Conta atualizada com sucesso.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The conta could not be saved. Please, try again.'));
+            $this->Flash->error(__('Ocorreu um erro na tentativa de salvar a conta. Por favor, tente novamente.'));
         }
-        $this->set(compact('conta'));
+        $title = 'Editar Conta';
+        $this->set(compact('conta', 'title'));
     }
 
     /**
@@ -103,14 +121,24 @@ class ContasController extends AppController
      */
     public function delete($id = null)
     {
-        $this->request->allowMethod(['post', 'delete']);
-        $conta = $this->Contas->get($id);
-        if ($this->Contas->delete($conta)) {
-            $this->Flash->success(__('The conta has been deleted.'));
-        } else {
-            $this->Flash->error(__('The conta could not be deleted. Please, try again.'));
-        }
+        return $this->doDelete($this->Contas, $id);
+    }
 
-        return $this->redirect(['action' => 'index']);
+    public function search()
+    {
+        $allowedFilters = [
+            'q' => [
+                'operator' => 'MULTI_LIKE',
+                'fields' => [
+                    'Contas.nome',
+                    'Contas.cpf_cnpj',
+                    'Contas.razao_social',
+                    'Contas.email',
+                ]
+            ],
+            'ativar' => ['field' => 'Contas.ativar'],
+        ];
+        
+        return $this->doAdvancedSearch($this->Contas, $allowedFilters, ['Contas.nome' => 'ASC']);
     }
 }
