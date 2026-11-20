@@ -29,7 +29,8 @@ storage/anexos/*
 
 webroot/img/profile/*
 !webroot/img/profile/.gitkeep
-
+webroot/files/
+!webroot/files/.gitkeep
 webroot/img/usuarios/*
 !webroot/img/usuarios/.gitkeep
 
@@ -47,3 +48,6 @@ config/app.php.PGBKP
 *.BKP
 config/app_local.php
 .idea/
+
+# Plugins com versionamento independente
+/plugins/AclManager/
