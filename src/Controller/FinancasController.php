@@ -1426,15 +1426,16 @@ public function buscaAvancada()
     // RECEITAS
     // ============================================
     if ($tipo === 'receitas') {
+/**
         $catsReceitas = $this->Financas->Ccustos
             ->find('list', ['keyField' => 'id', 'valueField' => 'id'])
             ->where(['parent_id' => 1])
             ->toArray();
-        
-        $allowedFilters['ccustos_id'] = [
-            'field' => 'Financas.ccustos_id',
-            'operator' => 'IN',
-            'value' => !empty($catsReceitas) ? array_keys($catsReceitas) : [1]
+**/
+        $allowedFilters['tipo'] = [
+            'field' => 'Financas.tipo',
+            'operator' => '=',
+            'value' => 1
         ];
 
         $this->doAdvancedSearch(
@@ -1451,6 +1452,7 @@ public function buscaAvancada()
     // DESPESAS
     // ============================================
     if ($tipo === 'despesas') {
+/***        
         $categoriasIds = [];
         
         if (!empty($queryParams['categoria_id'])) {
@@ -1470,7 +1472,14 @@ public function buscaAvancada()
                 'value' => $categoriasIds
             ];
         }
-        
+        ***/
+    
+        $allowedFilters['tipo'] = [
+            'field' => 'Financas.tipo',
+            'operator' => '=',
+            'value' => 2
+        ];
+
         $this->doAdvancedSearch(
             $this->Financas,
             $allowedFilters,
