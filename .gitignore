@@ -1,8 +1,5 @@
 # CakePHP 3
 
-/vendor/*
-/config/app.php
-
 /tmp/*
 /tmp/cache/models/*
 !/tmp/cache/models/empty
@@ -29,8 +26,7 @@ storage/anexos/*
 
 webroot/img/profile/*
 !webroot/img/profile/.gitkeep
-webroot/files/
-!webroot/files/.gitkeep
+
 webroot/img/usuarios/*
 !webroot/img/usuarios/.gitkeep
 
@@ -43,11 +39,17 @@ webroot/img/logo/*
 /app/Config/core.php
 /app/Config/database.php
 /vendors/*
-config/app.php
-config/app.php.PGBKP
+/config/app.php
+/config/app.php.PGBKP
 *.BKP
-config/app_local.php
+/config/app_local.php
 .idea/
+/vendor/*
+
+
+# Arquivos armazenados pela aplicacao
+/webroot/files/*
+!/webroot/files/.gitkeep
 
 # Plugins com versionamento independente
 /plugins/AclManager/

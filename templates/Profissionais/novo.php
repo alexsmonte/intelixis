@@ -49,6 +49,9 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais', 'url' => ['controller'
                                 <div class="col-md-6 mb-3">
                                         <?= $this->Form->control('nome', ['label' => 'Nome Completo', 'class' => 'form-control', 'v-mask' => "'nome'", 'minlength' => '3']); ?>
                                 </div>
+                                <div class="col-md-6 mb-3">
+                                        <?= $this->Form->control('documento', ['label' => 'CPF/CNPJ', 'class' => 'form-control', 'v-mask' => "'documento'", 'maxlength' => 18]); ?>
+                                </div>
                                 <div class="col-md-3 mb-3">
                                         <?= $this->Form->control('data_nascimento', ['label' => 'Data de Nascimento', 'class' => 'form-control', 'type' => 'date']); ?>
                                 </div>
@@ -113,10 +116,17 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais', 'url' => ['controller'
                         <div class="row">
                                 <div class="col-md-12 mb-3">
                                         <div class="d-flex justify-content-between align-items-end mb-1">
-                                                <label class="form-label mb-0" for="convenios-ids">Convênios que este profissional atende</label>
+                                                <label class="form-label mb-0" for="convenios-ids">Convênios que este
+                                                        profissional atende</label>
                                                 <div>
-                                                        <button type="button" class="btn btn-sm btn-link text-primary p-0 me-2" onclick="$('#convenios-ids > option').prop('selected', true); $('#convenios-ids').trigger('change');">Selecionar Todos</button>
-                                                        <button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="$('#convenios-ids').val(null).trigger('change');">Desmarcar Todos</button>
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-link text-primary p-0 me-2"
+                                                                onclick="$('#convenios-ids > option').prop('selected', true); $('#convenios-ids').trigger('change');">Selecionar
+                                                                Todos</button>
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-link text-danger p-0"
+                                                                onclick="$('#convenios-ids').val(null).trigger('change');">Desmarcar
+                                                                Todos</button>
                                                 </div>
                                         </div>
                                         <?= $this->Form->control('convenios._ids', [
@@ -140,10 +150,17 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais', 'url' => ['controller'
                         <div class="row">
                                 <div class="col-md-12 mb-3">
                                         <div class="d-flex justify-content-between align-items-end mb-1">
-                                                <label class="form-label mb-0" for="servicos-ids">Serviços que este profissional atende</label>
+                                                <label class="form-label mb-0" for="servicos-ids">Serviços que este
+                                                        profissional atende</label>
                                                 <div>
-                                                        <button type="button" class="btn btn-sm btn-link text-primary p-0 me-2" onclick="$('#servicos-ids > option').prop('selected', true); $('#servicos-ids').trigger('change');">Selecionar Todos</button>
-                                                        <button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="$('#servicos-ids').val(null).trigger('change');">Desmarcar Todos</button>
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-link text-primary p-0 me-2"
+                                                                onclick="$('#servicos-ids > option').prop('selected', true); $('#servicos-ids').trigger('change');">Selecionar
+                                                                Todos</button>
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-link text-danger p-0"
+                                                                onclick="$('#servicos-ids').val(null).trigger('change');">Desmarcar
+                                                                Todos</button>
                                                 </div>
                                         </div>
                                         <?= $this->Form->control('servicos._ids', [
@@ -193,22 +210,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais', 'url' => ['controller'
 <?= $this->Html->script('vue/programacao-semanal.js') ?>
 
 <!-- vue cep autocomplete-->
-<?= $this->Html->script('vue/cep-autocomplete.js') ?>
+<?= $this->Html->script('vue/cep-autocomplete.js?v=' . filemtime(WWW_ROOT . 'js/vue/cep-autocomplete.js')) ?>
 
 <!-- vue-masks -->
 <?= $this->Html->script('vue/vue-masks.js') ?>
-
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        if (typeof IMask !== 'undefined' && window.VueMasks) {
-            // Inicializa as máscaras estáticas com base nos configs do vue-masks
-            const inputElements = document.querySelectorAll('input[v-mask]');
-            inputElements.forEach(input => {
-                const maskType = input.getAttribute('v-mask').replace(/['"]/g, '');
-                if (window.VueMasks.maskRegistry[maskType]) {
-                    IMask(input, window.VueMasks.maskRegistry[maskType]);
-                }
-            });
-        }
-    });
-</script>

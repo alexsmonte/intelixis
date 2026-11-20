@@ -82,7 +82,7 @@ class AssinaturasTable extends Table
             ->notEmptyString('plano_id');
 
         $validator
-            ->date('data_vencimento',['dmy'],'Informe uma data válida')
+            ->date('data_vencimento', ['ymd'], 'Informe uma data válida')
             ->requirePresence('data_vencimento', 'create')
             ->notEmptyDate('data_vencimento');
 

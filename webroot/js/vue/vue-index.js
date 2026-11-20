@@ -27,11 +27,11 @@ const FiltroBusca = {
     emits: ['update:modelValue', 'search'],
     template: `
         <div class="position-relative">
-            <input :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" 
+            <input :value="modelValue" @input="$emit('update:modelValue', $event.target.value); $emit('search')" 
                 type="text" class="form-control rounded-pill ps-5" 
                 :placeholder="placeholder || 'Buscar...'" @keyup.enter="$emit('search')">
             <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
-                <i class="ti ti-search"></i>
+                <span class="iconify fs-5" data-icon="solar:magnifer-linear"></span>
             </span>
         </div>
     `
@@ -59,13 +59,13 @@ const FiltroBadges = {
                 <span class="text-muted me-1" style="font-size:0.82rem;">Filtros ativos:</span>
 
                 <div v-if="query" class="filtro-badge">
-                    <i class="ti ti-search" style="font-size:0.8rem;"></i>
+                    <span class="iconify" data-icon="solar:magnifer-linear" style="font-size:1rem;"></span>
                     <span>{{ query.length > 15 ? query.substring(0, 15) + '...' : query }}</span>
                     <button class="btn-remover" @click="$emit('removerFiltro', 'texto')">✕</button>
                 </div>
 
                 <div v-if="dataInicio || dataFim" class="filtro-badge">
-                    <i class="ti ti-calendar" style="font-size:0.8rem;"></i>
+                    <span class="iconify" data-icon="solar:calendar-linear" style="font-size:1rem;"></span>
                     <span>
                         {{ dataInicio ? formatarDataSimples(dataInicio) : '—' }}
                         &nbsp;-&nbsp;
@@ -78,7 +78,7 @@ const FiltroBadges = {
             </div>
 
             <button v-if="temFiltrosAtivos" class="btn-limpar-todos" @click="$emit('limparFiltros')" title="Limpar todos os filtros">
-                <span class="iconify" data-icon="tabler:filter-2-x" style="font-size:1.3rem;"></span>
+                <span class="iconify" data-icon="solar:close-circle-bold-duotone" style="font-size:1.3rem;"></span>
             </button>
         </div>
     `
@@ -207,7 +207,8 @@ function createVueIndex(extraConfig = {}) {
          * to add custom query params for your specific page.
          */
         buildSearchUrl() {
-            let url = `${this.routes.search}?page=${this.pagination.page}&limit=${this.pagination.limit}`;
+            const separator = this.routes.search.includes('?') ? '&' : '?';
+            let url = `${this.routes.search}${separator}page=${this.pagination.page}&limit=${this.pagination.limit}`;
             if (this.query && this.query.trim()) url += `&q=${encodeURIComponent(this.query.trim())}`;
             if (this.dataInicio) url += `&data_inicio=${this.dataInicio} 00:00:00`;
             if (this.dataFim) url += `&data_fim=${this.dataFim} 23:59:59`;
@@ -319,7 +320,7 @@ function createVueIndex(extraConfig = {}) {
 
             const itemId = item.id;
             // Tenta achar um campo de nome legível; fallback para #id
-            const itemNome = item.nome || item.name || item.descricao || item.titulo || `#${itemId}`;
+            const itemNome = item.nome || item.nome_fantasia || item.razao_social || item.name || item.descricao || item.titulo || `#${itemId}`;
             // Capitaliza o entityName (ex: "o Caixa" → exibe como está, ou "o caixa")
             const entidade = this.entityName || 'o registro';
 

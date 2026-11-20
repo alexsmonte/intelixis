@@ -187,4 +187,4 @@ $this->BreadcrumbsPlus->add([['title' => 'Profissionais', 'url' => ['controller'
 <?= $this->Html->script('vue/programacao-semanal.js') ?>
 <?= $this->Html->script('vue/programacao-personalizada.js') ?>
 <?= $this->Html->script('vue/programacao-indisponivel.js') ?>
-<?= $this->Html->script('vue/cep-autocomplete.js') ?>
+<?= $this->Html->script('vue/cep-autocomplete.js?v=' . filemtime(WWW_ROOT . 'js/vue/cep-autocomplete.js')) ?>

@@ -5,19 +5,19 @@ use Cake\Collection\Collection;
 
 $collection = new Collection($servico->periodos);
 
-if(!empty($estabelecimento->periodos))
-$collection = new Collection($servico->periodos);
-$agrupados      = $collection->groupBy('cadeia_id')->toArray();
-$semanal        = $agrupados['1'] ?? [];
-$disponiveis    = $agrupados['2'] ?? [];
-$indisponiveis  = $agrupados['3'] ?? [];
+if (!empty($estabelecimento->periodos))
+    $collection = new Collection($servico->periodos);
+$agrupados = $collection->groupBy('cadeia_id')->toArray();
+$semanal = $agrupados['1'] ?? [];
+$disponiveis = $agrupados['2'] ?? [];
+$indisponiveis = $agrupados['3'] ?? [];
 
 $this->BreadcrumbsPlus->add([
     ['title' => 'Serviços', 'url' => ['controller' => 'Servicos', 'action' => 'index']],
     ['title' => 'Editar']
 ]);
 ?>
-<?= $this->element('barra-titulo',['title' => $title]); ?>
+<?= $this->element('barra-titulo', ['title' => $title]); ?>
 
 <div class="card w-100 position-relative overflow-hidden">
     <div class="px-4 py-3 border-bottom">
@@ -39,11 +39,12 @@ $this->BreadcrumbsPlus->add([
                     <?= $this->Form->label('ativar', 'Ativar', ['class' => 'form-check-label']) ?>
                 </div>
             </div>
-            
+
             <div class="row">
-                <div class="col-md-6 mb-3">
+                <div class="col-md-7 mb-3">
                     <?= $this->Form->control('nome', [
                         'label' => 'Nome do Serviço',
+                        'placeholder' => 'Digite o nome do serviço',
                         'class' => 'form-control',
                     ]); ?>
                 </div>
@@ -51,33 +52,29 @@ $this->BreadcrumbsPlus->add([
                 <div class="col-md-2 mb-3">
                     <?= $this->Form->control('valor', [
                         'label' => 'Valor',
+                        'type' => 'text',
                         'class' => 'form-control',
+                        'v-mask' => "'valor'",
+                        'templates' => ['inputContainer' => '{{content}}'],
+                        'title' => 'Digite o valor em R$',
+                        'data-bs-toggle' => 'tooltip',
+                        'data-bs-placement' => 'top'
                     ]); ?>
                 </div>
 
-                <div class="col-md-2 mb-3">
-                    <div class="position-relative">
-                        <?= $this->Form->control('duracao', [
-                            'type' => 'number',
-                            'min' => 5,
-                            'step' => 5,
-                            'class' => 'form-control',
-                            'placeholder' => 'Ex: 30',
-                            'label' => 'Duração'
-                        ]) ?>
-                        <span style="position: absolute; top: 50%; align: center; right: 70px; transform: translateY(0%); pointer-events: none; color: #6c757d;">Minutos</span>
-                    </div>
+                <div class="col-md-3 mb-3" data-vue="duracao-picker" data-duracao-inicial="<?= h($servico->duracao) ?>">
+                    <!-- Componente de duração: converte para minutos antes de enviar -->
                 </div>
-            </div>    
-
-            <div class="row"> 
-                <div class="col-md-12 mb-3">
-                    <?= $this->Form->control('descricao', ['label' => 'Descrição','class' => 'form-control']); ?>
-                </div> 
             </div>
 
-            <!-- Convênios -->                            
-            <div class="row"> 
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <?= $this->Form->control('descricao', ['label' => 'Descrição', 'class' => 'form-control']); ?>
+                </div>
+            </div>
+
+            <!-- Convênios -->
+            <div class="row">
                 <div class="col-md-12 mb-3">
                     <?= $this->Form->control('convenios._ids', [
                         'type' => 'select',
@@ -90,7 +87,7 @@ $this->BreadcrumbsPlus->add([
             </div>
 
             <!-- Profissionais -->
-            <div class="row"> 
+            <div class="row">
                 <div class="col-md-12 mb-3">
                     <?= $this->Form->control('profissionais._ids', [
                         'type' => 'select',
@@ -103,26 +100,22 @@ $this->BreadcrumbsPlus->add([
             </div>
 
             <!-- Programação semanal Vue -->
-            <div data-vue="programacao-semanal"
-                                 data-programacao-inicial='<?= json_encode($semanal ?? []) ?>'
-                                 data-habilitar-inicial="<?= $servico->habilitar_programacao ? 'true' : 'false' ?>">
-                                <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
-	                            </div>
+            <div data-vue="programacao-semanal" data-programacao-inicial='<?= json_encode($semanal ?? []) ?>'
+                data-habilitar-inicial="<?= $servico->habilitar_programacao ? 'true' : 'false' ?>">
+                <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
+            </div>
 
-                                <div data-vue="programacao-personalizada"
-                                        data-programacao-inicial='<?= htmlspecialchars(json_encode($disponiveis ?? []), ENT_QUOTES, 'UTF-8') ?>'
-                                        data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
-                                        data-base-url="<?= $this->Url->build(['controller'=>'Periodos', 'action' =>'delete'], ['fullBase' => false]) ?>"
-                                >
-                                        <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
-                                </div>
+            <div data-vue="programacao-personalizada"
+                data-programacao-inicial='<?= htmlspecialchars(json_encode($disponiveis ?? []), ENT_QUOTES, 'UTF-8') ?>'
+                data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
+                data-base-url="<?= $this->Url->build(['controller' => 'Periodos', 'action' => 'delete'], ['fullBase' => false]) ?>">
+                <!-- Inputs hidden gerados pelo Vue ficarão aqui dentro do form -->
+            </div>
 
-                                <div data-vue="dias-indisponiveis"
-                                        data-periodos-iniciais='<?= json_encode($indisponiveis ?? []) ?>'
-                                         data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
-                                         data-base-url="<?= $this->Url->build(['controller'=>'Periodos', 'action' =>'delete'], ['fullBase' => false]) ?>"
-                                >
-                                </div>
+            <div data-vue="dias-indisponiveis" data-periodos-iniciais='<?= json_encode($indisponiveis ?? []) ?>'
+                data-token="<?= h($this->request->getAttribute('csrfToken')) ?>"
+                data-base-url="<?= $this->Url->build(['controller' => 'Periodos', 'action' => 'delete'], ['fullBase' => false]) ?>">
+            </div>
 
 
             <div class="row mt-3">
@@ -138,7 +131,9 @@ $this->BreadcrumbsPlus->add([
 
 <!-- vue  -->
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-<!-- Vue e componentes programacao.js -->
+<?= $this->Html->script('vue/vue-masks.js?v=2.5') ?>
+<!-- Componente de duração -->
+<?= $this->Html->script('vue/duracao-picker.js?v=2.5') ?>
 <?= $this->Html->script('vue/programacao-semanal.js') ?>
 <?= $this->Html->script('vue/programacao-personalizada.js') ?>
 <?= $this->Html->script('vue/programacao-indisponivel.js') ?>

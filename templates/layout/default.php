@@ -174,6 +174,8 @@ $primeiroNome = explode(' ', trim($nomeCompleto))[0] ?? '';
 
     <!-- solar icons -->
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+    <!-- classic iconify (for span class="iconify") -->
+    <script src="https://cdn.jsdelivr.net/npm/@iconify/iconify@3/dist/iconify.min.js"></script>
 
 
 
