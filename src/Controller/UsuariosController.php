@@ -19,7 +19,7 @@ class UsuariosController extends AppController
         parent::beforeFilter($event);
         // Configure the login action to not require authentication, preventing
         // the infinite redirect loop issue
-        $this->Authentication->addUnauthenticatedActions(['login']);
+        $this->Authentication->addUnauthenticatedActions(['login','logout']);
     }
 
 
@@ -297,12 +297,14 @@ class UsuariosController extends AppController
     public function logout()
     {
         $result = $this->Authentication->getResult();
-        // regardless of POST or GET, redirect if user is logged in
+
         if ($result && $result->isValid()) {
             $this->Authentication->logout();
-
-            return $this->redirect(['controller' => 'Usuarios', 'action' => 'login']);
         }
+
+        $this->getRequest()->getSession()->destroy();
+
+        return $this->redirect(['controller' => 'Usuarios', 'action' => 'login']);
     }
 
     public function search()

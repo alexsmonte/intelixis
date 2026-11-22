@@ -46,3 +46,10 @@ webroot/img/logo/*
 .idea/
 /vendor/*
 
+
+# Arquivos armazenados pela aplicacao
+/webroot/files/*
+!/webroot/files/.gitkeep
+
+# Plugins com versionamento independente
+/plugins/AclManager/
