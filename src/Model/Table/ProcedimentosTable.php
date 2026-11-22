@@ -84,6 +84,10 @@ class ProcedimentosTable extends Table
             'dependent' => true,
             'cascadeCallbacks' => true,
         ]);
+
+        $this->belongsTo('ClientesConvenios', [
+            'foreignKey' => 'clientes_convenio_id',
+        ]);
     }
 
     /**
@@ -137,6 +141,10 @@ class ProcedimentosTable extends Table
             ->scalar('dentes')
             ->maxLength('dentes', 255)
             ->allowEmptyString('dentes');
+
+        $validator
+            ->integer('clientes_convenio_id')
+            ->allowEmptyString('clientes_convenio_id');
 
         return $validator;
     }

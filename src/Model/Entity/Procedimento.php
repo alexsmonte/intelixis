@@ -52,11 +52,13 @@ class Procedimento extends Entity
         'parcelas' => true,
         'faces' => true,
         'dentes' => true,
+        'clientes_convenio_id' => true,
         'created' => true,
         'modified' => true,
         'consulta' => true,
         'servico' => true,
         'profissional' => true,
+        'clientes_convenio' => true,
         'anexos' => true,
         'documentos' => true,
     ];

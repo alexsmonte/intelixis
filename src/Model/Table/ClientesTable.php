@@ -56,6 +56,11 @@ class ClientesTable extends Table
         $this->hasMany('Agendamentos', [
             'foreignKey' => 'cliente_id',
         ]);
+        $this->hasMany('ClientesConvenios', [
+            'foreignKey' => 'cliente_id',
+            'dependent' => true,
+            'saveStrategy' => 'replace',
+        ]);
     }
 
     /**
@@ -78,7 +83,7 @@ class ClientesTable extends Table
                 'provider' => 'table',
                 'message' => __('Informe nome e sobrenome.'),
             ])
-            ->requirePresence('nome', 'create')
+            ->requirePresence('nome', true)
             ->notEmptyString('nome', __('O nome é obrigatório.'));
 
         $validator
@@ -94,15 +99,16 @@ class ClientesTable extends Table
         $validator
             ->scalar('sexo')
             ->maxLength('sexo', 1)
+            ->requirePresence('sexo', true)
             ->notEmptyString('sexo', __('O sexo é obrigatório.'))
             ->inList('sexo', ['M', 'F', 'I'], __('O sexo deve ser Masculino, Feminino ou Indefinido.'));
         $validator
             ->date('data_nascimento', ['dmy'], 'Informe uma data válida')
-            ->requirePresence('data_nascimento', 'create')
+            ->requirePresence('data_nascimento', true)
             ->allowEmptyDate('data_nascimento');
 
         $validator
-            ->requirePresence('documento', 'create', __('O documento é obrigatório.'))
+            ->requirePresence('documento', true, __('O documento é obrigatório.'))
             ->notEmptyString('documento', __('O documento é obrigatório.'))
             ->add('documento', 'validLength', [
                 'rule' => ['custom', '/^(\d{11}|\d{14})$/'],
@@ -182,6 +188,10 @@ class ClientesTable extends Table
             ->scalar('parentesco_responsavel')
             ->maxLength('parentesco_responsavel', 20)
             ->allowEmptyString('parentesco_responsavel');
+
+        $validator
+            ->boolean('foto')
+            ->allowEmptyString('foto');
 
         return $validator;
     }

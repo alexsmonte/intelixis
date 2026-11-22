@@ -170,11 +170,17 @@
 
     if (typeof module !== 'undefined') module.exports = window.VueMasks;
 
-    // Inicialização automática para inputs com v-mask fora de um app Vue (CakePHP SSR)
-    document.addEventListener('DOMContentLoaded', () => {
+    // Inicialização automática robusta para inputs com v-mask fora de um app Vue (CakePHP SSR)
+    function autoInit() {
         document.querySelectorAll('input[v-mask]').forEach(input => {
             const maskType = input.getAttribute('v-mask').replace(/['"]/g, '');
             if (maskType) inicializarMascara(input, maskType);
         });
-    });
-})();
+    }
+
+    if (document.readyState !== 'loading') {
+        autoInit();
+    } else {
+        document.addEventListener('DOMContentLoaded', autoInit);
+    }
+});

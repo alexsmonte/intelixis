@@ -9,21 +9,42 @@ $retornoAtendimento = $this->request->getSession()
 ?>
 <meta name="csrfToken" content="<?= $this->request->getAttribute('csrfToken') ?>">
 
+<?php
+$conveniosOpcoes = [];
+if (!empty($convenios)) {
+    foreach ($convenios as $id => $nome) {
+        $conveniosOpcoes[] = ['id' => $id, 'text' => $nome];
+    }
+}
+$conveniosStr = json_encode($conveniosOpcoes);
+?>
 <div data-vue="generic-modal" data-title="Cadastrar Cliente"
     data-submit-url="<?= $this->Url->build(['controller' => 'Clientes', 'action' => 'novo'], ['fullBase' => true]) ?>"
     data-trigger-btn="#btnAbrirCadastroCliente" data-modal-size="modal-xl" data-fields='[
+        {"name":"toggle_nome_social", "label":"Incluir Nome Social", "type":"switch", "col": 12},
         {"name":"nome","label":"Nome Completo","type":"text","id":"nome","col":6,"placeholder":"Digite o nome","mask":"nome"},
+        {"name":"nome_social","label":"Nome Social","type":"text","id":"nome_social","col":6,"dependsOn":"toggle_nome_social"},
         {"name":"data_nascimento","label":"Nascimento","type":"date","id":"data_nascimento","col":3},
+        {"name":"sexo","label":"Sexo","type":"select","id":"sexo","col":3,"options":{"M":"Masculino","F":"Feminino","I":"Indefinido"},"empty":"Selecione"},
         {"name":"documento","label":"CPF","type":"text","id":"documento","col":3,"mask":"cpf"},
-        {"name":"email","label":"Email","type":"email","id":"email","col":6},
-        {"name":"telefone","label":"Telefone","type":"text","id":"telefone","col":3,"mask":"telefone"},
-        {"name":"celular","label":"Celular","type":"text","id":"celular","col":3,"mask":"celular"},
-        {"name":"cep","label":"CEP","vueComponent":"cep-autocomplete","id":"cep","col":3},
+        {"name":"email","label":"Email","type":"email","id":"email","col":3},
+        {"name":"telefone","label":"Telefone","type":"text","id":"telefone","col":4,"mask":"telefone"},
+        {"name":"celular","label":"Celular","type":"text","id":"celular","col":4,"mask":"celular"},
+        {"name":"cep","label":"CEP","vueComponent":"cep-autocomplete","id":"cep","col":4},
         {"name":"logradouro","label":"Logradouro","type":"text","id":"logradouro","col":7,"autocompleteField":true},
         {"name":"numero","label":"Número","type":"text","id":"numero", "col":2},
-         {"name":"bairro","label":"Bairro","type":"text","id":"bairro","col":5,"autocompleteField":true},
+        {"name":"complemento","label":"Complemento","type":"text","id":"complemento","col":3},
+        {"name":"bairro","label":"Bairro","type":"text","id":"bairro","col":5,"autocompleteField":true},
         {"name":"cidade","label":"Cidade","type":"text","id":"cidade","col":5,"autocompleteField":true},
-        {"name":"uf","label":"UF","type":"text","id":"uf","col":2,"autocompleteField":true}
+        {"name":"uf","label":"UF","type":"text","id":"uf","col":2,"autocompleteField":true},
+        {"name":"toggle_responsavel", "label":"Cadastrar Responsável Legal", "type":"switch", "col": 12},
+        {"type":"html", "content":"<div class=\"col-md-12 mt-2 mb-2\"><h6 class=\"border-bottom pb-2\">Responsável Legal:</h6></div>", "dependsOn":"toggle_responsavel"},
+        {"name":"nome_responsavel","label":"Nome do Responsável","type":"text","id":"nome_responsavel","col":4, "dependsOn":"toggle_responsavel"},
+        {"name":"documento_responsavel","label":"CPF","type":"text","id":"documento_responsavel","col":3,"mask":"cpf", "dependsOn":"toggle_responsavel"},
+        {"name":"telefone_responsavel","label":"Telefone/Celular","type":"text","id":"telefone_responsavel","col":3,"mask":"celular", "dependsOn":"toggle_responsavel"},
+        {"name":"parentesco_responsavel","label":"Parentesco","type":"text","id":"parentesco_responsavel","col":2, "dependsOn":"toggle_responsavel"},
+        {"type":"html", "content":"<div class=\"col-md-12 mt-4 mb-2\"><h6 class=\"border-bottom pb-2\">Convênios / Planos de Saúde:</h6></div>"},
+        {"name":"convenios", "vueComponent":"convenios-cliente", "col": 12, "dataAttributes": { "data-convenios-opcoes": <?= json_encode($conveniosStr) ?> } }
      ]'>
 </div>
 
@@ -280,10 +301,11 @@ $retornoAtendimento = $this->request->getSession()
 
 
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-<?= $this->Html->script('vue/generic-modal.js') ?>
+<?= $this->Html->script('vue/generic-modal.js?v=' . filemtime(WWW_ROOT . 'js/vue/generic-modal.js')) ?>
 <?= $this->Html->script('vue/vue-masks.js') ?>
 <?= $this->Html->script('vue/form-cadastrar.js') ?>
 <?= $this->Html->script('vue/cep-autocomplete.js?v=' . filemtime(WWW_ROOT . 'js/vue/cep-autocomplete.js')) ?>
+<?= $this->Html->script('vue/convenios-cliente.js?v=' . filemtime(WWW_ROOT . 'js/vue/convenios-cliente.js')) ?>
 
 <?= $this->Html->script([
     'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js',
@@ -668,15 +690,52 @@ $retornoAtendimento = $this->request->getSession()
             locale: 'pt-br',
             timeZone: 'local',
             displayEventTime: true,
-            slotLabelFormat: [
-                { hour: 'numeric', minute: '2-digit', meridiem: false, hour12: false },
-                { weekday: 'long' }
-            ],
+            slotLabelFormat: { hour: 'numeric', minute: '2-digit', meridiem: false, hour12: false },
             slotDuration: '<?= gmdate("H:i:s", $segundos); ?>',
             snapDuration: '<?= gmdate("H:i:s", $segundos); ?>',
             slotLabelInterval: '<?= gmdate("H:i:s", $segundos); ?>',
-            slotMinTime: '<?= isset($estabelecimento->periodos[0]->data_hora_inicio) ? $estabelecimento->periodos[0]->data_hora_inicio->format("H:i:s") : '07:00:00'; ?>',
-            slotMaxTime: '<?= isset($estabelecimento->periodos[1]->data_hora_fim) ? $estabelecimento->periodos[1]->data_hora_fim->format("H:i:s") : '18:00:00'; ?>',
+            <?php
+            $slotMin = '23:59:59';
+            $slotMax = '00:00:00';
+            
+            if (!empty($estabelecimento->periodos)) {
+                foreach ($estabelecimento->periodos as $periodo) {
+                    if ($periodo->data_hora_inicio) {
+                        $inicio = $periodo->data_hora_inicio->format("H:i:s");
+                        if ($inicio < $slotMin) {
+                            $slotMin = $inicio;
+                        }
+                    }
+                    if ($periodo->data_hora_fim) {
+                        $fim = $periodo->data_hora_fim->format("H:i:s");
+                        if ($fim > $slotMax) {
+                            $slotMax = $fim;
+                        }
+                    }
+                }
+                
+                // Se por algum erro de cadastro max <= min, usamos valores padrão
+                if ($slotMax <= $slotMin) {
+                    $slotMin = '07:00:00';
+                    $slotMax = '18:00:00';
+                }
+            } else {
+                $slotMin = '07:00:00';
+                $slotMax = '18:00:00';
+            }
+            
+            // MARGEM DE SEGURANÇA: 
+            // Para não cortar eventos de profissionais que chegam mais cedo ou saem mais tarde
+            // que o horário padrão do estabelecimento, forçamos um limite mais amplo.
+            if ($slotMin > '06:00:00') {
+                $slotMin = '06:00:00';
+            }
+            if ($slotMax < '22:00:00') {
+                $slotMax = '22:00:00';
+            }
+            ?>
+            slotMinTime: '<?= $slotMin; ?>',
+            slotMaxTime: '<?= $slotMax; ?>',
             //slotMinTime:'07:00',
             //slotMaxTime:'18:00',
             height: checkWidowWidth() ? 900 : 1052,

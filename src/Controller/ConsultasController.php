@@ -148,19 +148,31 @@ class ConsultasController extends AppController
         }
 
 
-        $servicosTable      = $this->fetchTable('Servicos');
-        $profissionaisTable = $this->fetchTable('Profissionais');
-        $receituariosTable  = $this->fetchTable('Receituarios');
+        $servicosTable          = $this->fetchTable('Servicos');
+        $profissionaisTable     = $this->fetchTable('Profissionais');
+        $receituariosTable      = $this->fetchTable('Receituarios');
+        $clientesConveniosTable = $this->fetchTable('ClientesConvenios');
 
         $servicos       =   $servicosTable->find('list')->find('ativar')->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])->all();
         $clientes       = $this->Consultas->Clientes->find('list')->where(['Clientes.id' => $consulta->cliente_id])->all();
         $profissionais  = $profissionaisTable->find('list')->where(['estabelecimento_id' => $this->getRequest()->getSession()->read('Auth.Estabelecimento.id')])->all();
 
+        $clienteConveniosData = $clientesConveniosTable->find()
+            ->where(['cliente_id' => $consulta->cliente_id, 'status' => 'ATIVO'])
+            ->contain(['Convenios'])
+            ->all();
+
+        $clienteConvenios = array_map(fn($c) => [
+            'id'    => $c->id,
+            'label' => $c->convenio->nome
+                . ' — Carteirinha: ' . $c->numero_carteirinha
+                . ($c->plano ? ' | Plano: ' . $c->plano : ''),
+        ], $clienteConveniosData->toArray());
 
         $receituarioMedico = $receituariosTable->getAgrupadosPorCategoria($this->getRequest()->getSession()->read('Auth.Estabelecimento.id'));
 
         $title  =   'Minha consulta';
-        $this->set(compact('consulta', 'clientes', 'profissionais','title', 'servicos', 'receituarioMedico'));
+        $this->set(compact('consulta', 'clientes', 'profissionais', 'title', 'servicos', 'receituarioMedico', 'clienteConvenios'));
     }
 
 

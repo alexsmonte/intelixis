@@ -61,5 +61,12 @@ class Cliente extends Entity
         'modified' => true,
         'estabelecimento' => true,
         'agendamentos' => true,
+        'clientes_convenios' => true,
+        'foto' => true,
     ];
+
+    protected function _getFoto(): bool
+    {
+        return !empty($this->_fields['foto']);
+    }
 }

@@ -90,6 +90,22 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                                 </div>
                             </div>
 
+                            <div class="col-lg-12 mb-3" v-if="clienteConvenios.length > 0">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="input mb-3 select">
+                                            <label>Convênio</label>
+                                            <select class="form-select" v-model="item.clientes_convenio_id" :disabled="item.aprovar">
+                                                <option :value="null">Particular (sem convênio)</option>
+                                                <option v-for="conv in clienteConvenios" :value="conv.id" :key="conv.id">
+                                                    {{ conv.label }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="row mb-5" v-show="item.id && item.aprovar == 1 && item.aberto == 1"
                                 style="height: 350px;">
                                 <div class="col-lg-12">
@@ -2233,6 +2249,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                 filaImpressao: [],
                 itens: <?= json_encode($consulta->procedimentos); ?>,
                 servicosRaw: <?= json_encode($servicos); ?>,
+                clienteConvenios: <?= json_encode($clienteConvenios); ?>,
                 modelo: {
                     id: null,
                     tipo: null,
@@ -3679,6 +3696,7 @@ $this->BreadcrumbsPlus->add([['title' => 'Consultas', 'url' => ['controller' => 
                     consulta_id: <?= $consulta->id; ?>,
                     servico_id: null,
                     profissional_id: null,
+                    clientes_convenio_id: null,
                     quantidade: 1,
                     valor_unitario: '',
                     desconto: '0.00',

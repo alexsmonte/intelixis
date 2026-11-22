@@ -22,24 +22,10 @@
 
             const submitForm = async () => {
                 try {
-                    const data = new FormData();
-
-                    // 1️⃣ Atualiza o form reativo com os inputs do DOM (CEP autocomplete etc.)
-                    const modalEl = document.getElementById("genericModal");
-                    if (modalEl) {
-                        const inputs = modalEl.querySelectorAll("input, select, textarea");
-                        inputs.forEach(input => {
-                            // Se o input tem id e está no form reativo, atualiza
-                            if (input.id && form.hasOwnProperty(input.id)) {
-                                form[input.id] = input.value;
-                            }
-                        });
-                    }
-
-                    // 2️⃣ Adiciona todos os campos do form reativo no FormData
-                    for (let key in form) {
-                        data.append(key, form[key]);
-                    }
+                    const formEl = document.getElementById("genericModalForm");
+                    if (!formEl) return;
+                    
+                    const data = new FormData(formEl);
 
                     // 3️⃣ Envia o formulário
                     const resp = await fetch(props.submitUrl, {
@@ -57,7 +43,12 @@
                         Swal.fire({ icon: "success", title: "Sucesso", text: result.message });
                         fecharModal();
                     } else {
-                        Swal.fire({ icon: "error", title: "Erro", text: result.message });
+                        // Se houver erros de validação, exibe de forma amigável
+                        let msg = result.message || "Erro de validação.";
+                        if (result.errors) {
+                            msg = Object.values(result.errors).map(e => Object.values(e).join(", ")).join("<br>");
+                        }
+                        Swal.fire({ icon: "error", title: "Erro", html: msg });
                     }
 
                 } catch (e) {
@@ -82,6 +73,7 @@
         <div>
             <div class="modal fade" id="genericModal" tabindex="-1">
                 <div class="modal-dialog" :class="modalSize">
+                    <form id="genericModalForm" @submit.prevent="submitForm">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">{{ title }}</h5>
@@ -90,15 +82,37 @@
                         <div class="modal-body">
                             <div class="row">
                                 <template v-for="f in fields" :key="f.name">
-                                    <!-- Se for cep-autocomplete apenas renderiza o div -->
-                                    <div v-if="f.vueComponent" :class="'col-md-'+(f.col||3)" :data-vue="f.vueComponent"></div>
+                                   <template v-if="!f.dependsOn || form[f.dependsOn]">
+                                    <!-- Campos full width ou dividers (type == 'html') -->
+                                    <div v-if="f.type === 'html'" :class="'col-md-'+(f.col||12)" v-html="f.content"></div>
+                                    
+                                    <!-- Switch -->
+                                    <div v-else-if="f.type === 'switch'" :class="'col-md-'+(f.col||12)+' mb-3 mt-2'">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" :id="f.id || f.name" v-model="form[f.name]">
+                                            <label class="form-check-label fw-bold text-muted" :for="f.id || f.name">{{ f.label }}</label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Componente Vue customizado -->
+                                    <div v-else-if="f.vueComponent" :class="'col-md-'+(f.col||3)" :data-vue="f.vueComponent" v-bind="f.dataAttributes || {}"></div>
 
                                     <!-- Campos normais -->
                                     <div v-else :class="'col-md-'+(f.col||3)+' mb-3'">
-                                        <label v-if="f.label" :for="f.id" class="form-label">{{ f.label }}</label>
+                                        <label v-if="f.label" :for="f.id || f.name" class="form-label">{{ f.label }}</label>
 
-                                        <!-- Se for autocompleteField: sem v-model -->
-                                        <input v-if="f.autocompleteField"
+                                        <!-- Select -->
+                                        <select v-if="f.type === 'select'"
+                                            class="form-select"
+                                            v-model="form[f.name]"
+                                            :id="f.id || f.name"
+                                            :name="f.name">
+                                            <option v-if="f.empty" value="">{{ f.empty }}</option>
+                                            <option v-for="(text, val) in f.options" :key="val" :value="val">{{ text }}</option>
+                                        </select>
+                                        
+                                        <!-- Se for autocompleteField: sem v-model, apenas name e id -->
+                                        <input v-else-if="f.autocompleteField"
                                             :type="f.type || 'text'"
                                             class="form-control"
                                             :id="f.id || f.name"
@@ -106,7 +120,7 @@
                                             :placeholder="f.placeholder || ''"
                                             v-mask="f.mask" />
 
-                                        <!-- Se não for autocompleteField: usa v-model -->
+                                        <!-- Se não for autocompleteField nem select: usa v-model -->
                                         <input v-else
                                             :type="f.type || 'text'"
                                             class="form-control"
@@ -115,17 +129,17 @@
                                             :name="f.name"
                                             :placeholder="f.placeholder || ''"
                                             v-mask="f.mask" />
-                                 </div>
+                                  </div>
+                                 </template>
                                 </template>
-
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" @click="submitForm">Salvar</button>
+                            <button type="submit" class="btn btn-primary">Salvar</button>
                             <button type="button" class="btn bg-danger-subtle text-danger" @click="fecharModal">Cancelar</button>
-                            
                         </div>
                     </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -151,6 +165,10 @@
                 }
 
                 const vm = app.mount(el);
+                
+                if (window.initConveniosCliente) {
+                    window.initConveniosCliente();
+                }
 
                 // botão que abre o modal
                 const btn = document.querySelector(el.dataset.triggerBtn);
